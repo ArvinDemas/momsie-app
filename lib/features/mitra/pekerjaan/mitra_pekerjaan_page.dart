@@ -117,14 +117,14 @@ class MitraPekerjaanPage extends StatelessWidget {
                   Text(
                     "Panggilan Video",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     "Al Ikhsan Akbar Fatahillah",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.black,
                     ),
                   ),
@@ -132,18 +132,82 @@ class MitraPekerjaanPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
           const Divider(
             color: Colors.black,
             height: 20,
             thickness: 0.5,
           ),
-          const SizedBox(height: 10),
           const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(),
-              Column(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.date_range),
+                      SizedBox(width: 15),
+                      Text(
+                        "21 Maret 2024",
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(Icons.wallet),
+                      SizedBox(width: 15),
+                      Text("Rp. 50.000")
+                    ],
+                  )
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.access_time),
+                      SizedBox(width: 15),
+                      Text("02.00 PM")
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(Icons.timelapse),
+                      SizedBox(width: 15),
+                      Text("1 Jam")
+                    ],
+                  ),
+                ],
+              ),
             ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: ColorDouce.douceBase,
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Klaim",
+                  style: TextStyle(
+                    color: ColorDouce.douceBase,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           )
         ],
       ),
