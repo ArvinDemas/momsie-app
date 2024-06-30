@@ -16,32 +16,30 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    {
-      return TextField(
-        controller: controller,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          suffixIcon: iconImage,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 10,
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          label: Text(
-            hintText,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-            ),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(26),
-            borderSide: const BorderSide(
-              color: Colors.black87,
-            ),
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        suffixIcon: iconImage,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 5,
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        label: Text(
+          hintText,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 16,
           ),
         ),
-      );
-    }
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(26),
+          borderSide: const BorderSide(
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
   }
 }

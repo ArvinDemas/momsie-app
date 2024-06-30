@@ -9,4 +9,7 @@ class AppRoutes {
   static const String createPassword = '/create-password';
   static const String mitra = '/mitra';
   static const String user = '/user';
+  static const String mitraDataDiri = '/mitra-data-diri';
+  static const String mitraRiwayat = '/mitra-riwayat';
+  static const String mitraPendapatan = '/mitra-pendapatan';
 }

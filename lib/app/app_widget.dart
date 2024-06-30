@@ -3,6 +3,9 @@ import 'package:douce/features/forgot/forgot_page.dart';
 import 'package:douce/features/forgot/password_page.dart';
 import 'package:douce/features/forgot/verification_page.dart';
 import 'package:douce/features/login/login_page.dart';
+import 'package:douce/features/mitra/akun/mitra_datadiri_page.dart';
+import 'package:douce/features/mitra/akun/mitra_pendapatan_page.dart';
+import 'package:douce/features/mitra/akun/mitra_riwayat_page.dart';
 import 'package:douce/features/mitra/main_mitra.dart';
 import 'package:douce/features/register/register_page.dart';
 import 'package:douce/features/register/success_register_page.dart';
@@ -51,6 +54,18 @@ class AppWidget extends StatelessWidget {
           name: AppRoutes.mitra,
           page: () => const MainMitraPage(),
         ),
+        GetPage(
+          name: AppRoutes.mitraDataDiri,
+          page: () => const MitraDataDiriPage(),
+        ),
+        GetPage(
+          name: AppRoutes.mitraPendapatan,
+          page: () => const MitraPendapatanPage(),
+        ),
+        GetPage(
+          name: AppRoutes.mitraRiwayat,
+          page: () => const MitraRiwayatPage(),
+        )
       ],
       initialRoute: AppRoutes.mitra,
     );
