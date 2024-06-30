@@ -10,6 +10,9 @@ import 'package:douce/features/mitra/main_mitra.dart';
 import 'package:douce/features/register/register_page.dart';
 import 'package:douce/features/register/success_register_page.dart';
 import 'package:douce/features/splash/splash_screen.dart';
+import 'package:douce/features/user/beranda/detail_toko_page.dart.dart';
+import 'package:douce/features/user/main_user.dart';
+import 'package:douce/features/user/obat/detail_obat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -65,9 +68,21 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.mitraRiwayat,
           page: () => const MitraRiwayatPage(),
+        ),
+        GetPage(
+          name: AppRoutes.user,
+          page: () => const MainUserPage(),
+        ),
+        GetPage(
+          name: AppRoutes.detailObat,
+          page: () => const DetailObatPage(),
+        ),
+        GetPage(
+          name: AppRoutes.detailToko,
+          page: () => const DetailTokoPage(),
         )
       ],
-      initialRoute: AppRoutes.mitra,
+      initialRoute: AppRoutes.user,
     );
   }
 }

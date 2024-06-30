@@ -80,7 +80,7 @@ class TopBar extends StatelessWidget {
                 width: MediaQuery.of(context).size.width - 50,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 15,
-                  vertical: 10,
+                  vertical: 5,
                 ),
                 child: TextFormField(
                   decoration: InputDecoration(

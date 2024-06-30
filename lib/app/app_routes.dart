@@ -12,4 +12,6 @@ class AppRoutes {
   static const String mitraDataDiri = '/mitra-data-diri';
   static const String mitraRiwayat = '/mitra-riwayat';
   static const String mitraPendapatan = '/mitra-pendapatan';
+  static const String detailToko = '/detail-toko';
+  static const String detailObat = '/detail-obat';
 }

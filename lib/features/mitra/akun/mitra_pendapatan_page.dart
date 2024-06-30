@@ -1,6 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class MitraPendapatanPage extends StatelessWidget {
