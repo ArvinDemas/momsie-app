@@ -14,4 +14,16 @@ class AppRoutes {
   static const String mitraPendapatan = '/mitra-pendapatan';
   static const String detailToko = '/detail-toko';
   static const String detailObat = '/detail-obat';
+  static const String userDataDiri = '/user-data-diri';
+  static const String userProgress = '/user-progress';
+  static const String userProgram = '/user-program';
+  static const String userRiwayat = '/user-riwayat';
+  static const String userHubungi = '/user-hubungi';
+  static const String userSettings = '/user-settings';
+  static const String userKebijakanPrivasi = '/user-kebijakan-privasi';
+  static const String userSettingAkun = '/user-setting-akun';
+  static const String userSettingBahasa = '/user-setting-bahasa';
+  static const String userSettingNotifikasi = '/user-setting-notifikasi';
+  static const String userTentangDoula = '/user-tentang-doula';
+  static const String userBantuan = '/user-bantuan';
 }

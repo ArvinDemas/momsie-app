@@ -1,8 +1,6 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/topbar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class UserBerandaPage extends StatelessWidget {

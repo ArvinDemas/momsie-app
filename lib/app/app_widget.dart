@@ -10,6 +10,18 @@ import 'package:douce/features/mitra/main_mitra.dart';
 import 'package:douce/features/register/register_page.dart';
 import 'package:douce/features/register/success_register_page.dart';
 import 'package:douce/features/splash/splash_screen.dart';
+import 'package:douce/features/user/akun/settings/user_bantuan_page.dart';
+import 'package:douce/features/user/akun/settings/user_kebijakanprivasi_page.dart';
+import 'package:douce/features/user/akun/settings/user_settingakun_page.dart';
+import 'package:douce/features/user/akun/settings/user_settingbahasa_page.dart';
+import 'package:douce/features/user/akun/settings/user_settingnotifikasi_page.dart';
+import 'package:douce/features/user/akun/settings/user_tentangdoula_page.dart';
+import 'package:douce/features/user/akun/user_datadiri_page.dart';
+import 'package:douce/features/user/akun/user_hubungi_page.dart';
+import 'package:douce/features/user/akun/progress/user_program_page.dart';
+import 'package:douce/features/user/akun/progress/user_progress_page.dart';
+import 'package:douce/features/user/akun/progress/user_riwayat_page.dart';
+import 'package:douce/features/user/akun/settings/user_settings_page.dart';
 import 'package:douce/features/user/beranda/detail_toko_page.dart.dart';
 import 'package:douce/features/user/main_user.dart';
 import 'package:douce/features/user/obat/detail_obat_page.dart';
@@ -80,9 +92,57 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.detailToko,
           page: () => const DetailTokoPage(),
-        )
+        ),
+        GetPage(
+          name: AppRoutes.userDataDiri,
+          page: () => const UserDataDiriPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userProgress,
+          page: () => const UserProgressPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userProgram,
+          page: () => const UserProgramPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userRiwayat,
+          page: () => const UserRiwayatPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userHubungi,
+          page: () => const UserHubungiPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userSettings,
+          page: () => const UserSettingsPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userKebijakanPrivasi,
+          page: () => const UserKebijakanPrivasiPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userSettingAkun,
+          page: () => const UserSettingAkunPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userSettingBahasa,
+          page: () => const UserSettingBahasaPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userTentangDoula,
+          page: () => const UserTentangDoulaPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userSettingNotifikasi,
+          page: () => const UserSettingNotifikasiPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userBantuan,
+          page: () => const UserBantuanPage(),
+        ),
       ],
-      initialRoute: AppRoutes.user,
+      initialRoute: AppRoutes.login,
     );
   }
 }

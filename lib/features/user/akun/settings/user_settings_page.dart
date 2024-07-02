@@ -1,0 +1,82 @@
+import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/widget/menu_container.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class UserSettingsPage extends StatelessWidget {
+  const UserSettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ColorDouce.grayBackground,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 30,
+            vertical: 30,
+          ),
+          child: ListView(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: Get.back,
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: ColorDouce.douceBase,
+                    ),
+                  ),
+                  const Text(
+                    "Pengaturan",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.heart_broken_rounded,
+                    color: Colors.transparent,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              MenuContainer(
+                title: "Akun",
+                icon: Icons.person,
+                onTap: () => Get.toNamed('/user-setting-akun'),
+              ),
+              MenuContainer(
+                title: "Notifikasi",
+                icon: Icons.notifications,
+                onTap: () => Get.toNamed('/user-setting-notifikasi'),
+              ),
+              MenuContainer(
+                title: "Bahasa",
+                icon: Icons.language,
+                onTap: () => Get.toNamed('/user-setting-bahasa'),
+              ),
+              MenuContainer(
+                title: "Bantuan",
+                icon: Icons.help,
+                onTap: () => Get.toNamed('/user-bantuan'),
+              ),
+              MenuContainer(
+                title: "Tentang Doula",
+                icon: Icons.info,
+                onTap: () => Get.toNamed('/user-tentang-doula'),
+              ),
+              MenuContainer(
+                title: "Kebijakan Privasi",
+                icon: Icons.privacy_tip,
+                onTap: () => Get.toNamed('/user-kebijakan-privasi'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

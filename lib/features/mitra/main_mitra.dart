@@ -32,7 +32,7 @@ class MainMitraPage extends StatelessWidget {
 }
 
 class MainMitraController extends GetxController {
-  RxInt selectedIndex = 0.obs;
+  RxInt selectedIndex = 3.obs;
 
   void onItemTapped(int index) {
     selectedIndex.value = index;
