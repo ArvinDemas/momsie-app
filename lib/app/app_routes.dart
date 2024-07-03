@@ -26,4 +26,10 @@ class AppRoutes {
   static const String userSettingNotifikasi = '/user-setting-notifikasi';
   static const String userTentangDoula = '/user-tentang-doula';
   static const String userBantuan = '/user-bantuan';
+  static const String userArtikel = '/user-artikel';
+  static const String userDetailProgram = '/user-detail-program';
+  static const String userProgramBulan = '/user-program-bulan';
+  static const String userProgramMinggu = '/user-program-minggu';
+  static const String userDetailGerakan = '/user-detail-gerakan';
+  static const String userNotification = '/user-notification';
 }

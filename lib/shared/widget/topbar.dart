@@ -1,5 +1,6 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class TopBar extends StatelessWidget {
   const TopBar({super.key});
@@ -18,15 +19,15 @@ class TopBar extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          const Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25),
+                padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    const Row(
                       children: [
                         Text(
                           'Halo, ',
@@ -50,13 +51,16 @@ class TopBar extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: 30,
+                        InkWell(
+                          onTap: () => Get.toNamed('/user-notification'),
+                          child: const Icon(
+                            Icons.notifications,
+                            color: Colors.white,
+                            size: 30,
+                          ),
                         ),
-                        SizedBox(width: 10),
-                        Icon(
+                        const SizedBox(width: 10),
+                        const Icon(
                           Icons.person,
                           color: Colors.white,
                           size: 30,

@@ -5,8 +5,11 @@ class CustomAlertDialog extends StatelessWidget {
   final bool isSuccess;
   final String descText;
 
-  const CustomAlertDialog(
-      {super.key, required this.isSuccess, required this.descText});
+  const CustomAlertDialog({
+    super.key,
+    required this.isSuccess,
+    required this.descText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +47,7 @@ class CustomAlertDialog extends StatelessWidget {
                 fontFamily: 'OpenSans',
                 fontWeight: FontWeight.w400,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             Container(
