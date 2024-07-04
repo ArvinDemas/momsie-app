@@ -2,8 +2,8 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+class ApotikTopBar extends StatelessWidget {
+  const ApotikTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,45 +27,46 @@ class TopBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Halo, ',
+                          'Apotik Terdekat',
                           style: TextStyle(
                             fontWeight: FontWeight.w300,
-                            fontSize: 20,
+                            fontSize: 14,
                             fontFamily: 'Open-Sans',
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          'Miranda',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                            fontFamily: 'Open-Sans',
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              'Sekar Indo',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                fontFamily: 'Open-Sans',
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        InkWell(
-                          onTap: () => Get.toNamed('/user-notification'),
-                          child: const Icon(
-                            Icons.notifications,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                      ],
+                    InkWell(
+                      onTap: () => Get.toNamed('/user-notification'),
+                      child: const Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                        size: 30,
+                      ),
                     ),
                   ],
                 ),

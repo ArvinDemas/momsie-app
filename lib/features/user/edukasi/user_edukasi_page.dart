@@ -1,6 +1,6 @@
 import 'package:douce/features/user/edukasi/user_edukasi_controller.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/topbar.dart';
+import 'package:douce/shared/widget/apotek_topbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,7 +15,7 @@ class UserEdukasiPage extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(0),
       children: [
-        const TopBar(),
+        const ApotikTopBar(),
         const SizedBox(height: 30),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),

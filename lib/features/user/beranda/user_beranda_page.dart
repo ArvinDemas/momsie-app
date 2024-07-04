@@ -1,4 +1,6 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/widget/doula_container.dart';
+import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:douce/shared/widget/topbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,16 +43,16 @@ class UserBerandaPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 40),
-              SingleChildScrollView(
+              const SingleChildScrollView(
                 clipBehavior: Clip.none,
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    topDoulaContainer(),
-                    const SizedBox(width: 15),
-                    topDoulaContainer(),
-                    const SizedBox(width: 15),
-                    topDoulaContainer(),
+                    DoulaContainer(),
+                    SizedBox(width: 15),
+                    DoulaContainer(),
+                    SizedBox(width: 15),
+                    DoulaContainer(),
                   ],
                 ),
               ),
@@ -76,11 +78,11 @@ class UserBerandaPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Column(
+              const Column(
                 children: [
-                  rumahSakitContainer(),
-                  const SizedBox(height: 10),
-                  rumahSakitContainer(),
+                  RumahSakitContainer(),
+                  SizedBox(height: 10),
+                  RumahSakitContainer(),
                 ],
               ),
               const SizedBox(height: 30),
@@ -146,161 +148,6 @@ class UserBerandaPage extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-
-  Widget topDoulaContainer() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-      ),
-      width: 175,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Center(
-                child: Transform.translate(
-                  offset: const Offset(0, -30),
-                  child: Image.asset(
-                    "assets/images/topdoula.png",
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-              ),
-              Center(
-                child: Transform.translate(
-                  offset: const Offset(0, 125),
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: ColorDouce.douceBase,
-                      borderRadius: BorderRadius.circular(9999),
-                    ),
-                    child: const Icon(Icons.arrow_forward, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Transform.translate(
-            offset: const Offset(0, -20),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Dr. Zahra",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 20,
-                      color: Colors.orange,
-                    ),
-                    Text(
-                      "4.9",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          Transform.translate(
-            offset: const Offset(0, -20),
-            child: Text(
-              "Ahli Gizi",
-              style: TextStyle(
-                color: ColorDouce.douceBase,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget rumahSakitContainer() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Image.asset(
-              'assets/images/rs.png',
-              height: 80,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "RSUP Dr. Sardjito",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.star,
-                    size: 20,
-                    color: Colors.orange,
-                  ),
-                  Text(
-                    "4.9",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    " | 400m",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          const Text(
-            "Jl. Kesehatan No. 1, Sekip, Yogyakarta",
-            style: TextStyle(
-              fontSize: 14,
-              letterSpacing: 0,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey,
-            ),
-          )
-        ],
-      ),
     );
   }
 

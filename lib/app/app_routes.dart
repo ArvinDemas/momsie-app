@@ -32,4 +32,9 @@ class AppRoutes {
   static const String userProgramMinggu = '/user-program-minggu';
   static const String userDetailGerakan = '/user-detail-gerakan';
   static const String userNotification = '/user-notification';
+  static const String detailRumahSakit = '/detail-rumah-sakit';
+  static const String detailDoula = '/detail-doula';
+  static const String bookingDoula = '/booking-doula';
+  static const String confirmBooking = '/confirm-booking';
+  static const String paymentMethod = '/payment-method';
 }

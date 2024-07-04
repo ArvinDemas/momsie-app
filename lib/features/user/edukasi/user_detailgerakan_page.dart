@@ -176,6 +176,7 @@ class UserDetailGerakanPage extends StatelessWidget {
         return const CustomAlertDialog(
           isSuccess: true,
           descText: "Silahkan Kembali Besok Untuk Program Yoga Selanjutnya",
+          destination: '/user-detail-program',
         );
       },
     );

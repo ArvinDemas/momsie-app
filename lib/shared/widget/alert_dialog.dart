@@ -1,14 +1,17 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   final bool isSuccess;
   final String descText;
+  final String destination;
 
   const CustomAlertDialog({
     super.key,
     required this.isSuccess,
     required this.descText,
+    required this.destination,
   });
 
   @override
@@ -50,22 +53,25 @@ class CustomAlertDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 60,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                color: ColorDouce.douceBase,
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: const Text(
-                "OK",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontFamily: 'OpenSans',
-                  fontWeight: FontWeight.w300,
+            InkWell(
+              onTap: () => Get.toNamed(destination),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 60,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: ColorDouce.douceBase,
+                  borderRadius: BorderRadius.circular(26),
+                ),
+                child: const Text(
+                  "OK",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'OpenSans',
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
               ),
             )

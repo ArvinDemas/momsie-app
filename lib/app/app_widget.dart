@@ -22,13 +22,18 @@ import 'package:douce/features/user/akun/progress/user_program_page.dart';
 import 'package:douce/features/user/akun/progress/user_progress_page.dart';
 import 'package:douce/features/user/akun/progress/user_riwayat_page.dart';
 import 'package:douce/features/user/akun/settings/user_settings_page.dart';
-import 'package:douce/features/user/beranda/detail_toko_page.dart.dart';
+import 'package:douce/features/user/beranda/detail_toko_page.dart';
 import 'package:douce/features/user/beranda/uesr_notifikasi.dart';
 import 'package:douce/features/user/edukasi/user_artikel_page.dart';
 import 'package:douce/features/user/edukasi/user_detailgerakan_page.dart';
 import 'package:douce/features/user/edukasi/user_detailprogram_page.dart';
 import 'package:douce/features/user/edukasi/user_programbulan_page.dart';
 import 'package:douce/features/user/edukasi/user_programminggu_page.dart';
+import 'package:douce/features/user/kesehatan/booking_doula_page.dart';
+import 'package:douce/features/user/kesehatan/confirm_booking_page.dart';
+import 'package:douce/features/user/kesehatan/detail_doula_page.dart';
+import 'package:douce/features/user/kesehatan/detail_rumahsakit_page.dart';
+import 'package:douce/features/user/kesehatan/payment_method_page.dart';
 import 'package:douce/features/user/main_user.dart';
 import 'package:douce/features/user/obat/detail_obat_page.dart';
 import 'package:flutter/material.dart';
@@ -170,9 +175,29 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.userNotification,
           page: () => const UserNotifikasiPage(),
+        ),
+        GetPage(
+          name: AppRoutes.detailRumahSakit,
+          page: () => const DetailRumahSakitPage(),
+        ),
+        GetPage(
+          name: AppRoutes.detailDoula,
+          page: () => const DetailDoulaPage(),
+        ),
+        GetPage(
+          name: AppRoutes.bookingDoula,
+          page: () => const BookingDoulaPage(),
+        ),
+        GetPage(
+          name: AppRoutes.confirmBooking,
+          page: () => const ConfirmBookingPage(),
+        ),
+        GetPage(
+          name: AppRoutes.paymentMethod,
+          page: () => const PaymentMethodPage(),
         )
       ],
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
     );
   }
 }

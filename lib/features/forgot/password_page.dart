@@ -120,7 +120,10 @@ class CreatePasswordPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return const CustomAlertDialog(
-            isSuccess: true, descText: "Password Berhasil diubah");
+          isSuccess: true,
+          descText: "Password Berhasil diubah",
+          destination: '/login',
+        );
       },
     );
   }
