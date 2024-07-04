@@ -1,6 +1,7 @@
 import 'package:douce/features/user/edukasi/user_detailgerakan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/alert_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -107,34 +108,57 @@ class UserDetailGerakanPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            SizedBox(
-                              width: 150,
-                              height: 150,
-                              child: CircularProgressIndicator(
-                                value: 0.5,
-                                color: ColorDouce.douceBase,
-                                backgroundColor: ColorDouce.kindaRed,
-                                strokeWidth: 10,
-                                strokeCap: StrokeCap.round,
-                              ),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 150,
+                                  height: 150,
+                                  child: CircularProgressIndicator(
+                                    value: gerakanController.timerSecond.value /
+                                        60,
+                                    color: ColorDouce.douceBase,
+                                    backgroundColor: ColorDouce.kindaRed,
+                                    strokeWidth: 10,
+                                    strokeCap: StrokeCap.round,
+                                  ),
+                                ),
+                                Text(
+                                  gerakanController.timerString(),
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 30),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: ColorDouce.douceBase,
-                                borderRadius: BorderRadius.circular(9999),
-                              ),
-                              child: const Icon(
-                                Icons.play_arrow,
-                                color: Colors.white,
-                                size: 28,
+                            InkWell(
+                              onTap: () => gerakanController.timerClick(),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: ColorDouce.douceBase,
+                                  borderRadius: BorderRadius.circular(9999),
+                                ),
+                                child: Icon(
+                                  gerakanController.isPlaying.value
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            buttonContainer("Selesai", () {
-                              showCustomDialog(context);
-                            })
+                            buttonContainer(
+                              "Selesai",
+                              () {
+                                showCustomDialog(context);
+                              },
+                            )
                           ],
                         ),
                 ],
@@ -176,7 +200,7 @@ class UserDetailGerakanPage extends StatelessWidget {
         return const CustomAlertDialog(
           isSuccess: true,
           descText: "Silahkan Kembali Besok Untuk Program Yoga Selanjutnya",
-          destination: '/user-detail-program',
+          destination: '/user',
         );
       },
     );
