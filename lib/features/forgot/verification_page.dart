@@ -1,17 +1,15 @@
+import 'package:douce/features/forgot/verification_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class VerificationPage extends StatelessWidget {
-  VerificationPage({super.key});
-
-  final TextEditingController firstController = TextEditingController();
-  final TextEditingController secondController = TextEditingController();
-  final TextEditingController thirdController = TextEditingController();
-  final TextEditingController fourthController = TextEditingController();
+  const VerificationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final verificationController = Get.put(VerificationController());
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Column(
@@ -68,13 +66,13 @@ class VerificationPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    customInputBox(firstController),
+                    customInputBox(verificationController.firstController),
                     const SizedBox(width: 20),
-                    customInputBox(secondController),
+                    customInputBox(verificationController.secondController),
                     const SizedBox(width: 20),
-                    customInputBox(thirdController),
+                    customInputBox(verificationController.thirdController),
                     const SizedBox(width: 20),
-                    customInputBox(fourthController),
+                    customInputBox(verificationController.fourthController),
                   ],
                 ),
                 const SizedBox(height: 30),

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SplashScreen extends StatelessWidget {
-  SplashScreen({super.key});
-
-  final SplashController controllerSplash = Get.put(SplashController());
+  const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(SplashController());
+
     return Scaffold(
       backgroundColor: ColorDouce.douceBase,
       body: Center(

@@ -50,15 +50,15 @@ class AppWidget extends StatelessWidget {
       getPages: [
         GetPage(
           name: AppRoutes.login,
-          page: () => LoginPage(),
+          page: () => const LoginPage(),
         ),
         GetPage(
           name: AppRoutes.splash,
-          page: () => SplashScreen(),
+          page: () => const SplashScreen(),
         ),
         GetPage(
           name: AppRoutes.register,
-          page: () => RegisterPage(),
+          page: () => const RegisterPage(),
         ),
         GetPage(
           name: AppRoutes.registerSuccess,
@@ -70,7 +70,7 @@ class AppWidget extends StatelessWidget {
         ),
         GetPage(
           name: AppRoutes.verificationForgot,
-          page: () => VerificationPage(),
+          page: () => const VerificationPage(),
         ),
         GetPage(
           name: AppRoutes.createPassword,
