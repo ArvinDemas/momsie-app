@@ -1,5 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/topbar.dart';
+import 'package:douce/shared/widget/base_page.dart';
 import 'package:flutter/material.dart';
 
 class MitraPekerjaanPage extends StatelessWidget {
@@ -7,57 +7,58 @@ class MitraPekerjaanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(0),
-      children: [
-        const TopBar(),
-        const SizedBox(height: 50),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Maret 2024",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Juni 2024",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
+    return BasePage(
+      childWidget: ListView(
+        padding: const EdgeInsets.all(0),
+        children: [
+          const SizedBox(height: 50),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              children: [
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Maret 2024",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(width: 10),
-                      Icon(Icons.calendar_month_outlined)
-                    ],
-                  )
-                ],
-              ),
-              const SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  calendarContainer("Sen", "21", false),
-                  calendarContainer("Sel", "22", false),
-                  calendarContainer("Rab", "23", true),
-                  calendarContainer("Kam", "24", false),
-                  calendarContainer("Jum", "25", false),
-                ],
-              ),
-              const SizedBox(height: 25),
-              jobContainer(),
-            ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Juni 2024",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(Icons.calendar_month_outlined)
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    calendarContainer("Sen", "21", false),
+                    calendarContainer("Sel", "22", false),
+                    calendarContainer("Rab", "23", true),
+                    calendarContainer("Kam", "24", false),
+                    calendarContainer("Jum", "25", false),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                jobContainer(),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

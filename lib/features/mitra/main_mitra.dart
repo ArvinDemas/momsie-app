@@ -18,14 +18,17 @@ class MainMitraPage extends StatelessWidget {
       body: Obx(
         () => mitraController.pageList[mitraController.selectedIndex.value],
       ),
-      bottomNavigationBar: NavBar(
-        listItems: const [
-          {'label': 'Beranda', 'count': '0'},
-          {'label': 'Pekerjaan', 'count': '1'},
-          {'label': 'Status', 'count': '2'},
-          {'label': 'Akun', 'count': '3'},
-        ],
-        onChangeIndex: mitraController.onItemTapped,
+      bottomNavigationBar: Obx(
+        () => NavBar(
+          listItems: const [
+            {'label': 'Beranda', 'count': 0},
+            {'label': 'Pekerjaan', 'count': 1},
+            {'label': 'Status', 'count': 2},
+            {'label': 'Akun', 'count': 3},
+          ],
+          onChangeIndex: mitraController.onItemTapped,
+          selectedIndex: mitraController.selectedIndex.value,
+        ),
       ),
     );
   }

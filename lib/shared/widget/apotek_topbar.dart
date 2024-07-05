@@ -9,6 +9,7 @@ class ApotikTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 150,
+      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: ColorDouce.douceBase,
         borderRadius: const BorderRadius.only(

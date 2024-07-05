@@ -4,19 +4,21 @@ class NavBar extends StatelessWidget {
   const NavBar({
     required this.onChangeIndex,
     required this.listItems,
+    required this.selectedIndex,
     super.key,
   });
 
-  final List<Map<String, String>> listItems;
+  final List<Map<String, dynamic>> listItems;
   final Function(int) onChangeIndex;
+  final int selectedIndex;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: MediaQuery.of(context).size.width * 0.04,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
       ),
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: 90,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
@@ -29,27 +31,16 @@ class NavBar extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.01,
-            ),
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: listItems
-                  .map(
-                    (item) => navbarItems(
-                      item['label']!,
-                      int.parse(item['count']!),
-                      context,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        ],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: listItems
+            .map(
+              (item) => navbarItems(
+                item['label']!,
+                item['count']!,
+                context,
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -63,22 +54,55 @@ class NavBar extends StatelessWidget {
       onTap: () {
         onChangeIndex(navbarIndex);
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.01,
-        ),
-        width: MediaQuery.of(context).size.width * 0.17,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.15,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.abc),
+            selectedIndex == navbarIndex
+                ? Transform.translate(
+                    offset: const Offset(0, -25),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(10),
+                      child: Image.asset(
+                        'assets/images/navbar/$label-active.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                    ),
+                  )
+                : Image.asset(
+                    'assets/images/navbar/$label.png',
+                    width: 27,
+                    height: 37,
+                  ),
             const SizedBox(height: 3),
-            FittedBox(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
+            Transform.translate(
+              offset: selectedIndex == navbarIndex
+                  ? const Offset(0, -25)
+                  : const Offset(0, 0),
+              child: FittedBox(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: selectedIndex == navbarIndex ? 14 : 12,
+                    fontWeight: selectedIndex == navbarIndex
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
                 ),
               ),
             ),

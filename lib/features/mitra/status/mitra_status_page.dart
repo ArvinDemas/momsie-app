@@ -1,6 +1,6 @@
 import 'package:douce/features/mitra/status/mitra_status_controller.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/topbar.dart';
+import 'package:douce/shared/widget/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,98 +11,99 @@ class MitraStatusPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final mitraStatusController = Get.put(MitraStatusController());
 
-    return ListView(
-      padding: const EdgeInsets.all(0),
-      children: [
-        const TopBar(),
-        const SizedBox(height: 50),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 30,
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      mitraStatusController.changeStatus("Berjalan");
-                    },
-                    child: Obx(
-                      () => Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 7,
-                          horizontal: 24,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              mitraStatusController.status.value == "Berjalan"
-                                  ? ColorDouce.douceBase
-                                  : ColorDouce.grayBackground,
-                          borderRadius: BorderRadius.circular(26),
-                          border: Border.all(
-                            color: ColorDouce.douceBase,
+    return BasePage(
+      childWidget: ListView(
+        padding: const EdgeInsets.all(0),
+        children: [
+          const SizedBox(height: 50),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        mitraStatusController.changeStatus("Berjalan");
+                      },
+                      child: Obx(
+                        () => Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 7,
+                            horizontal: 24,
                           ),
-                        ),
-                        child: Text(
-                          "Berjalan",
-                          style: TextStyle(
-                            fontSize: 16,
+                          decoration: BoxDecoration(
                             color:
                                 mitraStatusController.status.value == "Berjalan"
-                                    ? Colors.white
-                                    : Colors.black,
+                                    ? ColorDouce.douceBase
+                                    : ColorDouce.grayBackground,
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(
+                              color: ColorDouce.douceBase,
+                            ),
+                          ),
+                          child: Text(
+                            "Berjalan",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: mitraStatusController.status.value ==
+                                      "Berjalan"
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      mitraStatusController.changeStatus("Terkonfirmasi");
-                    },
-                    child: Obx(
-                      () => Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 7,
-                          horizontal: 24,
-                        ),
-                        decoration: BoxDecoration(
-                          color: mitraStatusController.status.value ==
-                                  "Terkonfirmasi"
-                              ? ColorDouce.douceBase
-                              : ColorDouce.grayBackground,
-                          borderRadius: BorderRadius.circular(26),
-                          border: Border.all(
-                            color: ColorDouce.douceBase,
+                    InkWell(
+                      onTap: () {
+                        mitraStatusController.changeStatus("Terkonfirmasi");
+                      },
+                      child: Obx(
+                        () => Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 7,
+                            horizontal: 24,
                           ),
-                        ),
-                        child: Text(
-                          "Terkonfirmasi",
-                          style: TextStyle(
-                            fontSize: 16,
+                          decoration: BoxDecoration(
                             color: mitraStatusController.status.value ==
                                     "Terkonfirmasi"
-                                ? Colors.white
-                                : Colors.black,
+                                ? ColorDouce.douceBase
+                                : ColorDouce.grayBackground,
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(
+                              color: ColorDouce.douceBase,
+                            ),
+                          ),
+                          child: Text(
+                            "Terkonfirmasi",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: mitraStatusController.status.value ==
+                                      "Terkonfirmasi"
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Obx(
-                () => mitraStatusController.status.value == "Berjalan"
-                    ? berjalanColumn()
-                    : terkonfirmasiColumn(),
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Obx(
+                  () => mitraStatusController.status.value == "Berjalan"
+                      ? berjalanColumn()
+                      : terkonfirmasiColumn(),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

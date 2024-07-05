@@ -21,15 +21,18 @@ class MainUserPage extends StatelessWidget {
         () =>
             mainUserController.pageList[mainUserController.selectedIndex.value],
       ),
-      bottomNavigationBar: NavBar(
-        listItems: const [
-          {'label': 'Beranda', 'count': '0'},
-          {'label': 'Kesehatan', 'count': '1'},
-          {'label': 'Obat', 'count': '2'},
-          {'label': 'Edukasi', 'count': '3'},
-          {'label': 'Akun', 'count': '4'},
-        ],
-        onChangeIndex: mainUserController.onItemTapped,
+      bottomNavigationBar: Obx(
+        () => NavBar(
+          listItems: const [
+            {'label': 'Beranda', 'count': 0},
+            {'label': 'Kesehatan', 'count': 1},
+            {'label': 'Obat', 'count': 2},
+            {'label': 'Edukasi', 'count': 3},
+            {'label': 'Akun', 'count': 4},
+          ],
+          onChangeIndex: mainUserController.onItemTapped,
+          selectedIndex: mainUserController.selectedIndex.value,
+        ),
       ),
     );
   }

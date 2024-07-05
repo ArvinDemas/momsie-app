@@ -1,5 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/topbar.dart';
+import 'package:douce/shared/widget/base_page.dart';
 import 'package:flutter/material.dart';
 
 class MitraBerandaPage extends StatelessWidget {
@@ -7,62 +7,63 @@ class MitraBerandaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(0),
-      children: [
-        const TopBar(),
-        const SizedBox(height: 50),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Tanggal",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+    return BasePage(
+      childWidget: ListView(
+        padding: const EdgeInsets.all(0),
+        children: [
+          const SizedBox(height: 50),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Tanggal",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      color: ColorDouce.douceBase,
+                    Text(
+                      "Lihat Semua",
+                      style: TextStyle(
+                        color: ColorDouce.douceBase,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 15),
+                jobContainer(),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Tersedia",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 15),
-              jobContainer(),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Tersedia",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      color: ColorDouce.douceBase,
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 15),
-              serviceContainer(),
-              const SizedBox(height: 15),
-              serviceContainer(),
-            ],
-          ),
-        )
-      ],
+                    Text(
+                      "Lihat Semua",
+                      style: TextStyle(
+                        color: ColorDouce.douceBase,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 15),
+                serviceContainer(),
+                const SizedBox(height: 15),
+                serviceContainer(),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
