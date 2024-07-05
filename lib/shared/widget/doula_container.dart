@@ -11,9 +11,10 @@ class DoulaContainer extends StatelessWidget {
       onTap: () => Get.toNamed("/detail-doula"),
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: 10,
+          horizontal: 12,
+          vertical: 2,
         ),
-        width: 175,
+        width: 160,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(26),
@@ -28,14 +29,14 @@ class DoulaContainer extends StatelessWidget {
                     offset: const Offset(0, -30),
                     child: Image.asset(
                       "assets/images/topdoula.png",
-                      width: 100,
-                      height: 100,
+                      width: 75,
+                      height: 75,
                     ),
                   ),
                 ),
                 Center(
                   child: Transform.translate(
-                    offset: const Offset(0, 125),
+                    offset: const Offset(0, 100),
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(

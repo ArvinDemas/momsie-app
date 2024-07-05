@@ -151,6 +151,7 @@ class UserKesehatanPage extends StatelessWidget {
     return const Wrap(
       spacing: 10,
       runSpacing: 50,
+      alignment: WrapAlignment.spaceAround,
       children: [
         DoulaContainer(),
         DoulaContainer(),

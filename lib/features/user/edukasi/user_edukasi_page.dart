@@ -1,6 +1,7 @@
 import 'package:douce/features/user/edukasi/user_edukasi_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/apotek_topbar.dart';
+import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -108,14 +109,15 @@ class UserEdukasiPage extends StatelessWidget {
   }
 
   Widget artikelColumn() {
-    return Wrap(
-      spacing: 15,
+    return const Wrap(
+      spacing: 20,
+      alignment: WrapAlignment.spaceAround,
       runSpacing: 20,
       children: [
-        artikelContainer(),
-        artikelContainer(),
-        artikelContainer(),
-        artikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
       ],
     );
   }
@@ -131,60 +133,6 @@ class UserEdukasiPage extends StatelessWidget {
         const SizedBox(height: 20),
         programKehamilanContainer(),
       ],
-    );
-  }
-
-  Widget artikelContainer() {
-    return InkWell(
-      onTap: () => Get.toNamed('/user-artikel'),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        width: 160,
-        decoration: BoxDecoration(
-          color: ColorDouce.douceBase,
-          borderRadius: BorderRadius.circular(26),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                'assets/images/artikel.png',
-                height: 100,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "By Lionel Messi",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
-            const Text(
-              "Tips dan Trik untuk Ibu Hamil",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "10 Agustus 2021",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 

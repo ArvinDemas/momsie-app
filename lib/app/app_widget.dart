@@ -30,6 +30,7 @@ import 'package:douce/features/user/edukasi/user_detailprogram_page.dart';
 import 'package:douce/features/user/edukasi/user_programbulan_page.dart';
 import 'package:douce/features/user/edukasi/user_programminggu_page.dart';
 import 'package:douce/features/user/kesehatan/booking_doula_page.dart';
+import 'package:douce/features/user/kesehatan/chat_page.dart';
 import 'package:douce/features/user/kesehatan/confirm_booking_page.dart';
 import 'package:douce/features/user/kesehatan/detail_doula_page.dart';
 import 'package:douce/features/user/kesehatan/detail_rumahsakit_page.dart';
@@ -195,6 +196,10 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.paymentMethod,
           page: () => const PaymentMethodPage(),
+        ),
+        GetPage(
+          name: AppRoutes.chatPage,
+          page: () => const ChatPage(),
         )
       ],
       initialRoute: AppRoutes.splash,

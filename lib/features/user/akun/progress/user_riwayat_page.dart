@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/doula_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -64,6 +65,7 @@ class UserRiwayatPage extends StatelessWidget {
     return const Wrap(
       spacing: 20,
       runSpacing: 50,
+      alignment: WrapAlignment.spaceAround,
       children: [
         DoulaContainer(),
         DoulaContainer(),
@@ -84,14 +86,15 @@ class UserRiwayatPage extends StatelessWidget {
   }
 
   Widget artikelColumn() {
-    return Wrap(
+    return const Wrap(
+      alignment: WrapAlignment.spaceAround,
       spacing: 20,
       runSpacing: 20,
       children: [
-        artikelContainer(),
-        artikelContainer(),
-        artikelContainer(),
-        artikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
+        ArtikelContainer(),
       ],
     );
   }
@@ -159,57 +162,6 @@ class UserRiwayatPage extends StatelessWidget {
               letterSpacing: 0,
               fontWeight: FontWeight.w400,
               color: Colors.grey,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget artikelContainer() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      width: 175,
-      decoration: BoxDecoration(
-        color: ColorDouce.douceBase,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              'assets/images/artikel.png',
-              height: 100,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            "By Lionel Messi",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-              color: Colors.white,
-            ),
-          ),
-          const Text(
-            "Tips dan Trik untuk Ibu Hamil",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            "10 Agustus 2021",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-              color: Colors.white,
             ),
           )
         ],

@@ -37,4 +37,5 @@ class AppRoutes {
   static const String bookingDoula = '/booking-doula';
   static const String confirmBooking = '/confirm-booking';
   static const String paymentMethod = '/payment-method';
+  static const String chatPage = '/chat-page';
 }

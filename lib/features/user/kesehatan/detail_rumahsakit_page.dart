@@ -127,6 +127,7 @@ class DetailRumahSakitPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               const SingleChildScrollView(
+                clipBehavior: Clip.none,
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
@@ -161,7 +162,7 @@ class DetailRumahSakitPage extends StatelessWidget {
               const ObatContainer(),
               const SizedBox(height: 20),
               InkWell(
-                onTap: () => {},
+                onTap: () => Get.toNamed('/chat-page'),
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   width: double.infinity,

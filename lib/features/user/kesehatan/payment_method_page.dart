@@ -77,7 +77,7 @@ class PaymentMethodPage extends StatelessWidget {
           isSuccess: true,
           descText:
               "Pembayaran anda telah berhasil. Sekarang anda sudah bisa konsultasi dengan dokter",
-          destination: '/user',
+          destination: '/chat-page',
         );
       },
     );

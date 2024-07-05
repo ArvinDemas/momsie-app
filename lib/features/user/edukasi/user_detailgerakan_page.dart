@@ -1,9 +1,7 @@
 import 'package:douce/features/user/edukasi/user_detailgerakan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/alert_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class UserDetailGerakanPage extends StatelessWidget {
