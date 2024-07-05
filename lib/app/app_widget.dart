@@ -23,7 +23,7 @@ import 'package:douce/features/user/akun/progress/user_progress_page.dart';
 import 'package:douce/features/user/akun/progress/user_riwayat_page.dart';
 import 'package:douce/features/user/akun/settings/user_settings_page.dart';
 import 'package:douce/features/user/beranda/detail_toko_page.dart';
-import 'package:douce/features/user/beranda/user_notifikasi.dart';
+import 'package:douce/features/user/beranda/user_notifikasi_page.dart';
 import 'package:douce/features/user/edukasi/user_artikel_page.dart';
 import 'package:douce/features/user/edukasi/user_detailgerakan_page.dart';
 import 'package:douce/features/user/edukasi/user_detailprogram_page.dart';
@@ -46,8 +46,11 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: ThemeData(
+        splashColor: Colors.transparent,
+      ),
       debugShowCheckedModeBanner: false,
-      title: 'Douce',
+      title: 'Doula',
       getPages: [
         GetPage(
           name: AppRoutes.login,

@@ -20,7 +20,7 @@ class UserDataDiriPage extends StatelessWidget {
           const AccountTopBar(isEditPage: true),
           const SizedBox(height: 100),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 editTextField(nameController, "Nama Lengkap"),

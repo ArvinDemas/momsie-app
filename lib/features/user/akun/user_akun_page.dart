@@ -14,7 +14,7 @@ class UserAkunPage extends StatelessWidget {
         const AccountTopBar(),
         const SizedBox(height: 75),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               const Text(

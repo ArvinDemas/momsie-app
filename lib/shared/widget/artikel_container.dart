@@ -11,7 +11,7 @@ class ArtikelContainer extends StatelessWidget {
       onTap: () => Get.toNamed('/user-artikel'),
       child: Container(
         padding: const EdgeInsets.all(10),
-        width: 140,
+        width: 150,
         decoration: BoxDecoration(
           color: ColorDouce.douceBase,
           borderRadius: BorderRadius.circular(16),
@@ -32,7 +32,7 @@ class ArtikelContainer extends StatelessWidget {
             const Text(
               "By Lionel Messi",
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.w300,
                 color: Colors.white,
               ),
@@ -40,7 +40,7 @@ class ArtikelContainer extends StatelessWidget {
             const Text(
               "Tips dan Trik untuk Ibu Hamil",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
               ),
@@ -49,7 +49,7 @@ class ArtikelContainer extends StatelessWidget {
             const Text(
               "10 Agustus 2021",
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.w300,
                 color: Colors.white,
               ),

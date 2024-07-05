@@ -19,7 +19,7 @@ class MitraRiwayatPage extends StatelessWidget {
           const SizedBox(height: 50),
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 30,
+              horizontal: 20,
             ),
             child: Column(
               children: [

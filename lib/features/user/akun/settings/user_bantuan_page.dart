@@ -16,7 +16,7 @@ class UserBantuanPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: 30,
+            horizontal: 20,
             vertical: 30,
           ),
           child: ListView(

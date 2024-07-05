@@ -16,7 +16,7 @@ class UserSettingNotifikasiPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: 30,
+            horizontal: 20,
             vertical: 20,
           ),
           child: ListView(

@@ -17,9 +17,7 @@ class MitraStatusPage extends StatelessWidget {
         children: [
           const SizedBox(height: 50),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 Row(

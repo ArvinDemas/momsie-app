@@ -78,17 +78,17 @@ class NavBar extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       child: Image.asset(
                         'assets/images/navbar/$label-active.png',
-                        width: 30,
-                        height: 30,
+                        width: 32,
+                        height: 32,
                       ),
                     ),
                   )
                 : Image.asset(
                     'assets/images/navbar/$label.png',
                     width: 27,
-                    height: 37,
+                    height: 27,
                   ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 5),
             Transform.translate(
               offset: selectedIndex == navbarIndex
                   ? const Offset(0, -25)

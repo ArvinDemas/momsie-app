@@ -13,7 +13,7 @@ class BookingDoulaPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 15,
-            horizontal: 30,
+            horizontal: 20,
           ),
           child: ListView(
             children: [

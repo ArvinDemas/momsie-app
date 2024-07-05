@@ -12,7 +12,7 @@ class UserDetailProgramPage extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
-            horizontal: 30,
+            horizontal: 20,
             vertical: 20,
           ),
           children: [

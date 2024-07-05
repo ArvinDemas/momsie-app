@@ -14,6 +14,7 @@ class MainMitraPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainMitraController mitraController = Get.put(MainMitraController());
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: ColorDouce.grayBackground,
       body: Obx(
         () => mitraController.pageList[mitraController.selectedIndex.value],

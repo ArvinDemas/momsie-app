@@ -2,6 +2,7 @@ import 'package:douce/features/user/akun/user_hubungi_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 class UserHubungiPage extends StatelessWidget {
   const UserHubungiPage({super.key});
 
@@ -15,7 +16,7 @@ class UserHubungiPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: 30,
+            horizontal: 20,
             vertical: 15,
           ),
           child: ListView(

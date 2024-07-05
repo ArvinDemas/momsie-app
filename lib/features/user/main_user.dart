@@ -16,6 +16,7 @@ class MainUserPage extends StatelessWidget {
     final MainUserController mainUserController = Get.put(MainUserController());
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: ColorDouce.grayBackground,
       body: Obx(
         () =>
