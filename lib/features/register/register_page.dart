@@ -16,7 +16,8 @@ class RegisterPage extends StatelessWidget {
     final TextEditingController passwordController = TextEditingController();
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(0),
         children: [
           Container(
             width: MediaQuery.of(context).size.width,

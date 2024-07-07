@@ -195,10 +195,15 @@ class UserDetailGerakanPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const CustomAlertDialog(
+        return CustomAlertDialog(
           isSuccess: true,
           descText: "Silahkan Kembali Besok Untuk Program Yoga Selanjutnya",
           destination: '/user',
+          onTap: () {
+            Get.offAllNamed('/user');
+            Get.toNamed('/user-program-bulan');
+            Get.toNamed('/user-program-minggu');
+          },
         );
       },
     );

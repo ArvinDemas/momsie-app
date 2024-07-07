@@ -80,28 +80,26 @@ class ChatPage extends StatelessWidget {
                                       color: ColorDouce.douceBase,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            message[index]['message'],
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 16,
-                                              color: Colors.white,
-                                            ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          message[index]['message'],
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 16,
+                                            color: Colors.white,
                                           ),
-                                          Text(
-                                            message[index]['time'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
+                                        ),
+                                        Text(
+                                          message[index]['time'],
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -120,28 +118,26 @@ class ChatPage extends StatelessWidget {
                                       color: ColorDouce.douceBase,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            message[index]['message'],
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 16,
-                                              color: Colors.white,
-                                            ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          message[index]['message'],
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 16,
+                                            color: Colors.white,
                                           ),
-                                          Text(
-                                            message[index]['time'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
+                                        ),
+                                        Text(
+                                          message[index]['time'],
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

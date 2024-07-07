@@ -48,12 +48,12 @@ class UserAkunPage extends StatelessWidget {
               MenuContainer(
                 title: "My Doula",
                 icon: Icons.abc,
-                onTap: () => Get.toNamed('/mitra'),
+                onTap: () => Get.offAllNamed('/mitra'),
               ),
               MenuContainer(
                 title: "Keluar",
                 icon: Icons.logout,
-                onTap: () => {},
+                onTap: () => Get.offAllNamed('/login'),
               ),
             ],
           ),

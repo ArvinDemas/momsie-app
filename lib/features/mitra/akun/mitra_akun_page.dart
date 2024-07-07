@@ -43,7 +43,7 @@ class MitraAkunPage extends StatelessWidget {
               MenuContainer(
                 title: "Kembali",
                 icon: Icons.logout,
-                onTap: () => Get.toNamed("/user"),
+                onTap: () => Get.offAllNamed("/user"),
               ),
             ],
           ),

@@ -9,6 +9,6 @@ class SplashController extends GetxController {
 
   void loadData() async {
     await Future.delayed(const Duration(seconds: 2));
-    Get.toNamed('/login');
+    Get.offNamed('/login');
   }
 }

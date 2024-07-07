@@ -6,12 +6,14 @@ class CustomAlertDialog extends StatelessWidget {
   final bool isSuccess;
   final String descText;
   final String destination;
+  final Function? onTap;
 
   const CustomAlertDialog({
     super.key,
     required this.isSuccess,
     required this.descText,
     required this.destination,
+    this.onTap,
   });
 
   @override
@@ -54,7 +56,9 @@ class CustomAlertDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             InkWell(
-              onTap: () => Get.toNamed(destination),
+              onTap: () {
+                onTap == null ? Get.offAllNamed(destination) : onTap!();
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 60,

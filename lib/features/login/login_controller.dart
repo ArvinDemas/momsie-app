@@ -8,7 +8,7 @@ class LoginController extends GetxController {
   }
 
   void loginSuccess() {
-    Get.toNamed('/user');
+    Get.offAllNamed('/user');
   }
 
   void forgotPassword() {

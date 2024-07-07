@@ -13,22 +13,25 @@ class MainMitraPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MainMitraController mitraController = Get.put(MainMitraController());
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: ColorDouce.grayBackground,
-      body: Obx(
-        () => mitraController.pageList[mitraController.selectedIndex.value],
-      ),
-      bottomNavigationBar: Obx(
-        () => NavBar(
-          listItems: const [
-            {'label': 'Beranda', 'count': 0},
-            {'label': 'Pekerjaan', 'count': 1},
-            {'label': 'Status', 'count': 2},
-            {'label': 'Akun', 'count': 3},
-          ],
-          onChangeIndex: mitraController.onItemTapped,
-          selectedIndex: mitraController.selectedIndex.value,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: ColorDouce.grayBackground,
+        body: Obx(
+          () => mitraController.pageList[mitraController.selectedIndex.value],
+        ),
+        bottomNavigationBar: Obx(
+          () => NavBar(
+            listItems: const [
+              {'label': 'Beranda', 'count': 0},
+              {'label': 'Pekerjaan', 'count': 1},
+              {'label': 'Status', 'count': 2},
+              {'label': 'Akun', 'count': 3},
+            ],
+            onChangeIndex: mitraController.onItemTapped,
+            selectedIndex: mitraController.selectedIndex.value,
+          ),
         ),
       ),
     );

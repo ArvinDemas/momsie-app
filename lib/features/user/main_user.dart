@@ -15,24 +15,27 @@ class MainUserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainUserController mainUserController = Get.put(MainUserController());
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: ColorDouce.grayBackground,
-      body: Obx(
-        () =>
-            mainUserController.pageList[mainUserController.selectedIndex.value],
-      ),
-      bottomNavigationBar: Obx(
-        () => NavBar(
-          listItems: const [
-            {'label': 'Beranda', 'count': 0},
-            {'label': 'Kesehatan', 'count': 1},
-            {'label': 'Obat', 'count': 2},
-            {'label': 'Edukasi', 'count': 3},
-            {'label': 'Akun', 'count': 4},
-          ],
-          onChangeIndex: mainUserController.onItemTapped,
-          selectedIndex: mainUserController.selectedIndex.value,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: ColorDouce.grayBackground,
+        body: Obx(
+          () => mainUserController
+              .pageList[mainUserController.selectedIndex.value],
+        ),
+        bottomNavigationBar: Obx(
+          () => NavBar(
+            listItems: const [
+              {'label': 'Beranda', 'count': 0},
+              {'label': 'Kesehatan', 'count': 1},
+              {'label': 'Obat', 'count': 2},
+              {'label': 'Edukasi', 'count': 3},
+              {'label': 'Akun', 'count': 4},
+            ],
+            onChangeIndex: mainUserController.onItemTapped,
+            selectedIndex: mainUserController.selectedIndex.value,
+          ),
         ),
       ),
     );

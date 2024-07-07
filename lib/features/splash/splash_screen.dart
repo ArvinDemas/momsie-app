@@ -10,13 +10,16 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(SplashController());
 
-    return Scaffold(
-      backgroundColor: ColorDouce.douceBase,
-      body: Center(
-        child: Image.asset(
-          'assets/images/logo.png',
-          width: MediaQuery.of(context).size.width * 0.7,
-          height: MediaQuery.of(context).size.height * 0.5,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: ColorDouce.douceBase,
+        body: Center(
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: MediaQuery.of(context).size.height * 0.3,
+          ),
         ),
       ),
     );

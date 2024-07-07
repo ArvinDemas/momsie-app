@@ -73,11 +73,16 @@ class PaymentMethodPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const CustomAlertDialog(
+        return CustomAlertDialog(
           isSuccess: true,
           descText:
               "Pembayaran anda telah berhasil. Sekarang anda sudah bisa konsultasi dengan dokter",
           destination: '/chat-page',
+          onTap: () {
+            Get.offAllNamed('/user');
+            Get.toNamed('/detail-doula');
+            Get.toNamed('/chat-page');
+          },
         );
       },
     );
