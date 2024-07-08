@@ -1,5 +1,6 @@
 import 'package:douce/features/user/beranda/user_beranda_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/doula_container.dart';
@@ -146,12 +147,16 @@ class UserBerandaPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Wrap(
-                  runSpacing: 10,
-                  children: [
-                    artikelTerkiniContainer(),
-                    artikelTerkiniContainer(),
-                  ],
+                Obx(
+                  () => controller.isArtikelLoading.value
+                      ? const Center(child: CircularProgressIndicator())
+                      : Wrap(
+                          runSpacing: 10,
+                          children: controller.artikelList
+                              .map(
+                                  (artikel) => artikelTerkiniContainer(artikel))
+                              .toList(),
+                        ),
                 ),
               ],
             ),
@@ -236,9 +241,9 @@ class UserBerandaPage extends StatelessWidget {
     );
   }
 
-  Widget artikelTerkiniContainer() {
+  Widget artikelTerkiniContainer(ArtikelModel artikel) {
     return InkWell(
-      onTap: () => Get.toNamed("/detail-artikel"),
+      onTap: () => Get.toNamed("/user-artikel", arguments: artikel),
       child: Container(
         padding: const EdgeInsets.all(8),
         width: double.infinity,
@@ -260,37 +265,39 @@ class UserBerandaPage extends StatelessWidget {
               flex: 1,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(18),
-                child: Image.asset(
-                  'assets/images/artikel.png',
+                child: Image.network(
+                  artikel.imageUrl,
+                  height: 100,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            const Expanded(
+            Expanded(
               flex: 1,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "By Lionel Messi",
-                    style: TextStyle(
+                    "By ${artikel.publisher}",
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.grey,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    "Panduan Nutrisi yang penting",
-                    style: TextStyle(
+                    artikel.title,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    "Jun 12, 2024",
-                    style: TextStyle(
+                    artikel.date,
+                    style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

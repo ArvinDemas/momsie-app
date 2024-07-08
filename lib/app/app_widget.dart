@@ -48,6 +48,7 @@ class AppWidget extends StatelessWidget {
     return GetMaterialApp(
       theme: ThemeData(
         splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
       ),
       debugShowCheckedModeBanner: false,
       title: 'Doula',

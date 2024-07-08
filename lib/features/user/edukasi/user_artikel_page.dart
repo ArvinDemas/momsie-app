@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,7 @@ class UserArtikelPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ArtikelModel artikel = Get.arguments as ArtikelModel;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -34,27 +36,27 @@ class UserArtikelPage extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.heart_broken_rounded,
-                    color: ColorDouce.douceBase,
+                    color: Colors.transparent,
                   ),
                 ],
               ),
               const SizedBox(height: 25),
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  'assets/images/artikel.png',
+                child: Image.network(
+                  artikel.imageUrl,
                   width: double.infinity,
                   height: 175,
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                "Tips dan Trik untuk Ibu Hamil",
-                style: TextStyle(
-                  fontSize: 18,
+              const SizedBox(height: 5),
+              Text(
+                artikel.title,
+                style: const TextStyle(
+                  fontSize: 20,
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -62,7 +64,7 @@ class UserArtikelPage extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "By Lioel Messi",
+                    "By ${artikel.publisher}",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w300,
@@ -71,27 +73,27 @@ class UserArtikelPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   const Text(
-                    "|",
+                    " | ",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    "10 Agustus 2021",
-                    style: TextStyle(
+                  Text(
+                    artikel.date,
+                    style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              const Text(
-                "Kehamilan adalah perjalanan yang luar biasa bagi setiap ibu. Namun, dalam kegembiraan tersebut, mungkin ada kekhawatiran dan kebingungan tentang menjaga kesehatan dan kenyamanan",
-                style: TextStyle(
+              const SizedBox(height: 20),
+              Text(
+                artikel.content,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w300,
                   color: Colors.black,

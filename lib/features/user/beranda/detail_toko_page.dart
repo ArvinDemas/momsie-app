@@ -115,28 +115,17 @@ class DetailTokoPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
+                  fontWeight: FontWeight.w300,
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Product",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorDouce.douceBase,
-                    ),
-                  ),
-                ],
+              const Text(
+                "Product",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(height: 20),
               Wrap(
