@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1057882811150-48f832ds7j4treot5b2pmqbi9vqnj51f.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1057882811150-48f832ds7j4treot5b2pmqbi9vqnj51f</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAD3lkrgf8i8AuNm4OqKzs3cnvKLO0DdfI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1057882811150</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.douce.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>doula-6b8a2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>doula-6b8a2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1057882811150:ios:2f117a5e9453c60d71855f</string>
+</dict>
+</plist>

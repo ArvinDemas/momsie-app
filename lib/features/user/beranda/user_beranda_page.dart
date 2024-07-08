@@ -1,4 +1,6 @@
+import 'package:douce/features/user/beranda/user_beranda_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/doula_container.dart';
 import 'package:douce/shared/widget/rumah_sakit_container.dart';
@@ -10,6 +12,8 @@ class UserBerandaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final UserBerandaController controller = Get.put(UserBerandaController());
+
     return BasePage(
       childWidget: ListView(
         padding: const EdgeInsets.all(0),
@@ -106,16 +110,19 @@ class UserBerandaPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Wrap(
-                    spacing: 15,
-                    children: [
-                      tokoBayiContainer(),
-                      tokoBayiContainer(),
-                      tokoBayiContainer(),
-                    ],
-                  ),
+                Obx(
+                  () => controller.isTokoBayiLoading.value
+                      ? const Center(child: CircularProgressIndicator())
+                      : SingleChildScrollView(
+                          clipBehavior: Clip.none,
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                            spacing: 15,
+                            children: controller.tokoBayiList
+                                .map((e) => tokoBayiContainer(e))
+                                .toList(),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -154,9 +161,9 @@ class UserBerandaPage extends StatelessWidget {
     );
   }
 
-  Widget tokoBayiContainer() {
+  Widget tokoBayiContainer(TokoBayiModel tokoBayi) {
     return InkWell(
-      onTap: () => Get.toNamed("/detail-toko"),
+      onTap: () => Get.toNamed("/detail-toko", arguments: tokoBayi),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -177,44 +184,44 @@ class UserBerandaPage extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: Image.asset(
-                'assets/images/toko.png',
+              child: Image.network(
+                tokoBayi.image,
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 5),
-            const Text(
-              "Baby Shop Jogja",
-              style: TextStyle(
+            Text(
+              tokoBayi.nama,
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Text(
-              "Jl. Kesehatan No. 1, Sekip, Yogyakarta",
-              style: TextStyle(
+            Text(
+              tokoBayi.alamat,
+              style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star,
                       size: 20,
                       color: Colors.orange,
                     ),
                     Text(
-                      "4.9",
-                      style: TextStyle(
+                      tokoBayi.rating,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),

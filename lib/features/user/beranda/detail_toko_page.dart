@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,7 @@ class DetailTokoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TokoBayiModel tokoBayi = Get.arguments as TokoBayiModel;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -34,49 +36,58 @@ class DetailTokoPage extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.heart_broken_rounded,
-                    color: ColorDouce.douceBase,
+                    color: Colors.transparent,
                   ),
                 ],
               ),
               const SizedBox(height: 25),
               SizedBox(
                 width: double.infinity,
+                height: 125,
                 child: Row(
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Image.asset("assets/images/toko.png"),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                          tokoBayi.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Baby Shop Jogja",
-                            style: TextStyle(
+                            tokoBayi.nama,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            "Jl. Kaliurang KM 5,5 Yogyakarta",
-                            style: TextStyle(
+                            tokoBayi.alamat,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black,
                             ),
                           ),
-                          Row(children: [
-                            Icon(Icons.star, color: Colors.orange),
-                            Text(
-                              "4.9",
-                              style: TextStyle(fontSize: 14),
-                            )
-                          ])
+                          Row(
+                            children: [
+                              const Icon(Icons.star, color: Colors.orange),
+                              Text(
+                                tokoBayi.rating,
+                                style: const TextStyle(fontSize: 14),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -99,9 +110,9 @@ class DetailTokoPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Baby Shop Jogja adalah toko perlengkapan bayi yang menyediakan berbagai macam kebutuhan bayi dan anak-anak. Kami menyediakan berbagai macam produk berkualitas dengan harga terjangkau.",
-                style: TextStyle(
+              Text(
+                tokoBayi.desc,
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
                 ),
@@ -127,10 +138,15 @@ class DetailTokoPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              productContainer(),
-              const SizedBox(height: 10),
-              productContainer(),
+              const SizedBox(height: 20),
+              Wrap(
+                runSpacing: 15,
+                children: tokoBayi.product
+                    .map<Widget>(
+                      (product) => productContainer(product),
+                    )
+                    .toList(),
+              ),
             ],
           ),
         ),
@@ -138,7 +154,7 @@ class DetailTokoPage extends StatelessWidget {
     );
   }
 
-  Widget productContainer() {
+  Widget productContainer(String product) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -146,7 +162,7 @@ class DetailTokoPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withOpacity(0.3),
             spreadRadius: 0.5,
             blurRadius: 4,
             offset: const Offset(0, 3),
@@ -156,18 +172,13 @@ class DetailTokoPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            "assets/images/pakaian.png",
-            width: 60,
-            height: 60,
-          ),
-          const SizedBox(width: 20),
-          const Text(
-            "Pakaian Bayi",
-            style: TextStyle(
+          Text(
+            product,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w400,
               color: Colors.black,
+              fontFamily: "OpenSans",
             ),
           )
         ],
