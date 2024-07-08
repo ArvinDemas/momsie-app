@@ -8,7 +8,6 @@ class UserProgramMingguPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -54,17 +53,17 @@ class UserProgramMingguPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            gerakanContainer(),
-            const SizedBox(height: 10),
-            gerakanContainer(),
-            const SizedBox(height: 10),
-            gerakanContainer(),
-            const SizedBox(height: 10),
-            gerakanContainer(),
-            const SizedBox(height: 10),
-            gerakanContainer(),
-            const SizedBox(height: 10),
-            gerakanContainer(),
+            Wrap(
+              runSpacing: 15,
+              children: [
+                gerakanContainer(),
+                gerakanContainer(),
+                gerakanContainer(),
+                gerakanContainer(),
+                gerakanContainer(),
+                gerakanContainer(),
+              ],
+            )
           ],
         ),
       ),
@@ -75,7 +74,7 @@ class UserProgramMingguPage extends StatelessWidget {
     return InkWell(
       onTap: () => Get.toNamed("/user-detail-gerakan"),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(

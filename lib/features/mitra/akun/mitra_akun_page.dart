@@ -1,4 +1,5 @@
 import 'package:douce/shared/widget/account_topbar.dart';
+import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:douce/shared/widget/menu_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,7 +44,17 @@ class MitraAkunPage extends StatelessWidget {
               MenuContainer(
                 title: "Kembali",
                 icon: Icons.logout,
-                onTap: () => Get.offAllNamed("/user"),
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ConfirmDialog(
+                      descText: "Kembali Ke Halaman User ?",
+                      onTap: () {
+                        Get.offAllNamed('/user');
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

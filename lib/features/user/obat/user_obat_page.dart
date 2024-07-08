@@ -41,11 +41,14 @@ class UserObatPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                const ObatContainer(),
-                const SizedBox(height: 10),
-                const ObatContainer(),
-                const SizedBox(height: 10),
-                const ObatContainer(),
+                const Wrap(
+                  runSpacing: 15,
+                  children: [
+                    ObatContainer(),
+                    ObatContainer(),
+                    ObatContainer(),
+                  ],
+                )
               ],
             ),
           ),

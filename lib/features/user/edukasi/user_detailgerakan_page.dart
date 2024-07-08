@@ -13,7 +13,6 @@ class UserDetailGerakanPage extends StatelessWidget {
         Get.put(UserDetailGerakanController());
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(

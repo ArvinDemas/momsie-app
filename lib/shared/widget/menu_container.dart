@@ -7,11 +7,13 @@ class MenuContainer extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.onTap,
+    this.image,
   });
 
   final String title;
   final IconData icon;
   final Function onTap;
+  final String? image;
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +35,17 @@ class MenuContainer extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: ColorDouce.douceBase,
-                size: 32,
-              ),
+              image == null
+                  ? Icon(
+                      icon,
+                      color: ColorDouce.douceBase,
+                      size: 32,
+                    )
+                  : Image.asset(
+                      "assets/images/$image",
+                      width: 32,
+                      height: 32,
+                    ),
               const SizedBox(width: 30),
               Text(
                 title,

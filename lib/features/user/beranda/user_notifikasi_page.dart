@@ -8,7 +8,6 @@ class UserNotifikasiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -58,12 +57,20 @@ class UserNotifikasiPage extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
+        border: const Border(
           bottom: BorderSide(
-            color: ColorDouce.grayBackground,
+            color: Colors.white,
             width: 1,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

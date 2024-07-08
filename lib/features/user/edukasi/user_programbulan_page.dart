@@ -8,7 +8,6 @@ class UserProgramBulanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -43,13 +42,14 @@ class UserProgramBulanPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 30),
-            bulanContainer(),
-            const SizedBox(height: 20),
-            bulanContainer(),
-            const SizedBox(height: 20),
-            bulanContainer(),
-            const SizedBox(height: 20),
-            bulanContainer(),
+            Wrap(
+              runSpacing: 25,
+              children: [
+                bulanContainer(),
+                bulanContainer(),
+                bulanContainer(),
+              ],
+            )
           ],
         ),
       ),

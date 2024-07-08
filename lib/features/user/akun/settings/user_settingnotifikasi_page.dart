@@ -12,7 +12,6 @@ class UserSettingNotifikasiPage extends StatelessWidget {
         Get.put(UserSettingNotifikasiController());
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(

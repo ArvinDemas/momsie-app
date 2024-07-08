@@ -95,12 +95,19 @@ class MitraPekerjaanPage extends StatelessWidget {
   Widget jobContainer() {
     return Container(
       padding: const EdgeInsets.all(30),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(
-          Radius.circular(20),
-        ),
-      ),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

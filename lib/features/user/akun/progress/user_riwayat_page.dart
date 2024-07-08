@@ -1,6 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/doula_container.dart';
+import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,6 @@ class UserRiwayatPage extends StatelessWidget {
     String jenisRiwayat = arguments["jenisRiwayat"];
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -76,11 +76,11 @@ class UserRiwayatPage extends StatelessWidget {
   }
 
   Widget layananColumn() {
-    return Column(
+    return const Column(
       children: [
-        layananContainer(),
-        const SizedBox(height: 20),
-        layananContainer(),
+        RumahSakitContainer(),
+        SizedBox(height: 20),
+        RumahSakitContainer(),
       ],
     );
   }
@@ -96,76 +96,6 @@ class UserRiwayatPage extends StatelessWidget {
         ArtikelContainer(),
         ArtikelContainer(),
       ],
-    );
-  }
-
-  Widget layananContainer() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Image.asset(
-              'assets/images/rs.png',
-              height: 80,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "RSUP Dr. Sardjito",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.star,
-                    size: 20,
-                    color: Colors.orange,
-                  ),
-                  Text(
-                    "4.9",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    " | 400m",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          const Text(
-            "Jl. Kesehatan No. 1, Sekip, Yogyakarta",
-            style: TextStyle(
-              fontSize: 14,
-              letterSpacing: 0,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey,
-            ),
-          )
-        ],
-      ),
     );
   }
 }

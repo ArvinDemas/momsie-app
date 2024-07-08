@@ -11,7 +11,6 @@ class MitraRiwayatPage extends StatelessWidget {
     final mitraRiwayatController = Get.put(MitraRiwayatController());
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: ListView(
         padding: const EdgeInsets.all(0),
         children: [
@@ -40,7 +39,7 @@ class MitraRiwayatPage extends StatelessWidget {
                             color: mitraRiwayatController.riwayat.value ==
                                     "Selanjutnya"
                                 ? ColorDouce.douceBase
-                                : ColorDouce.grayBackground,
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -73,7 +72,7 @@ class MitraRiwayatPage extends StatelessWidget {
                             color: mitraRiwayatController.riwayat.value ==
                                     "Sebelumnya"
                                 ? ColorDouce.douceBase
-                                : ColorDouce.grayBackground,
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -131,11 +130,19 @@ class MitraRiwayatPage extends StatelessWidget {
   Widget historyJobContainer() {
     return Container(
       padding: const EdgeInsets.all(30),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(20),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

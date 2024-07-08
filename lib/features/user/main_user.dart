@@ -3,7 +3,6 @@ import 'package:douce/features/user/beranda/user_beranda_page.dart';
 import 'package:douce/features/user/edukasi/user_edukasi_page.dart';
 import 'package:douce/features/user/kesehatan/user_kesehatan_page.dart';
 import 'package:douce/features/user/obat/user_obat_page.dart';
-import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,7 +18,6 @@ class MainUserPage extends StatelessWidget {
       canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: ColorDouce.grayBackground,
         body: Obx(
           () => mainUserController
               .pageList[mainUserController.selectedIndex.value],

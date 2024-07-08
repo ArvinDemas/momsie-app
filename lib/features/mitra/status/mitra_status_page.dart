@@ -37,7 +37,7 @@ class MitraStatusPage extends StatelessWidget {
                             color:
                                 mitraStatusController.status.value == "Berjalan"
                                     ? ColorDouce.douceBase
-                                    : ColorDouce.grayBackground,
+                                    : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -70,7 +70,7 @@ class MitraStatusPage extends StatelessWidget {
                             color: mitraStatusController.status.value ==
                                     "Terkonfirmasi"
                                 ? ColorDouce.douceBase
-                                : ColorDouce.grayBackground,
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -106,24 +106,22 @@ class MitraStatusPage extends StatelessWidget {
   }
 
   Widget berjalanColumn() {
-    return Column(
+    return Wrap(
+      runSpacing: 20,
       children: [
         berjalanJobContainer(),
-        const SizedBox(height: 20),
         berjalanJobContainer(),
-        const SizedBox(height: 20),
         berjalanJobContainer(),
       ],
     );
   }
 
   Widget terkonfirmasiColumn() {
-    return Column(
+    return Wrap(
+      runSpacing: 20,
       children: [
         terkonfirmasiJobContainer(),
-        const SizedBox(height: 20),
         terkonfirmasiJobContainer(),
-        const SizedBox(height: 20),
         terkonfirmasiJobContainer(),
       ],
     );
@@ -132,11 +130,19 @@ class MitraStatusPage extends StatelessWidget {
   Widget berjalanJobContainer() {
     return Container(
       padding: const EdgeInsets.all(30),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(20),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,11 +296,19 @@ class MitraStatusPage extends StatelessWidget {
   Widget terkonfirmasiJobContainer() {
     return Container(
       padding: const EdgeInsets.all(30),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(20),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

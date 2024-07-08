@@ -61,11 +61,14 @@ class TopBar extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 30,
-                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Image.asset(
+                            'assets/images/blank-profile.png',
+                            width: 32,
+                            height: 32,
+                          ),
+                        )
                       ],
                     ),
                   ],

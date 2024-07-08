@@ -13,7 +13,6 @@ class UserDataDiriPage extends StatelessWidget {
     final TextEditingController birthController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: ListView(
         padding: const EdgeInsets.all(0),
         children: [

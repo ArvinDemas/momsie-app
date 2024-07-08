@@ -8,7 +8,6 @@ class UserTentangDoulaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -48,6 +47,7 @@ class UserTentangDoulaPage extends StatelessWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
+                  fontFamily: 'OpenSans',
                 ),
               ),
             ],

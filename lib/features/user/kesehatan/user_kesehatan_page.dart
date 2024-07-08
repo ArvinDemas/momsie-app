@@ -40,7 +40,7 @@ class UserKesehatanPage extends StatelessWidget {
                       color: userKesehatanController.kesehatanType.value ==
                               "Rumah Sakit"
                           ? ColorDouce.douceBase
-                          : ColorDouce.grayBackground,
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(
                         color: ColorDouce.douceBase,
@@ -74,7 +74,7 @@ class UserKesehatanPage extends StatelessWidget {
                       color:
                           userKesehatanController.kesehatanType.value == "Doula"
                               ? ColorDouce.douceBase
-                              : ColorDouce.grayBackground,
+                              : Colors.white,
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(
                         color: ColorDouce.douceBase,
@@ -107,32 +107,45 @@ class UserKesehatanPage extends StatelessWidget {
   }
 
   Widget searchTextField(TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(
-          Icons.search,
-          size: 26,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 10,
-        ),
-        fillColor: Colors.white,
-        filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(26),
-        ),
-        hintText: "Cari Rumah Sakit atau Dokter",
-        hintStyle: const TextStyle(
-          color: Colors.black45,
-          fontSize: 14,
-          fontWeight: FontWeight.w300,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(26),
-          borderSide: const BorderSide(
-            color: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(
+            Icons.search,
+            size: 26,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          fillColor: Colors.white,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          hintText: "Cari Rumah Sakit atau Dokter",
+          hintStyle: const TextStyle(
+            color: Colors.black45,
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(26),
+            borderSide: const BorderSide(
+              color: Colors.black12,
+              width: 1,
+            ),
           ),
         ),
       ),

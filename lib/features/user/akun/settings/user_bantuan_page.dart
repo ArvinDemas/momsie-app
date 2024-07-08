@@ -12,7 +12,6 @@ class UserBantuanPage extends StatelessWidget {
         Get.put(UserBantuanController());
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -49,15 +48,16 @@ class UserBantuanPage extends StatelessWidget {
               Obx(
                 () => helpContainer(
                   "Bagaimana cara konsultasi dengan dokter",
-                  "Cara konsultasi dengan dokter dengan booking dokter tersebut dan memilih layanan",
+                  "Dengan booking dokter tersebut dan memilih layanan",
                   userBantuanController.konsultasiDokter.value,
                   () => userBantuanController.updateKonsultasiDokter(),
+                  true,
                 ),
               ),
               const SizedBox(height: 20),
               Obx(
                 () => userBantuanController.konsultasiDokter.value
-                    ? const SizedBox(height: 40)
+                    ? const SizedBox(height: 70)
                     : const SizedBox(),
               ),
               Obx(
@@ -66,6 +66,7 @@ class UserBantuanPage extends StatelessWidget {
                   "Tidak",
                   userBantuanController.konsultasiMahal.value,
                   () => userBantuanController.updateKonsultasiMahal(),
+                  false,
                 ),
               ),
               const SizedBox(height: 20),
@@ -80,6 +81,7 @@ class UserBantuanPage extends StatelessWidget {
                   "Bagus Banget",
                   userBantuanController.layananBagus.value,
                   () => userBantuanController.updateLayananBagus(),
+                  false,
                 ),
               ),
               const SizedBox(height: 20),
@@ -94,6 +96,7 @@ class UserBantuanPage extends StatelessWidget {
                   "Mantep",
                   userBantuanController.lupaPassword.value,
                   () => userBantuanController.updateLupaPassword(),
+                  false,
                 ),
               ),
             ],
@@ -108,6 +111,7 @@ class UserBantuanPage extends StatelessWidget {
     String subtitle,
     bool isToggle,
     Function onTap,
+    bool isSpecial,
   ) {
     return Stack(
       clipBehavior: Clip.none,
@@ -116,9 +120,10 @@ class UserBantuanPage extends StatelessWidget {
             ? Positioned(
                 left: 0,
                 right: 0,
-                bottom: -50,
+                bottom: isSpecial ? -80 : -50,
                 child: Container(
                   padding: const EdgeInsets.all(20),
+                  height: isSpecial ? 90 : 60,
                   decoration: BoxDecoration(
                     color: ColorDouce.douceBase,
                     borderRadius: const BorderRadius.only(
@@ -130,7 +135,8 @@ class UserBantuanPage extends StatelessWidget {
                     subtitle,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
+                      fontFamily: 'OpenSans',
                     ),
                   ),
                 ),
@@ -145,6 +151,14 @@ class UserBantuanPage extends StatelessWidget {
             ),
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -155,14 +169,15 @@ class UserBantuanPage extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'OpenSans',
                   ),
                 ),
               ),
               InkWell(
                 onTap: () => onTap(),
                 child: Icon(
-                  Icons.arrow_drop_down,
+                  isToggle ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                   size: 32,
                   color: ColorDouce.douceBase,
                 ),

@@ -12,7 +12,6 @@ class UserHubungiPage extends StatelessWidget {
         Get.put(UserHubungiController());
 
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -52,6 +51,7 @@ class UserHubungiPage extends StatelessWidget {
                   "(620) 555 - 1036",
                   userHubungiController.customerServiceToggle.value,
                   () => userHubungiController.toggleCustomerService(),
+                  Icons.headset_mic_outlined,
                 ),
               ),
               const SizedBox(height: 20),
@@ -63,9 +63,10 @@ class UserHubungiPage extends StatelessWidget {
               Obx(
                 () => contactContainer(
                   "WhatsApp",
-                  "(620) 555 - 1036",
+                  "0812 - 3456 - 7890",
                   userHubungiController.whatsAppToggle.value,
                   () => userHubungiController.toggleWhatsApp(),
+                  Icons.call,
                 ),
               ),
               const SizedBox(height: 20),
@@ -80,6 +81,7 @@ class UserHubungiPage extends StatelessWidget {
                   "www.doula.id",
                   userHubungiController.websiteToggle.value,
                   () => userHubungiController.toggleWebsite(),
+                  Icons.web_rounded,
                 ),
               ),
               const SizedBox(height: 20),
@@ -94,6 +96,7 @@ class UserHubungiPage extends StatelessWidget {
                   "Doula Indonesia",
                   userHubungiController.facebookToggle.value,
                   () => userHubungiController.toggleFacebook(),
+                  Icons.facebook,
                 ),
               ),
               const SizedBox(height: 20),
@@ -108,6 +111,7 @@ class UserHubungiPage extends StatelessWidget {
                   "@doula.id",
                   userHubungiController.instagramToggle.value,
                   () => userHubungiController.toggleInstagram(),
+                  Icons.mobile_friendly_sharp,
                 ),
               )
             ],
@@ -122,6 +126,7 @@ class UserHubungiPage extends StatelessWidget {
     String subtitle,
     bool isToggle,
     Function onTap,
+    IconData icon,
   ) {
     return Stack(
       clipBehavior: Clip.none,
@@ -145,6 +150,7 @@ class UserHubungiPage extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
+                      fontFamily: 'OpenSans',
                     ),
                   ),
                 ),
@@ -159,12 +165,20 @@ class UserHubungiPage extends StatelessWidget {
             ),
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Icon(
-                Icons.call,
+                icon,
                 size: 32,
                 color: ColorDouce.douceBase,
               ),
@@ -173,14 +187,15 @@ class UserHubungiPage extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w300,
+                  fontFamily: 'OpenSans',
                 ),
               ),
               const Spacer(),
               InkWell(
                 onTap: () => onTap(),
                 child: Icon(
-                  Icons.arrow_drop_down,
+                  isToggle ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                   size: 32,
                   color: ColorDouce.douceBase,
                 ),

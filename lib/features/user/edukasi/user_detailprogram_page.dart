@@ -8,7 +8,6 @@ class UserDetailProgramPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -71,10 +70,15 @@ class UserDetailProgramPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            weekContainer(),
-            weekContainer(),
-            weekContainer(),
-            weekContainer(),
+            Wrap(
+              runSpacing: 5,
+              children: [
+                monthContainer(),
+                monthContainer(),
+                monthContainer(),
+                monthContainer(),
+              ],
+            ),
           ],
         ),
       ),
@@ -88,6 +92,14 @@ class UserDetailProgramPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -104,7 +116,7 @@ class UserDetailProgramPage extends StatelessWidget {
     );
   }
 
-  Widget weekContainer() {
+  Widget monthContainer() {
     return InkWell(
       onTap: () => Get.toNamed('/user-program-bulan'),
       child: Container(

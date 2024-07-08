@@ -9,7 +9,6 @@ class UserProgressPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorDouce.grayBackground,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -45,12 +44,14 @@ class UserProgressPage extends StatelessWidget {
               const SizedBox(height: 30),
               MenuContainer(
                 title: "Program Kehailan",
+                image: 'kehamilan.png',
                 icon: Icons.abc,
                 onTap: () => Get.toNamed('/user-program'),
               ),
               MenuContainer(
                 title: "Riwayat Konsultasi",
                 icon: Icons.abc,
+                image: 'konsultasi.png',
                 onTap: () => Get.toNamed(
                   '/user-riwayat',
                   arguments: {
@@ -60,7 +61,7 @@ class UserProgressPage extends StatelessWidget {
               ),
               MenuContainer(
                 title: "Riwayat Layanan Kesehatan",
-                icon: Icons.abc,
+                icon: Icons.local_hospital,
                 onTap: () => Get.toNamed(
                   '/user-riwayat',
                   arguments: {
@@ -70,7 +71,7 @@ class UserProgressPage extends StatelessWidget {
               ),
               MenuContainer(
                 title: "Riwayat Artikel",
-                icon: Icons.abc,
+                icon: Icons.notes,
                 onTap: () => Get.toNamed(
                   '/user-riwayat',
                   arguments: {
@@ -80,7 +81,7 @@ class UserProgressPage extends StatelessWidget {
               ),
               MenuContainer(
                 title: "Disimpan",
-                icon: Icons.abc,
+                icon: Icons.save,
                 onTap: () {},
               ),
             ],

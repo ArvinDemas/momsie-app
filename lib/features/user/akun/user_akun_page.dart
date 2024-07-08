@@ -1,4 +1,5 @@
 import 'package:douce/shared/widget/account_topbar.dart';
+import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:douce/shared/widget/menu_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -48,12 +49,33 @@ class UserAkunPage extends StatelessWidget {
               MenuContainer(
                 title: "My Doula",
                 icon: Icons.abc,
-                onTap: () => Get.offAllNamed('/mitra'),
+                image: "small-logo.png",
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ConfirmDialog(
+                      descText: "Masuk Ke Halaman Doula ?",
+                      onTap: () {
+                        Get.offAllNamed('/mitra');
+                      },
+                    );
+                  },
+                ),
               ),
               MenuContainer(
                 title: "Keluar",
                 icon: Icons.logout,
-                onTap: () => Get.offAllNamed('/login'),
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ConfirmDialog(
+                      descText: "Keluar Dari Akun ?",
+                      onTap: () {
+                        Get.offAllNamed('/login');
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

@@ -46,12 +46,11 @@ class UserBerandaPage extends StatelessWidget {
                 const SingleChildScrollView(
                   clipBehavior: Clip.none,
                   scrollDirection: Axis.horizontal,
-                  child: Row(
+                  child: Wrap(
+                    spacing: 15,
                     children: [
                       DoulaContainer(),
-                      SizedBox(width: 15),
                       DoulaContainer(),
-                      SizedBox(width: 15),
                       DoulaContainer(),
                     ],
                   ),
@@ -78,10 +77,10 @@ class UserBerandaPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Column(
+                const Wrap(
+                  runSpacing: 15,
                   children: [
                     RumahSakitContainer(),
-                    SizedBox(height: 10),
                     RumahSakitContainer(),
                   ],
                 ),
@@ -109,12 +108,11 @@ class UserBerandaPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
+                  child: Wrap(
+                    spacing: 15,
                     children: [
                       tokoBayiContainer(),
-                      const SizedBox(width: 15),
                       tokoBayiContainer(),
-                      const SizedBox(width: 15),
                       tokoBayiContainer(),
                     ],
                   ),
@@ -141,9 +139,13 @@ class UserBerandaPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                artikelTerkiniContainer(),
-                const SizedBox(height: 10),
-                artikelTerkiniContainer(),
+                Wrap(
+                  runSpacing: 10,
+                  children: [
+                    artikelTerkiniContainer(),
+                    artikelTerkiniContainer(),
+                  ],
+                ),
               ],
             ),
           )
@@ -160,6 +162,14 @@ class UserBerandaPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(26),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         width: 175,
         child: Column(
@@ -228,6 +238,14 @@ class UserBerandaPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(26),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [

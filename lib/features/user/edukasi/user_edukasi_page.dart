@@ -42,7 +42,7 @@ class UserEdukasiPage extends StatelessWidget {
                             color:
                                 userEdukasiController.edukasi.value == "Artikel"
                                     ? ColorDouce.douceBase
-                                    : ColorDouce.grayBackground,
+                                    : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -76,7 +76,7 @@ class UserEdukasiPage extends StatelessWidget {
                             color: userEdukasiController.edukasi.value ==
                                     "Program Kehamilan"
                                 ? ColorDouce.douceBase
-                                : ColorDouce.grayBackground,
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -126,14 +126,12 @@ class UserEdukasiPage extends StatelessWidget {
   }
 
   Widget programKehamilanColumn() {
-    return Column(
+    return Wrap(
+      runSpacing: 20,
       children: [
         programKehamilanContainer(),
-        const SizedBox(height: 20),
         programKehamilanContainer(),
-        const SizedBox(height: 20),
         programKehamilanContainer(),
-        const SizedBox(height: 20),
         programKehamilanContainer(),
       ],
     );
@@ -148,6 +146,14 @@ class UserEdukasiPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [

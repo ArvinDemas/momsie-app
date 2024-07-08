@@ -26,7 +26,7 @@ class AccountTopBar extends StatelessWidget {
             left: 0,
             right: 0,
             child: Image.asset(
-              'assets/images/profile.png',
+              'assets/images/blank-profile.png',
               width: 150,
               height: 150,
             ),
