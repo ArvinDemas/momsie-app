@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,8 @@ class DetailObatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ObatModel obat = Get.arguments;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -53,37 +56,45 @@ class DetailObatPage extends StatelessWidget {
                           color: ColorDouce.douceBase,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Image.asset("assets/images/obat2.png"),
+                        child: Image.network(
+                          obat.image,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 15),
-                    const Expanded(
+                    Expanded(
+                      flex: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Baby Shop Jogja",
-                            style: TextStyle(
+                            obat.nama,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                             ),
                           ),
+                          const SizedBox(height: 5),
                           Text(
-                            "Jl. Kaliurang KM 5,5 Yogyakarta",
+                            "No Reg. ${obat.noreg}",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black,
+                              color: ColorDouce.douceBase,
                             ),
                           ),
-                          Row(children: [
-                            Icon(Icons.star, color: Colors.orange),
-                            Text(
-                              "4.9",
-                              style: TextStyle(fontSize: 14),
-                            )
-                          ])
+                          const SizedBox(height: 20),
+                          Text(
+                            "Rp ${obat.harga}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -106,10 +117,11 @@ class DetailObatPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Folamil Genio Tablet merupakan suplemen yang mengandung DHA, multivitamin, dan mineral yang dibutuhkan ....",
-                style: TextStyle(
+              Text(
+                obat.deskripsi,
+                style: const TextStyle(
                   fontSize: 14,
+                  fontWeight: FontWeight.w400,
                   color: Colors.black,
                 ),
               ),
@@ -123,116 +135,17 @@ class DetailObatPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Dewasa: 1 tablet sehari, diminum setelah makan.",
-                style: TextStyle(
+              Text(
+                obat.aturan,
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Perhatian",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Tidak dianjurkan untuk ibu hamil dan menyusui.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Beli di Tempat Terdekat",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 10),
-              rumahSakitContainer(),
-              const SizedBox(height: 10),
-              rumahSakitContainer(),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget rumahSakitContainer() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Image.asset(
-              'assets/images/rs.png',
-              height: 80,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "RSUP Dr. Sardjito",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.star,
-                    size: 20,
-                    color: Colors.orange,
-                  ),
-                  Text(
-                    "4.9",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    " | 400m",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          const Text(
-            "Jl. Kesehatan No. 1, Sekip, Yogyakarta",
-            style: TextStyle(
-              fontSize: 14,
-              letterSpacing: 0,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey,
-            ),
-          )
-        ],
       ),
     );
   }

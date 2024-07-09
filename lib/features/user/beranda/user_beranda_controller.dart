@@ -5,10 +5,10 @@ import 'package:douce/shared/util/service/tokobayi_service.dart';
 import 'package:get/get.dart';
 
 class UserBerandaController extends GetxController {
-  List<TokoBayiModel> tokoBayiList = [];
+  RxList<TokoBayiModel> tokoBayiList = <TokoBayiModel>[].obs;
   RxBool isTokoBayiLoading = true.obs;
 
-  List<ArtikelModel> artikelList = [];
+  RxList<ArtikelModel> artikelList = <ArtikelModel>[].obs;
   RxBool isArtikelLoading = true.obs;
   @override
   void onInit() {
@@ -25,8 +25,8 @@ class UserBerandaController extends GetxController {
     try {
       final tokoBayi = await TokoBayiService().getTokoBayi();
       if (tokoBayi.isNotEmpty) {
-        tokoBayiList =
-            tokoBayi.map((item) => TokoBayiModel.fromJson(item)).toList();
+        tokoBayiList.assignAll(
+            tokoBayi.map((item) => TokoBayiModel.fromJson(item)).toList());
       }
     } catch (e) {
       // print(e);
@@ -37,8 +37,8 @@ class UserBerandaController extends GetxController {
     try {
       final artikel = await ArtikelService().getArtikel();
       if (artikel.isNotEmpty) {
-        artikelList =
-            artikel.map((item) => ArtikelModel.fromJson(item)).toList();
+        artikelList.assignAll(
+            artikel.map((item) => ArtikelModel.fromJson(item)).toList());
       }
     } catch (e) {
       // print(e);

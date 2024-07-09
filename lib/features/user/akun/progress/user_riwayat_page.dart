@@ -1,5 +1,4 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/doula_container.dart';
 import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:flutter/material.dart';
@@ -91,10 +90,10 @@ class UserRiwayatPage extends StatelessWidget {
       spacing: 20,
       runSpacing: 20,
       children: [
-        ArtikelContainer(),
-        ArtikelContainer(),
-        ArtikelContainer(),
-        ArtikelContainer(),
+        // ArtikelContainer(),
+        // ArtikelContainer(),
+        // ArtikelContainer(),
+        // ArtikelContainer(),
       ],
     );
   }

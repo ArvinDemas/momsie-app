@@ -1,14 +1,17 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ObatContainer extends StatelessWidget {
-  const ObatContainer({super.key});
+  const ObatContainer({super.key, required this.obat});
+
+  final ObatModel obat;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Get.toNamed("/detail-obat"),
+      onTap: () => Get.toNamed("/detail-obat", arguments: obat),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -36,8 +39,8 @@ class ObatContainer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Image.asset(
-                  'assets/images/obat2.png',
+                child: Image.network(
+                  obat.image,
                   width: 75,
                   height: 75,
                 ),
@@ -47,27 +50,28 @@ class ObatContainer extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Paracetamol",
-                  style: TextStyle(
+                Text(
+                  obat.nama,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                   ),
                 ),
                 Text(
-                  "Vitamin",
+                  obat.jenis,
                   style: TextStyle(
                     fontSize: 14,
                     color: ColorDouce.douceBase,
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  "Rp 10.000",
-                  style: TextStyle(
+                Text(
+                  "Rp ${obat.harga} ",
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

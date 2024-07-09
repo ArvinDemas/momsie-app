@@ -10,7 +10,7 @@ class UserEdukasiPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserEdukasiController userEdukasiController =
+    final UserEdukasiController controller =
         Get.put(UserEdukasiController());
 
     return BasePage(
@@ -30,7 +30,7 @@ class UserEdukasiPage extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        userEdukasiController.changeEdukasi("Artikel");
+                        controller.changeEdukasi("Artikel");
                       },
                       child: Obx(
                         () => Container(
@@ -40,7 +40,7 @@ class UserEdukasiPage extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color:
-                                userEdukasiController.edukasi.value == "Artikel"
+                                controller.edukasi.value == "Artikel"
                                     ? ColorDouce.douceBase
                                     : Colors.white,
                             borderRadius: BorderRadius.circular(26),
@@ -52,7 +52,7 @@ class UserEdukasiPage extends StatelessWidget {
                             "Artikel",
                             style: TextStyle(
                               fontSize: 16,
-                              color: userEdukasiController.edukasi.value ==
+                              color: controller.edukasi.value ==
                                       "Artikel"
                                   ? Colors.white
                                   : Colors.black,
@@ -63,7 +63,7 @@ class UserEdukasiPage extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        userEdukasiController
+                        controller
                             .changeEdukasi("Program Kehamilan");
                       },
                       child: Obx(
@@ -73,7 +73,7 @@ class UserEdukasiPage extends StatelessWidget {
                             horizontal: 24,
                           ),
                           decoration: BoxDecoration(
-                            color: userEdukasiController.edukasi.value ==
+                            color: controller.edukasi.value ==
                                     "Program Kehamilan"
                                 ? ColorDouce.douceBase
                                 : Colors.white,
@@ -86,7 +86,7 @@ class UserEdukasiPage extends StatelessWidget {
                             "Program Kehamilan",
                             style: TextStyle(
                               fontSize: 16,
-                              color: userEdukasiController.edukasi.value ==
+                              color: controller.edukasi.value ==
                                       "Program Kehamilan"
                                   ? Colors.white
                                   : Colors.black,
@@ -99,8 +99,8 @@ class UserEdukasiPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Obx(
-                  () => userEdukasiController.edukasi.value == "Artikel"
-                      ? artikelColumn()
+                  () => controller.edukasi.value == "Artikel"
+                      ? artikelColumn(controller)
                       : programKehamilanColumn(),
                 ),
               ],
@@ -111,17 +111,16 @@ class UserEdukasiPage extends StatelessWidget {
     );
   }
 
-  Widget artikelColumn() {
-    return const Wrap(
-      spacing: 20,
-      alignment: WrapAlignment.spaceAround,
-      runSpacing: 20,
-      children: [
-        ArtikelContainer(),
-        ArtikelContainer(),
-        ArtikelContainer(),
-        ArtikelContainer(),
-      ],
+  Widget artikelColumn(UserEdukasiController controller) {
+    return Obx(
+      () => controller.isLoadingArtikel.value ? const Center(
+        child: CircularProgressIndicator(),
+      ) : Wrap(
+        spacing: 20,
+        alignment: WrapAlignment.spaceAround,
+        runSpacing: 20,
+        children: controller.artikelList.map((artikel) => ArtikelContainer(artikel: artikel)).toList()
+      ),
     );
   }
 

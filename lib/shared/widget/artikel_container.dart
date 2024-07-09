@@ -1,14 +1,17 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ArtikelContainer extends StatelessWidget {
-  const ArtikelContainer({super.key});
+  const ArtikelContainer({super.key, required this.artikel});
+
+  final ArtikelModel artikel;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Get.toNamed('/user-artikel'),
+      onTap: () => Get.toNamed('/user-artikel', arguments: artikel),
       child: Container(
         padding: const EdgeInsets.all(10),
         width: 150,
@@ -21,34 +24,34 @@ class ArtikelContainer extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                'assets/images/artikel.png',
+              child: Image.network(
+                artikel.imageUrl,
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 5),
-            const Text(
-              "By Lionel Messi",
-              style: TextStyle(
+            Text(
+              artikel.publisher,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w300,
                 color: Colors.white,
               ),
             ),
-            const Text(
-              "Tips dan Trik untuk Ibu Hamil",
-              style: TextStyle(
+            Text(
+              artikel.title,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "10 Agustus 2021",
-              style: TextStyle(
+            Text(
+              artikel.date,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w300,
                 color: Colors.white,

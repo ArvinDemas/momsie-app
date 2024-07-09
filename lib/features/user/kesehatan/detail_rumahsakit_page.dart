@@ -1,6 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/doula_container.dart';
-import 'package:douce/shared/widget/obat_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -157,9 +156,9 @@ class DetailRumahSakitPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              const ObatContainer(),
-              const ObatContainer(),
+              // const SizedBox(height: 20),
+              // const ObatContainer(),
+              // const ObatContainer(),
               const SizedBox(height: 20),
               InkWell(
                 onTap: () => Get.toNamed('/chat-page'),
