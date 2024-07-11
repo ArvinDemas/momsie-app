@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,7 @@ class UserDetailProgramPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProgramModel program = Get.arguments['program'];
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -42,7 +44,7 @@ class UserDetailProgramPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 30),
-            programKehamilanContainer(),
+            programKehamilanContainer(program),
             const SizedBox(height: 20),
             const Text(
               "Deskripsi",
@@ -53,17 +55,17 @@ class UserDetailProgramPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Program ini adalah program yang akan membantu ibu hamil untuk menjalani kehamilan dengan sehat dan bahagia.",
-              style: TextStyle(
+            Text(
+              program.desc,
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black,
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              "Program Yoga",
-              style: TextStyle(
+            Text(
+              "Program ${program.name}",
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
@@ -72,12 +74,9 @@ class UserDetailProgramPage extends StatelessWidget {
             const SizedBox(height: 10),
             Wrap(
               runSpacing: 5,
-              children: [
-                monthContainer(),
-                monthContainer(),
-                monthContainer(),
-                monthContainer(),
-              ],
+              children: program.months
+                  .map((bulan) => monthContainer(bulan, program))
+                  .toList(),
             ),
           ],
         ),
@@ -85,10 +84,13 @@ class UserDetailProgramPage extends StatelessWidget {
     );
   }
 
-  Widget programKehamilanContainer() {
+  Widget programKehamilanContainer(ProgramModel program) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 30,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -102,23 +104,32 @@ class UserDetailProgramPage extends StatelessWidget {
         ],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Program Yogya",
+            "Program ${program.name}",
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w500,
               color: ColorDouce.douceBase,
             ),
           ),
+          Image.network(
+            program.image,
+            width: 75,
+            height: 75,
+          )
         ],
       ),
     );
   }
 
-  Widget monthContainer() {
+  Widget monthContainer(Month bulan, ProgramModel program) {
     return InkWell(
-      onTap: () => Get.toNamed('/user-program-bulan'),
+      onTap: () => Get.toNamed('/user-program-bulan', arguments: {
+        'month': bulan,
+        'program': program,
+      }),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -130,18 +141,18 @@ class UserDetailProgramPage extends StatelessWidget {
             ),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Bulan ke - 1",
-              style: TextStyle(
+              "Bulan ke - ${bulan.month}",
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
               ),
             ),
-            Icon(Icons.arrow_forward_ios),
+            const Icon(Icons.arrow_forward_ios),
           ],
         ),
       ),

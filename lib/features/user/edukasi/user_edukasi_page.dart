@@ -1,5 +1,6 @@
 import 'package:douce/features/user/edukasi/user_edukasi_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/program_model.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,7 @@ class UserEdukasiPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserEdukasiController controller =
-        Get.put(UserEdukasiController());
+    final UserEdukasiController controller = Get.put(UserEdukasiController());
 
     return BasePage(
       isApotek: true,
@@ -39,10 +39,9 @@ class UserEdukasiPage extends StatelessWidget {
                             horizontal: 24,
                           ),
                           decoration: BoxDecoration(
-                            color:
-                                controller.edukasi.value == "Artikel"
-                                    ? ColorDouce.douceBase
-                                    : Colors.white,
+                            color: controller.edukasi.value == "Artikel"
+                                ? ColorDouce.douceBase
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -52,8 +51,7 @@ class UserEdukasiPage extends StatelessWidget {
                             "Artikel",
                             style: TextStyle(
                               fontSize: 16,
-                              color: controller.edukasi.value ==
-                                      "Artikel"
+                              color: controller.edukasi.value == "Artikel"
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -63,8 +61,7 @@ class UserEdukasiPage extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        controller
-                            .changeEdukasi("Program Kehamilan");
+                        controller.changeEdukasi("Program Kehamilan");
                       },
                       child: Obx(
                         () => Container(
@@ -73,10 +70,10 @@ class UserEdukasiPage extends StatelessWidget {
                             horizontal: 24,
                           ),
                           decoration: BoxDecoration(
-                            color: controller.edukasi.value ==
-                                    "Program Kehamilan"
-                                ? ColorDouce.douceBase
-                                : Colors.white,
+                            color:
+                                controller.edukasi.value == "Program Kehamilan"
+                                    ? ColorDouce.douceBase
+                                    : Colors.white,
                             borderRadius: BorderRadius.circular(26),
                             border: Border.all(
                               color: ColorDouce.douceBase,
@@ -101,7 +98,7 @@ class UserEdukasiPage extends StatelessWidget {
                 Obx(
                   () => controller.edukasi.value == "Artikel"
                       ? artikelColumn(controller)
-                      : programKehamilanColumn(),
+                      : programKehamilanColumn(controller),
                 ),
               ],
             ),
@@ -113,35 +110,46 @@ class UserEdukasiPage extends StatelessWidget {
 
   Widget artikelColumn(UserEdukasiController controller) {
     return Obx(
-      () => controller.isLoadingArtikel.value ? const Center(
-        child: CircularProgressIndicator(),
-      ) : Wrap(
-        spacing: 20,
-        alignment: WrapAlignment.spaceAround,
-        runSpacing: 20,
-        children: controller.artikelList.map((artikel) => ArtikelContainer(artikel: artikel)).toList()
-      ),
+      () => controller.isLoadingArtikel.value
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Wrap(
+              spacing: 20,
+              alignment: WrapAlignment.spaceAround,
+              runSpacing: 20,
+              children: controller.artikelList
+                  .map((artikel) => ArtikelContainer(artikel: artikel))
+                  .toList()),
     );
   }
 
-  Widget programKehamilanColumn() {
-    return Wrap(
-      runSpacing: 20,
-      children: [
-        programKehamilanContainer(),
-        programKehamilanContainer(),
-        programKehamilanContainer(),
-        programKehamilanContainer(),
-      ],
+  Widget programKehamilanColumn(UserEdukasiController controller) {
+    return Obx(
+      () => controller.isLoadingProgram.value
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Wrap(
+              runSpacing: 20,
+              children: controller.programList
+                  .map((program) => programKehamilanContainer(program))
+                  .toList(),
+            ),
     );
   }
 
-  Widget programKehamilanContainer() {
+  Widget programKehamilanContainer(ProgramModel program) {
     return InkWell(
-      onTap: () => Get.toNamed('/user-detail-program'),
+      onTap: () => Get.toNamed('/user-detail-program', arguments: {
+        'program': program,
+      }),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(
+          vertical: 5,
+          horizontal: 30,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -155,15 +163,21 @@ class UserEdukasiPage extends StatelessWidget {
           ],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Program Yogya",
+              "Program ${program.name}",
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w500,
                 color: ColorDouce.douceBase,
               ),
             ),
+            Image.network(
+              program.image,
+              width: 75,
+              height: 75,
+            )
           ],
         ),
       ),

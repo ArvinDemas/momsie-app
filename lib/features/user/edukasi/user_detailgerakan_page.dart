@@ -1,5 +1,6 @@
 import 'package:douce/features/user/edukasi/user_detailgerakan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/program_model.dart';
 import 'package:douce/shared/widget/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,16 @@ class UserDetailGerakanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserDetailGerakanController gerakanController =
         Get.put(UserDetailGerakanController());
+
+    final ProgramModel program = Get.arguments['program'];
+    final Week week = Get.arguments['week'];
+    final Month month = Get.arguments['month'];
+    final Move move = Get.arguments['move'];
+
+    gerakanController.timerSecond.value = move.time;
+    gerakanController.onTimeEnd = () {
+      showCustomDialog(context, program, week, month, move);
+    };
 
     return Scaffold(
       body: SafeArea(
@@ -26,7 +37,13 @@ class UserDetailGerakanPage extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     gerakanController.explanationState.value
-                        ? Get.back()
+                        ? Get.back(
+                            result: {
+                              "program": program,
+                              "month": month,
+                              "week": week,
+                            },
+                          )
                         : gerakanController.changeExplanationState();
                   },
                   child: Icon(
@@ -51,18 +68,20 @@ class UserDetailGerakanPage extends StatelessWidget {
             const SizedBox(height: 20),
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                'assets/images/gerakan.png',
+              child: Image.network(
+                move.image,
+                height: 150,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 20),
-            const Center(
+            Center(
               child: Text(
-                "Pose Sukhsana dan Pernapasan Dalam",
-                style: TextStyle(
+                move.name,
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -84,8 +103,13 @@ class UserDetailGerakanPage extends StatelessWidget {
                               textAlign: TextAlign.start,
                             ),
                             const SizedBox(height: 10),
-                            const Text(
-                              "Pose Sukhasana, atau yang dikenal sebagai Easy Pose, adalah posisi duduk yang nyaman dan mudah dilakukan. Ini adalah pose yang umum digunakan untuk meditasi, pernapasan, dan peregangan ringan. Pose ini melibatkan duduk dengan kaki silang di depan tubuh, dengan tulang belakang tegak dan bahu yang rileks.",
+                            Text(
+                              move.petunjuk,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.start,
                             ),
                             const SizedBox(height: 20),
                             buttonContainer(
@@ -96,9 +120,9 @@ class UserDetailGerakanPage extends StatelessWidget {
                         )
                       : Column(
                           children: [
-                            const Text(
-                              "5 Menit",
-                              style: TextStyle(
+                            Text(
+                              "${move.time / 60} Menit",
+                              style: const TextStyle(
                                 fontSize: 18,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
@@ -113,7 +137,7 @@ class UserDetailGerakanPage extends StatelessWidget {
                                   height: 150,
                                   child: CircularProgressIndicator(
                                     value: gerakanController.timerSecond.value /
-                                        60,
+                                        move.time,
                                     color: ColorDouce.douceBase,
                                     backgroundColor: ColorDouce.kindaRed,
                                     strokeWidth: 10,
@@ -153,7 +177,8 @@ class UserDetailGerakanPage extends StatelessWidget {
                             buttonContainer(
                               "Selesai",
                               () {
-                                showCustomDialog(context);
+                                showCustomDialog(
+                                    context, program, week, month, move);
                               },
                             )
                           ],
@@ -190,7 +215,8 @@ class UserDetailGerakanPage extends StatelessWidget {
     );
   }
 
-  void showCustomDialog(BuildContext context) {
+  void showCustomDialog(BuildContext context, ProgramModel program, Week week,
+      Month month, Move move) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -200,8 +226,19 @@ class UserDetailGerakanPage extends StatelessWidget {
           destination: '/user',
           onTap: () {
             Get.offAllNamed('/user');
-            Get.toNamed('/user-program-bulan');
-            Get.toNamed('/user-program-minggu');
+            Get.toNamed(
+              '/user-detail-program',
+              arguments: {
+                'program': program,
+              },
+            );
+            Get.toNamed(
+              '/user-program-bulan',
+              arguments: {
+                'month': month,
+                'program': program,
+              },
+            );
           },
         );
       },

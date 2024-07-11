@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,10 @@ class UserProgramMingguPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProgramModel program = Get.arguments['program'];
+    final Week week = Get.arguments['week'];
+    final Month month = Get.arguments['month'];
+
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -20,16 +25,21 @@ class UserProgramMingguPage extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.back();
+                    Get.back(
+                      result: {
+                        "program": program,
+                        "month": month,
+                      },
+                    );
                   },
                   child: Icon(
                     Icons.arrow_back_ios,
                     color: ColorDouce.douceBase,
                   ),
                 ),
-                const Text(
-                  "Minggu Ke - 1",
-                  style: TextStyle(
+                Text(
+                  "Minggu Ke - ${week.week}",
+                  style: const TextStyle(
                     fontSize: 22,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
@@ -55,14 +65,11 @@ class UserProgramMingguPage extends StatelessWidget {
             const SizedBox(height: 20),
             Wrap(
               runSpacing: 15,
-              children: [
-                gerakanContainer(),
-                gerakanContainer(),
-                gerakanContainer(),
-                gerakanContainer(),
-                gerakanContainer(),
-                gerakanContainer(),
-              ],
+              children: week.moves
+                  .map(
+                    (move) => gerakanContainer(program, month, week, move),
+                  )
+                  .toList(),
             )
           ],
         ),
@@ -70,9 +77,14 @@ class UserProgramMingguPage extends StatelessWidget {
     );
   }
 
-  Widget gerakanContainer() {
+  Widget gerakanContainer(ProgramModel program, Month month, Week week, Move move) {
     return InkWell(
-      onTap: () => Get.toNamed("/user-detail-gerakan"),
+      onTap: () => Get.toNamed("/user-detail-gerakan", arguments: {
+        "program": program,
+        "month": month,
+        "week": week,
+        "move": move,
+      }),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: const BoxDecoration(
@@ -83,20 +95,20 @@ class UserProgramMingguPage extends StatelessWidget {
             ),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
               child: Text(
-                "Pose Sukhsana + Pernapasan Dalam",
-                style: TextStyle(
+                move.name,
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black,
                   fontWeight: FontWeight.w300,
                 ),
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios,
               color: Colors.black,
               size: 24,

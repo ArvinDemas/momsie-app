@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,8 @@ class UserProgramBulanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Month month = Get.arguments['month'];
+    final ProgramModel program = Get.arguments['program'];
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -20,16 +23,16 @@ class UserProgramBulanPage extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.back();
+                    Get.back(result: program);
                   },
                   child: Icon(
                     Icons.arrow_back_ios,
                     color: ColorDouce.douceBase,
                   ),
                 ),
-                const Text(
-                  "Bulan Ke - 1",
-                  style: TextStyle(
+                Text(
+                  "Bulan Ke - ${month.month}",
+                  style: const TextStyle(
                     fontSize: 22,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
@@ -44,11 +47,11 @@ class UserProgramBulanPage extends StatelessWidget {
             const SizedBox(height: 30),
             Wrap(
               runSpacing: 25,
-              children: [
-                bulanContainer(),
-                bulanContainer(),
-                bulanContainer(),
-              ],
+              children: month.weeks
+                  .map(
+                    (week) => bulanContainer(program, month, week),
+                  )
+                  .toList(),
             )
           ],
         ),
@@ -56,9 +59,13 @@ class UserProgramBulanPage extends StatelessWidget {
     );
   }
 
-  Widget bulanContainer() {
+  Widget bulanContainer(ProgramModel program, Month month, Week week) {
     return InkWell(
-      onTap: () => Get.toNamed('/user-program-minggu'),
+      onTap: () => Get.toNamed('/user-program-minggu', arguments: {
+        'week': week,
+        'month': month,
+        'program': program,
+      }),
       child: Container(
         padding: const EdgeInsets.all(16),
         width: double.infinity,
@@ -79,18 +86,18 @@ class UserProgramBulanPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Minggu Ke - 1",
-                      style: TextStyle(
+                      "Minggu Ke - ${week.week}",
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
                     ),
-                    Text(
+                    const Text(
                       "Pengenalan Yoga Prenetal",
                       style: TextStyle(
                         fontSize: 16,
@@ -99,8 +106,8 @@ class UserProgramBulanPage extends StatelessWidget {
                     )
                   ],
                 ),
-                Image.asset(
-                  "assets/images/yoga.png",
+                Image.network(
+                  program.image,
                   width: 75,
                   height: 75,
                 ),
@@ -108,7 +115,7 @@ class UserProgramBulanPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             LinearProgressIndicator(
-              value: 0.5,
+              value: 1,
               color: ColorDouce.douceBase,
               minHeight: 5,
             ),
