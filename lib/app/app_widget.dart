@@ -214,7 +214,7 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.userSearch,
           page: () => const UserSearchPage(),
-        )
+        ),
       ],
       initialRoute: AppRoutes.splash,
     );

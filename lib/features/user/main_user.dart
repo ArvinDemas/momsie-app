@@ -13,14 +13,27 @@ class MainUserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MainUserController mainUserController = Get.put(MainUserController());
+    final List<Widget> pageList = [
+      UserBerandaPage(
+        changeNavigation: (String changeController) {
+          mainUserController.kesehatanController.value = changeController;
+          mainUserController.onItemTapped(1);
+        },
+      ),
+      UserKesehatanPage(
+        title: mainUserController.kesehatanController.value,
+      ),
+      const UserObatPage(),
+      const UserEdukasiPage(),
+      const UserAkunPage(),
+    ];
 
     return PopScope(
       canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: Obx(
-          () => mainUserController
-              .pageList[mainUserController.selectedIndex.value],
+          () => pageList[mainUserController.selectedIndex.value],
         ),
         bottomNavigationBar: Obx(
           () => NavBar(
@@ -42,16 +55,9 @@ class MainUserPage extends StatelessWidget {
 
 class MainUserController extends GetxController {
   RxInt selectedIndex = 0.obs;
+  RxString kesehatanController = "Rumah Sakit".obs;
 
   void onItemTapped(int index) {
     selectedIndex.value = index;
   }
-
-  final List<Widget> pageList = const [
-    UserBerandaPage(),
-    UserKesehatanPage(),
-    UserObatPage(),
-    UserEdukasiPage(),
-    UserAkunPage(),
-  ];
 }

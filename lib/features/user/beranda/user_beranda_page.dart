@@ -9,7 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UserBerandaPage extends StatelessWidget {
-  const UserBerandaPage({super.key});
+  const UserBerandaPage({
+    super.key,
+    required this.changeNavigation,
+  });
+
+  final Function(String) changeNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +43,16 @@ class UserBerandaPage extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: ColorDouce.douceBase,
+                    InkWell(
+                      onTap: () {
+                        changeNavigation("Doula");
+                      },
+                      child: Text(
+                        "Lihat Semua",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ColorDouce.douceBase,
+                        ),
                       ),
                     )
                   ],
@@ -65,29 +75,40 @@ class UserBerandaPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Rumah Sakit Terdekat",
+                      "Rumah Sakit Mitra",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: ColorDouce.douceBase,
+                    InkWell(
+                      onTap: () {
+                        changeNavigation("Rumah Sakit");
+                      },
+                      child: Text(
+                        "Lihat Semua",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ColorDouce.douceBase,
+                        ),
                       ),
                     )
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Wrap(
-                  runSpacing: 15,
-                  children: [
-                    RumahSakitContainer(),
-                    RumahSakitContainer(),
-                  ],
+                Obx(
+                  () => controller.isRumahSakitLoading.value
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : Wrap(
+                          runSpacing: 15,
+                          children: [
+                            for (final rumahSakit in controller.rumahSakitList)
+                              RumahSakitContainer(rumahSakit: rumahSakit),
+                          ],
+                        ),
                 ),
                 const SizedBox(height: 30),
                 Row(

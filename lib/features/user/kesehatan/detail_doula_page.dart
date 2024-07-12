@@ -1,5 +1,4 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -117,8 +116,6 @@ class DetailDoulaPage extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 20),
-              const RumahSakitContainer(),
               const SizedBox(height: 20),
               InkWell(
                 onTap: () => Get.toNamed("/booking-doula"),

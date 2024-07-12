@@ -1,6 +1,8 @@
 import 'package:douce/shared/util/model/artikel_model.dart';
+import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/util/service/artikel_service.dart';
+import 'package:douce/shared/util/service/rumahsakit_service.dart';
 import 'package:douce/shared/util/service/tokobayi_service.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +12,10 @@ class UserBerandaController extends GetxController {
 
   RxList<ArtikelModel> artikelList = <ArtikelModel>[].obs;
   RxBool isArtikelLoading = true.obs;
+
+  RxList<RumahSakitModel> rumahSakitList = <RumahSakitModel>[].obs;
+  RxBool isRumahSakitLoading = true.obs;
+
   @override
   void onInit() {
     getTokoBayi().then((_) {
@@ -17,6 +23,9 @@ class UserBerandaController extends GetxController {
     });
     getArtikel().then((_) {
       isArtikelLoading.value = false;
+    });
+    getRumahSakit().then((_) {
+      isRumahSakitLoading.value = false;
     });
     super.onInit();
   }
@@ -39,6 +48,18 @@ class UserBerandaController extends GetxController {
       if (artikel.isNotEmpty) {
         artikelList.assignAll(
             artikel.map((item) => ArtikelModel.fromJson(item)).toList());
+      }
+    } catch (e) {
+      // print(e);
+    }
+  }
+
+  Future<void> getRumahSakit() async {
+    try {
+      final List<RumahSakitModel> rumahSakit =
+          await RumahSakitService().getRumahSakit();
+      if (rumahSakit.isNotEmpty) {
+        rumahSakitList.assignAll(rumahSakit);
       }
     } catch (e) {
       // print(e);

@@ -1,5 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/doula_container.dart';
+import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +8,7 @@ class DetailRumahSakitPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final RumahSakitModel rumahSakit = Get.arguments;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -48,38 +49,45 @@ class DetailRumahSakitPage extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Image.asset(
-                        "assets/images/rs.png",
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: Image.network(
+                          rumahSakit.image,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "RSUP Dr. Sardjito",
-                            style: TextStyle(
+                            rumahSakit.nama,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            "Jl. Kaliurang KM 5,5 Yogyakarta",
-                            style: TextStyle(
+                            rumahSakit.alamat,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black,
                             ),
                           ),
-                          Row(children: [
-                            Icon(Icons.star, color: Colors.orange),
-                            Text(
-                              "4.9",
-                              style: TextStyle(fontSize: 14),
-                            )
-                          ])
+                          const Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.orange),
+                              Text(
+                                "4.9",
+                                style: TextStyle(fontSize: 14),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -102,60 +110,60 @@ class DetailRumahSakitPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text("Pemeriksaan Kehamilan Rutin, blablabla"),
+              Text(rumahSakit.layanan),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Doula",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorDouce.douceBase,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              const SingleChildScrollView(
-                clipBehavior: Clip.none,
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    DoulaContainer(),
-                    DoulaContainer(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Obat",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorDouce.douceBase,
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     const Text(
+              //       "Doula",
+              //       style: TextStyle(
+              //         fontSize: 20,
+              //         fontWeight: FontWeight.w500,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //     Text(
+              //       "Lihat Semua",
+              //       style: TextStyle(
+              //         fontSize: 14,
+              //         color: ColorDouce.douceBase,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 40),
+              // const SingleChildScrollView(
+              //   clipBehavior: Clip.none,
+              //   scrollDirection: Axis.horizontal,
+              //   child: Row(
+              //     children: [
+              //       DoulaContainer(),
+              //       DoulaContainer(),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 40),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     const Text(
+              //       "Obat",
+              //       style: TextStyle(
+              //         fontSize: 20,
+              //         fontWeight: FontWeight.w500,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //     Text(
+              //       "Lihat Semua",
+              //       style: TextStyle(
+              //         fontSize: 14,
+              //         color: ColorDouce.douceBase,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               // const SizedBox(height: 20),
               // const ObatContainer(),
               // const ObatContainer(),

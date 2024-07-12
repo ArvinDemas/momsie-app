@@ -1,6 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/doula_container.dart';
-import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -77,9 +76,9 @@ class UserRiwayatPage extends StatelessWidget {
   Widget layananColumn() {
     return const Column(
       children: [
-        RumahSakitContainer(),
+        // RumahSakitContainer(),
         SizedBox(height: 20),
-        RumahSakitContainer(),
+        // RumahSakitContainer(),
       ],
     );
   }

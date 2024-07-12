@@ -1,14 +1,27 @@
+import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RumahSakitContainer extends StatelessWidget {
-  const RumahSakitContainer({super.key});
+  const RumahSakitContainer(
+      {super.key, this.fullWidth = true, this.onTap, required this.rumahSakit});
+
+  final bool fullWidth;
+  final Function? onTap;
+  final RumahSakitModel rumahSakit;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Get.toNamed("/detail-rumah-sakit"),
+      onTap: () {
+        if (onTap != null) {
+          onTap!();
+        } else {
+          Get.toNamed("/detail-rumah-sakit", arguments: rumahSakit);
+        }
+      },
       child: Container(
+        width: fullWidth ? double.infinity : 300,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -27,59 +40,52 @@ class RumahSakitContainer extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(22),
-              child: Image.asset(
-                'assets/images/rs.png',
+              child: Image.network(
+                rumahSakit.image,
                 height: 80,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 10),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "RSUP Dr. Sardjito",
+                  rumahSakit.nama,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: fullWidth ? 18 : 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star,
                       size: 20,
                       color: Colors.orange,
                     ),
                     Text(
-                      "4.9",
-                      style: TextStyle(
+                      rumahSakit.rating,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    Text(
-                      " | 400m",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey,
-                      ),
-                    )
                   ],
                 ),
               ],
             ),
-            const Text(
-              "Jl. Kesehatan No. 1, Sekip, Yogyakarta",
-              style: TextStyle(
+            Text(
+              rumahSakit.alamat,
+              style: const TextStyle(
                 fontSize: 14,
                 letterSpacing: 0,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey,
               ),
-            )
+              overflow: !fullWidth ? TextOverflow.ellipsis : null,
+            ),
           ],
         ),
       ),
