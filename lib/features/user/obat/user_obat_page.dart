@@ -34,11 +34,24 @@ class UserObatPage extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: ColorDouce.douceBase,
+                    InkWell(
+                      onTap: () {
+                        controller.isObatLoading.value
+                            ? () {}
+                            : Get.toNamed(
+                                '/see-more',
+                                arguments: {
+                                  'title': 'Obat',
+                                  'obat': controller.obatList,
+                                },
+                              );
+                      },
+                      child: Text(
+                        "Lihat Semua",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ColorDouce.douceBase,
+                        ),
                       ),
                     )
                   ],

@@ -25,12 +25,7 @@ class UserProgramMingguPage extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.back(
-                      result: {
-                        "program": program,
-                        "month": month,
-                      },
-                    );
+                    Get.back();
                   },
                   child: Icon(
                     Icons.arrow_back_ios,
@@ -77,7 +72,8 @@ class UserProgramMingguPage extends StatelessWidget {
     );
   }
 
-  Widget gerakanContainer(ProgramModel program, Month month, Week week, Move move) {
+  Widget gerakanContainer(
+      ProgramModel program, Month month, Week week, Move move) {
     return InkWell(
       onTap: () => Get.toNamed("/user-detail-gerakan", arguments: {
         "program": program,

@@ -23,7 +23,7 @@ class UserProgramBulanPage extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.back(result: program);
+                    Get.back();
                   },
                   child: Icon(
                     Icons.arrow_back_ios,

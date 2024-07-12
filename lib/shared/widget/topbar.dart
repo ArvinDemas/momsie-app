@@ -119,6 +119,11 @@ class TopBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(32),
                     ),
                   ),
+                  onFieldSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      Get.toNamed('/user-search', arguments: value);
+                    }
+                  },
                 ),
               ),
             ),

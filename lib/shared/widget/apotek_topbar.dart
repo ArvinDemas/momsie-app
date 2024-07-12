@@ -89,7 +89,7 @@ class ApotikTopBar extends StatelessWidget {
                       blurRadius: 5,
                       offset: const Offset(0, 3),
                     ),
-                  ],  
+                  ],
                 ),
                 width: MediaQuery.of(context).size.width - 50,
                 padding: const EdgeInsets.symmetric(
@@ -117,6 +117,11 @@ class ApotikTopBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(32),
                     ),
                   ),
+                  onFieldSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      Get.toNamed('/user-search', arguments: value);
+                    }
+                  },
                 ),
               ),
             ),

@@ -38,4 +38,6 @@ class AppRoutes {
   static const String confirmBooking = '/confirm-booking';
   static const String paymentMethod = '/payment-method';
   static const String chatPage = '/chat-page';
+  static const String seeMore = '/see-more';
+  static const String userSearch = '/user-search';
 }

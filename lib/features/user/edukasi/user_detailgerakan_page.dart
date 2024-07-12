@@ -37,13 +37,7 @@ class UserDetailGerakanPage extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     gerakanController.explanationState.value
-                        ? Get.back(
-                            result: {
-                              "program": program,
-                              "month": month,
-                              "week": week,
-                            },
-                          )
+                        ? Get.back()
                         : gerakanController.changeExplanationState();
                   },
                   child: Icon(
