@@ -9,17 +9,12 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserKesehatanPage extends StatelessWidget {
-  const UserKesehatanPage({
-    super.key,
-    required this.title,
-  });
-
-  final String title;
+  const UserKesehatanPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final UserKesehatanController userKesehatanController =
-        Get.put(UserKesehatanController(title: title));
+        Get.put(UserKesehatanController());
     final GoogleMapsController mapcontroller = Get.put(GoogleMapsController());
     final TextEditingController searchController = TextEditingController();
 

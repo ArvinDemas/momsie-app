@@ -1,6 +1,7 @@
 import 'package:douce/features/user/akun/user_akun_page.dart';
 import 'package:douce/features/user/beranda/user_beranda_page.dart';
 import 'package:douce/features/user/edukasi/user_edukasi_page.dart';
+import 'package:douce/features/user/kesehatan/user_kesehatan_controller.dart';
 import 'package:douce/features/user/kesehatan/user_kesehatan_page.dart';
 import 'package:douce/features/user/obat/user_obat_page.dart';
 import 'package:douce/shared/widget/navbar.dart';
@@ -16,13 +17,15 @@ class MainUserPage extends StatelessWidget {
     final List<Widget> pageList = [
       UserBerandaPage(
         changeNavigation: (String changeController) {
-          mainUserController.kesehatanController.value = changeController;
+          if (!Get.isRegistered<UserKesehatanController>()) {
+            Get.put(UserKesehatanController());
+          }
+          Get.find<UserKesehatanController>().kesehatanType.value =
+              changeController;
           mainUserController.onItemTapped(1);
         },
       ),
-      UserKesehatanPage(
-        title: mainUserController.kesehatanController.value,
-      ),
+      const UserKesehatanPage(),
       const UserObatPage(),
       const UserEdukasiPage(),
       const UserAkunPage(),
