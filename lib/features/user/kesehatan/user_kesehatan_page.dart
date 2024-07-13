@@ -1,4 +1,3 @@
-import 'package:douce/features/user/kesehatan/google_maps_controller.dart';
 import 'package:douce/features/user/kesehatan/user_kesehatan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
@@ -15,8 +14,6 @@ class UserKesehatanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserKesehatanController userKesehatanController =
         Get.put(UserKesehatanController());
-    final GoogleMapsController mapcontroller = Get.put(GoogleMapsController());
-    final TextEditingController searchController = TextEditingController();
 
     return Stack(
       children: [
@@ -27,17 +24,17 @@ class UserKesehatanPage extends StatelessWidget {
                 )
               : userKesehatanController.kesehatanType.value == "Doula"
                   ? doulaColumn()
-                  : rumahSakitColum(mapcontroller),
+                  : rumahSakitColum(userKesehatanController),
         ),
         Positioned(
-          top: 50,
+          top: 70,
           left: 0,
           right: 0,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                searchTextField(searchController),
+                searchTextField(userKesehatanController),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -123,7 +120,7 @@ class UserKesehatanPage extends StatelessWidget {
     );
   }
 
-  Widget searchTextField(TextEditingController controller) {
+  Widget searchTextField(UserKesehatanController controller) {
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -136,7 +133,6 @@ class UserKesehatanPage extends StatelessWidget {
         ],
       ),
       child: TextField(
-        controller: controller,
         decoration: InputDecoration(
           prefixIcon: const Icon(
             Icons.search,
@@ -165,11 +161,12 @@ class UserKesehatanPage extends StatelessWidget {
             ),
           ),
         ),
+        onChanged: (value) => controller.onSearch(value),
       ),
     );
   }
 
-  Widget rumahSakitColum(GoogleMapsController controller) {
+  Widget rumahSakitColum(UserKesehatanController controller) {
     return Stack(
       children: [
         Obx(
@@ -227,19 +224,33 @@ class UserKesehatanPage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
-                      children: controller.listRumahSakit
-                          .map((RumahSakitModel rumahSakit) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: RumahSakitContainer(
-                            fullWidth: false,
-                            rumahSakit: rumahSakit,
-                            onTap: () {
-                              controller.updateSelected(rumahSakit);
-                            },
-                          ),
-                        );
-                      }).toList(),
+                      children: controller.searchValue.isEmpty
+                          ? controller.listRumahSakit
+                              .map((RumahSakitModel rumahSakit) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: RumahSakitContainer(
+                                  fullWidth: false,
+                                  rumahSakit: rumahSakit,
+                                  onTap: () {
+                                    controller.updateSelected(rumahSakit);
+                                  },
+                                ),
+                              );
+                            }).toList()
+                          : controller.listFilteredRumahSakit
+                              .map((RumahSakitModel rumahSakit) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: RumahSakitContainer(
+                                  fullWidth: false,
+                                  rumahSakit: rumahSakit,
+                                  onTap: () {
+                                    controller.updateSelected(rumahSakit);
+                                  },
+                                ),
+                              );
+                            }).toList(),
                     ),
                   ),
                 ),

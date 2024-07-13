@@ -29,10 +29,9 @@ class UserEdukasiController extends GetxController {
   }
 
   Future<void> getArtikel() async {
-    final artikel = await ArtikelService().getArtikel();
+    final List<ArtikelModel> artikel = await ArtikelService().getArtikel();
     if (artikel.isNotEmpty) {
-      artikelList
-          .assignAll(artikel.map((e) => ArtikelModel.fromJson(e)).toList());
+      artikelList.assignAll(artikel);
     }
   }
 

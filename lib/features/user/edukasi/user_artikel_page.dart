@@ -1,3 +1,4 @@
+import 'package:douce/features/user/edukasi/user_artikel_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,9 @@ class UserArtikelPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ArtikelModel artikel = Get.arguments as ArtikelModel;
+
+    final UserArtikelController controller =
+        Get.put(UserArtikelController(artikel.link));
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -46,7 +50,7 @@ class UserArtikelPage extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  artikel.imageUrl,
+                  artikel.thumbnail,
                   width: double.infinity,
                   height: 175,
                   fit: BoxFit.cover,
@@ -64,24 +68,7 @@ class UserArtikelPage extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "By ${artikel.publisher}",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      color: ColorDouce.douceBase,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    " | ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    artikel.date,
+                    artikel.pubDate,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -91,13 +78,19 @@ class UserArtikelPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                artikel.content,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.black,
-                ),
+              Obx(
+                () => controller.content.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Text(
+                        controller.content.value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),

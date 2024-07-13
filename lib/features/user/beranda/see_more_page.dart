@@ -73,6 +73,7 @@ class SeeMorePage extends StatelessWidget {
   Widget buildArtikelContent(List<ArtikelModel> listArtikel) {
     return Wrap(
       alignment: WrapAlignment.spaceEvenly,
+      runSpacing: 15,
       children: listArtikel
           .map(
             (artikel) => ArtikelContainer(
@@ -100,6 +101,7 @@ class SeeMorePage extends StatelessWidget {
   Widget buildTokoBayiContent(List<TokoBayiModel> listTokoBayi) {
     return Wrap(
       alignment: WrapAlignment.spaceEvenly,
+      runSpacing: 15,
       children: listTokoBayi
           .map(
             (tokoBayi) => TokoBayiContainer(

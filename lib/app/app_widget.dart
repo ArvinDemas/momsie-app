@@ -7,6 +7,7 @@ import 'package:douce/features/mitra/akun/mitra_datadiri_page.dart';
 import 'package:douce/features/mitra/akun/mitra_pendapatan_page.dart';
 import 'package:douce/features/mitra/akun/mitra_riwayat_page.dart';
 import 'package:douce/features/mitra/main_mitra.dart';
+import 'package:douce/features/mitra_register/mitra_register_page.dart';
 import 'package:douce/features/register/register_page.dart';
 import 'package:douce/features/register/success_register_page.dart';
 import 'package:douce/features/splash/splash_screen.dart';
@@ -214,6 +215,10 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.userSearch,
           page: () => const UserSearchPage(),
+        ),
+        GetPage(
+          name: AppRoutes.mitraRegister,
+          page: () => const MitraRegisterPage(),
         ),
       ],
       initialRoute: AppRoutes.splash,

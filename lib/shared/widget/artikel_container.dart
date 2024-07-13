@@ -14,7 +14,7 @@ class ArtikelContainer extends StatelessWidget {
       onTap: () => Get.toNamed('/user-artikel', arguments: artikel),
       child: Container(
         padding: const EdgeInsets.all(10),
-        width: 150,
+        width: 165,
         decoration: BoxDecoration(
           color: ColorDouce.douceBase,
           borderRadius: BorderRadius.circular(16),
@@ -25,21 +25,13 @@ class ArtikelContainer extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image.network(
-                artikel.imageUrl,
+                artikel.thumbnail,
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 5),
-            Text(
-              artikel.publisher,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
-            ),
+            const SizedBox(height: 10),
             Text(
               artikel.title,
               style: const TextStyle(
@@ -48,9 +40,8 @@ class ArtikelContainer extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              artikel.date,
+              artikel.pubDate,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w300,

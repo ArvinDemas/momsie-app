@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
     required this.iconImage,
     required this.isPassword,
     required this.controller,
+    this.lineLimit = 1,
     super.key,
   });
 
@@ -13,6 +14,7 @@ class CustomTextField extends StatelessWidget {
   final Icon iconImage;
   final bool isPassword;
   final TextEditingController controller;
+  final int lineLimit;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
       ),
+      maxLines: lineLimit,
     );
   }
 }

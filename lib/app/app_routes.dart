@@ -40,4 +40,5 @@ class AppRoutes {
   static const String chatPage = '/chat-page';
   static const String seeMore = '/see-more';
   static const String userSearch = '/user-search';
+  static const String mitraRegister = '/mitra-register';
 }

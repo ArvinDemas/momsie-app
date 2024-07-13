@@ -16,6 +16,24 @@ class UserBerandaController extends GetxController {
   RxList<RumahSakitModel> rumahSakitList = <RumahSakitModel>[].obs;
   RxBool isRumahSakitLoading = true.obs;
 
+  List<RumahSakitModel> getRandomRumahSakit() {
+    var list = rumahSakitList.toList();
+    list.shuffle();
+    return list.take(2).toList();
+  }
+
+  List<ArtikelModel> getRandomArtikel() {
+    var list = artikelList.toList();
+    list.shuffle();
+    return list.take(6).toList();
+  }
+
+  List<TokoBayiModel> getRandomTokoBayi() {
+    var list = tokoBayiList.toList();
+    list.shuffle();
+    return list.take(2).toList();
+  }
+
   @override
   void onInit() {
     getTokoBayi().then((_) {
@@ -44,10 +62,9 @@ class UserBerandaController extends GetxController {
 
   Future<void> getArtikel() async {
     try {
-      final artikel = await ArtikelService().getArtikel();
+      final List<ArtikelModel> artikel = await ArtikelService().getArtikel();
       if (artikel.isNotEmpty) {
-        artikelList.assignAll(
-            artikel.map((item) => ArtikelModel.fromJson(item)).toList());
+        artikelList.assignAll(artikel);
       }
     } catch (e) {
       // print(e);

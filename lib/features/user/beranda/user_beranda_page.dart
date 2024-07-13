@@ -104,10 +104,12 @@ class UserBerandaPage extends StatelessWidget {
                         )
                       : Wrap(
                           runSpacing: 15,
-                          children: [
-                            for (final rumahSakit in controller.rumahSakitList)
-                              RumahSakitContainer(rumahSakit: rumahSakit),
-                          ],
+                          children: controller
+                              .getRandomRumahSakit()
+                              .map((rumahSakit) => RumahSakitContainer(
+                                    rumahSakit: rumahSakit,
+                                  ))
+                              .toList(),
                         ),
                 ),
                 const SizedBox(height: 30),
@@ -154,11 +156,14 @@ class UserBerandaPage extends StatelessWidget {
                           clipBehavior: Clip.none,
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
-                            spacing: 15,
-                            children: controller.tokoBayiList
-                                .map((tokobayi) => TokoBayiContainer(
-                                      tokoBayi: tokobayi,
-                                    ))
+                            spacing: 20,
+                            children: controller
+                                .getRandomTokoBayi()
+                                .map(
+                                  (tokoBayi) => TokoBayiContainer(
+                                    tokoBayi: tokoBayi,
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ),
@@ -205,7 +210,8 @@ class UserBerandaPage extends StatelessWidget {
                       ? const Center(child: CircularProgressIndicator())
                       : Wrap(
                           runSpacing: 10,
-                          children: controller.artikelList
+                          children: controller
+                              .getRandomArtikel()
                               .map(
                                   (artikel) => artikelTerkiniContainer(artikel))
                               .toList(),
@@ -244,7 +250,7 @@ class UserBerandaPage extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(18),
                 child: Image.network(
-                  artikel.imageUrl,
+                  artikel.thumbnail,
                   height: 100,
                   fit: BoxFit.cover,
                 ),
@@ -257,15 +263,6 @@ class UserBerandaPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "By ${artikel.publisher}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
                     artikel.title,
                     style: const TextStyle(
                       fontSize: 16,
@@ -274,7 +271,7 @@ class UserBerandaPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    artikel.date,
+                    artikel.pubDate,
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 12,

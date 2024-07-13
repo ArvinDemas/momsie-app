@@ -56,7 +56,13 @@ class UserAkunPage extends StatelessWidget {
                     return ConfirmDialog(
                       descText: "Masuk Ke Halaman Doula ?",
                       onTap: () {
-                        Get.offAllNamed('/mitra');
+                        bool isMitra = true;
+                        if (isMitra) {
+                          Get.offAllNamed('/mitra');
+                          // ignore: dead_code
+                        } else {
+                          Get.offNamed('/mitra-register');
+                        }
                       },
                     );
                   },
