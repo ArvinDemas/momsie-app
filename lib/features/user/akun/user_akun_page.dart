@@ -1,28 +1,35 @@
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:douce/shared/widget/menu_container.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class UserAkunPage extends StatelessWidget {
   const UserAkunPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final UserController userController = Get.find<UserController>();
+
     return ListView(
       padding: const EdgeInsets.all(0),
       children: [
         const AccountTopBar(),
-        const SizedBox(height: 75),
+        const SizedBox(height: 50),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              const Text(
-                "Miranda",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              Obx(
+                () => Text(
+                  userController.username.value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 15),
@@ -76,7 +83,9 @@ class UserAkunPage extends StatelessWidget {
                   builder: (BuildContext context) {
                     return ConfirmDialog(
                       descText: "Keluar Dari Akun ?",
-                      onTap: () {
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut();
+                        await GoogleSignIn().signOut();
                         Get.offAllNamed('/login');
                       },
                     );

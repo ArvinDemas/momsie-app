@@ -1,3 +1,4 @@
+import 'package:douce/features/forgot/forgot_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ForgotController controller = Get.put(ForgotController());
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Column(
@@ -65,12 +68,48 @@ class ForgotPasswordPage extends StatelessWidget {
                   hintText: "Email",
                   iconImage: const Icon(Icons.email_outlined),
                   isPassword: false,
-                  controller: TextEditingController(),
+                  controller: controller.emailController.value,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
+                Obx(
+                  () => controller.isSent.value
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "You Don't receive email ?",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            InkWell(
+                              onTap: () {
+                                controller.resetPassword();
+                              },
+                              child: Text(
+                                "Resend",
+                                style: TextStyle(
+                                  color: ColorDouce.douceBase,
+                                  fontSize: 14,
+                                  fontFamily: 'OpenSans',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : const SizedBox(),
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
                 InkWell(
                   onTap: () {
-                    Get.toNamed("/verification-forgot");
+                    controller.resetPassword();
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -90,7 +129,7 @@ class ForgotPasswordPage extends StatelessWidget {
                       ],
                     ),
                     child: const Text(
-                      "Lanjut",
+                      "Kirim",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -99,6 +138,38 @@ class ForgotPasswordPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 20),
+                Obx(
+                  () => controller.isSent.value
+                      ? InkWell(
+                          onTap: () {
+                            Get.offNamed('/login');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(26),
+                              border: Border.all(
+                                color: ColorDouce.douceBase,
+                              ),
+                            ),
+                            child: Text(
+                              "Kembali",
+                              style: TextStyle(
+                                color: ColorDouce.douceBase,
+                                fontSize: 16,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
                 ),
               ],
             ),

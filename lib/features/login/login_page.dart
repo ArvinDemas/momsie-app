@@ -11,9 +11,6 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
 
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -103,17 +100,17 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
-                    hintText: "Username",
+                    hintText: "Email",
                     iconImage: const Icon(Icons.person_2_outlined),
                     isPassword: false,
-                    controller: usernameController,
+                    controller: loginController.emailController.value,
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     hintText: "Password",
                     iconImage: const Icon(Icons.lock_outline),
                     isPassword: true,
-                    controller: passwordController,
+                    controller: loginController.passwordController.value,
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -136,7 +133,10 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 15),
                   InkWell(
                     onTap: () {
-                      loginController.loginSuccess();
+                      loginController.tryLogin(
+                        loginController.emailController.value.text,
+                        loginController.passwordController.value.text,
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -198,31 +198,36 @@ class LoginPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(26),
-                      border: Border.all(
-                        color: Colors.black12,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/google.png',
-                          width: 25,
-                          height: 25,
+                  InkWell(
+                    onTap: () {
+                      loginController.tryGoogleLogin();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(26),
+                        border: Border.all(
+                          color: Colors.black12,
                         ),
-                        const SizedBox(width: 15),
-                        const Text(
-                          "Masuk dengan Google",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/google.png',
+                            width: 25,
+                            height: 25,
                           ),
-                        )
-                      ],
+                          const SizedBox(width: 15),
+                          const Text(
+                            "Masuk dengan Google",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 15),

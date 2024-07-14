@@ -11,9 +11,6 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final RegisterController registerController = Get.put(RegisterController());
 
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: ListView(
@@ -56,21 +53,21 @@ class RegisterPage extends StatelessWidget {
                   hintText: "Username",
                   iconImage: const Icon(Icons.person_2_outlined),
                   isPassword: false,
-                  controller: usernameController,
+                  controller: registerController.usernameController.value,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   hintText: "Email",
                   iconImage: const Icon(Icons.email_outlined),
-                  isPassword: true,
-                  controller: emailController,
+                  isPassword: false,
+                  controller: registerController.emailController.value,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   hintText: "Password",
                   iconImage: const Icon(Icons.lock_outline),
                   isPassword: true,
-                  controller: passwordController,
+                  controller: registerController.passwordController.value,
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -156,7 +153,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                   child: InkWell(
                     onTap: () {
-                      registerController.successRegister();
+                      registerController.tryRegister();
                     },
                     child: const Text(
                       "Daftar",

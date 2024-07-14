@@ -1,34 +1,81 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class UserSettingAkunPage extends StatelessWidget {
   const UserSettingAkunPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController nikController = TextEditingController();
-    final TextEditingController alamatController = TextEditingController();
-    final TextEditingController birthController = TextEditingController();
+    final UserController userController = Get.find<UserController>();
+    final UserSettingAkunController controller =
+        Get.put(UserSettingAkunController());
+
+    final Rx<TextEditingController> nameController =
+        TextEditingController().obs;
+    final Rx<TextEditingController> emailController =
+        TextEditingController().obs;
+
+    nameController.value.text = userController.username.value;
+    emailController.value.text = userController.email.value;
 
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(0),
         children: [
-          const AccountTopBar(isEditPage: true),
+          const AccountTopBar(
+            isEditPage: true,
+            isBackPage: true,
+          ),
           const SizedBox(height: 100),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                editTextField(nameController, "Nama Lengkap"),
+                editTextField(
+                  nameController.value,
+                  "Nama Lengkap",
+                  true,
+                ),
                 const SizedBox(height: 30),
-                editTextField(nikController, "NIK"),
+                editTextField(
+                  emailController.value,
+                  "Email",
+                  false,
+                ),
                 const SizedBox(height: 30),
-                editTextField(alamatController, "Alamat"),
-                const SizedBox(height: 30),
-                editTextField(birthController, "Tanggal Lahir"),
+                InkWell(
+                  onTap: () {
+                    controller.updateData(
+                      userController.uid.value,
+                      nameController.value.text,
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ColorDouce.douceBase,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "Confirm",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
           )
@@ -37,9 +84,17 @@ class UserSettingAkunPage extends StatelessWidget {
     );
   }
 
-  Widget editTextField(TextEditingController controller, String hintText) {
+  Widget editTextField(
+    TextEditingController controller,
+    String hintText,
+    bool isEnable,
+  ) {
     return TextField(
       controller: controller,
+      enabled: isEnable,
+      style: isEnable
+          ? const TextStyle(color: Colors.black)
+          : const TextStyle(color: Colors.black54),
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,
         label: Text(
@@ -47,6 +102,12 @@ class UserSettingAkunPage extends StatelessWidget {
           style: const TextStyle(
             color: Colors.black,
             fontSize: 20,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: ColorDouce.douceBase,
           ),
         ),
         enabledBorder: OutlineInputBorder(
@@ -64,5 +125,21 @@ class UserSettingAkunPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class UserSettingAkunController extends GetxController {
+  Future<void> updateData(String uid, String username) async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      await firestore.collection('user').doc(uid).update({
+        'username': username,
+      });
+      UserController userController = Get.find<UserController>();
+      userController.updateUser(username);
+      Get.back();
+    } catch (e) {
+      Get.snackbar("Error", "Something Went Wrong");
+    }
   }
 }

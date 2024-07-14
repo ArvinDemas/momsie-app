@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,8 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final UserController userController = Get.find<UserController>();
+
     return Container(
       height: 150,
       width: MediaQuery.of(context).size.width,
@@ -28,9 +31,9 @@ class TopBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Text(
+                        const Text(
                           'Halo, ',
                           style: TextStyle(
                             fontWeight: FontWeight.w300,
@@ -39,13 +42,15 @@ class TopBar extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          'Miranda',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                            fontFamily: 'Open-Sans',
-                            color: Colors.white,
+                        Obx(
+                          () => Text(
+                            userController.username.value,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
+                              fontFamily: 'Open-Sans',
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
@@ -61,12 +66,20 @@ class TopBar extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Image.asset(
-                            'assets/images/blank-profile.png',
-                            width: 32,
-                            height: 32,
+                        Obx(
+                          () => ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: userController.image.value.isEmpty
+                                ? Image.asset(
+                                    'assets/images/blank-profile.png',
+                                    width: 32,
+                                    height: 32,
+                                  )
+                                : Image.network(
+                                    userController.image.value,
+                                    width: 32,
+                                    height: 32,
+                                  ),
                           ),
                         )
                       ],
@@ -77,7 +90,7 @@ class TopBar extends StatelessWidget {
             ],
           ),
           Positioned(
-            top: 115,
+            top: 100,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Container(
