@@ -1,15 +1,18 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomDropDown extends StatelessWidget {
   const CustomDropDown({
     super.key,
     required this.items,
     required this.onChanged,
+    required this.selectedItem,
   });
 
   final List<String> items;
   final Function(String) onChanged;
+  final RxString selectedItem;
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +61,9 @@ class CustomDropDown extends StatelessWidget {
       onChanged: (value) {
         onChanged(value!);
       },
-      style: const TextStyle(
-        color: Colors.black,
+      value: selectedItem.value.isEmpty ? null : selectedItem.value,
+      style: TextStyle(
+        color: selectedItem.isEmpty ? Colors.black26 : Colors.black,
         fontSize: 16,
       ),
       icon: Icon(

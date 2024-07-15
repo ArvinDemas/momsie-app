@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
@@ -62,11 +63,28 @@ class UserAkunPage extends StatelessWidget {
                   builder: (BuildContext context) {
                     return ConfirmDialog(
                       descText: "Masuk Ke Halaman Doula ?",
-                      onTap: () {
-                        bool isMitra = true;
-                        if (isMitra) {
+                      onTap: () async {
+                        if (userController.isDoula.value) {
+                          final FirebaseFirestore firestore =
+                              FirebaseFirestore.instance;
+                          final UserController userController =
+                              Get.find<UserController>();
+
+                          final DocumentSnapshot mitraData = await firestore
+                              .collection('mitra')
+                              .doc(userController.uid.value)
+                              .get();
+                          userController.setDoula(
+                            mitraData['name'],
+                            mitraData['alamat'],
+                            mitraData['kotaProvinsi'],
+                            mitraData['biografi'],
+                            mitraData['image'],
+                            mitraData['jenisKelamin'],
+                            mitraData['nik'], 
+                          );
+
                           Get.offAllNamed('/mitra');
-                          // ignore: dead_code
                         } else {
                           Get.offNamed('/mitra-register');
                         }

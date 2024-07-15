@@ -1,5 +1,10 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class MitraRegisterController extends GetxController {
   final RxInt currentPage = 0.obs;
@@ -7,6 +12,8 @@ class MitraRegisterController extends GetxController {
   final RxString educationSelect = ''.obs;
   final RxString religionSelect = ''.obs;
   final RxString genderSelect = ''.obs;
+
+  final Rx<File?> currentImage = Rx<File?>(null);
 
   final Rx<TextEditingController> nameController = TextEditingController().obs;
   final Rx<TextEditingController> nikController = TextEditingController().obs;
@@ -19,6 +26,84 @@ class MitraRegisterController extends GetxController {
 
   void changePage(int page) {
     currentPage.value = page;
+  }
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      if (currentImage.value != null) {
+        currentImage.value = null;
+      }
+      currentImage.value = File(pickedFile.path);
+    }
+  }
+
+  Future<void> submitRegister() async {
+    try {
+      if (jobSelect.value.isEmpty ||
+          educationSelect.value.isEmpty ||
+          religionSelect.value.isEmpty ||
+          genderSelect.value.isEmpty ||
+          currentImage.value == null ||
+          nameController.value.text.isEmpty ||
+          nikController.value.text.isEmpty ||
+          alamatController.value.text.isEmpty ||
+          kotaProvinsiController.value.text.isEmpty ||
+          biografiController.value.text.isEmpty) {
+        Get.snackbar('Error', 'Data tidak boleh kosong');
+      } else {
+        final FirebaseFirestore firestore = FirebaseFirestore.instance;
+        final FirebaseStorage storage = FirebaseStorage.instance;
+        final UserController userController = Get.find<UserController>();
+
+        String filePath = 'mitra/${userController.uid.value}';
+        await storage.ref(filePath).putFile(currentImage.value!);
+        String downloadUrl = await storage.ref(filePath).getDownloadURL();
+
+        await firestore.collection('mitra').doc(userController.uid.value).set({
+          'name': nameController.value.text,
+          'nik': nikController.value.text,
+          'alamat': alamatController.value.text,
+          'kotaProvinsi': kotaProvinsiController.value.text,
+          'biografi': biografiController.value.text,
+          'pekerjaan': jobSelect.value,
+          'pendidikan': educationSelect.value,
+          'agama': religionSelect.value,
+          'jenisKelamin': genderSelect.value,
+          'image': downloadUrl,
+        });
+
+        await firestore
+            .collection('user')
+            .doc(userController.uid.value)
+            .update({
+          'isDoula': true,
+        });
+
+        userController.updateUser(
+          userController.username.value,
+          true,
+          userController.image.value,
+        );
+
+        userController.setDoula(
+          nameController.value.text,
+          alamatController.value.text,
+          kotaProvinsiController.value.text,
+          biografiController.value.text,
+          downloadUrl,
+          genderSelect.value,
+          nikController.value.text,
+        );
+
+        Get.offAllNamed('/mitra');
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Rx<List<String>> genderList = Rx<List<String>>([
@@ -43,6 +128,8 @@ class MitraRegisterController extends GetxController {
     'S3',
   ]);
   Rx<List<String>> jobList = Rx<List<String>>([
+    'Dokter',
+    'Perawat',
     'PNS',
     'TNI',
     'POLRI',

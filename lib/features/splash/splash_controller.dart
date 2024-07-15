@@ -31,6 +31,7 @@ class SplashController extends GetxController {
         user.email!,
         user.uid,
         userDoc['image'],
+        userDoc['isDoula'],
       );
       Get.offNamed('/user');
     });

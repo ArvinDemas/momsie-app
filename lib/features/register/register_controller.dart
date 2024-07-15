@@ -51,6 +51,7 @@ class RegisterController extends GetxController {
         'email': emailController.value.text,
         'uid': userCredential.user!.uid,
         'image': '',
+        'isDoula': false,
       };
 
       await FirebaseFirestore.instance
@@ -64,6 +65,7 @@ class RegisterController extends GetxController {
         emailController.value.text,
         userCredential.user!.uid,
         '',
+        false,
       );
 
       Get.toNamed('/register-success');

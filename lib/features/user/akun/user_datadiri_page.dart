@@ -23,7 +23,10 @@ class UserDataDiriPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(0),
         children: [
-          const AccountTopBar(isBackPage: true),
+          const AccountTopBar(
+            isBackPage: true,
+            isEditPage: true,
+          ),
           const SizedBox(height: 100),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),

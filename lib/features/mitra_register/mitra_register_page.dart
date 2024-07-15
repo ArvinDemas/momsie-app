@@ -88,14 +88,14 @@ class MitraRegisterPage extends StatelessWidget {
       CustomTextField(
         hintText: "Alamat",
         iconImage: const Icon(Icons.home),
-        isPassword: true,
+        isPassword: false,
         controller: controller.alamatController.value,
       ),
       const SizedBox(height: 30),
       CustomTextField(
         hintText: "Kota, Provinsi",
         iconImage: const Icon(Icons.location_city),
-        isPassword: true,
+        isPassword: false,
         controller: controller.kotaProvinsiController.value,
       ),
       const SizedBox(height: 40),
@@ -141,6 +141,7 @@ class MitraRegisterPage extends StatelessWidget {
         onChanged: (value) {
           controller.genderSelect.value = value;
         },
+        selectedItem: controller.genderSelect,
       ),
       const SizedBox(height: 10),
       const Text(
@@ -157,6 +158,7 @@ class MitraRegisterPage extends StatelessWidget {
         onChanged: (value) {
           controller.jobSelect.value = value;
         },
+        selectedItem: controller.jobSelect,
       ),
       const SizedBox(height: 10),
       const Text(
@@ -173,6 +175,7 @@ class MitraRegisterPage extends StatelessWidget {
         onChanged: (value) {
           controller.educationSelect.value = value;
         },
+        selectedItem: controller.educationSelect,
       ),
       const SizedBox(height: 10),
       const Text(
@@ -189,6 +192,7 @@ class MitraRegisterPage extends StatelessWidget {
         onChanged: (value) {
           controller.religionSelect.value = value;
         },
+        selectedItem: controller.religionSelect,
       ),
       const SizedBox(height: 40),
       Row(
@@ -273,38 +277,55 @@ class MitraRegisterPage extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 10),
-      InkWell(
-        onTap: () {
-          // print('Tap to upload image');
-        },
-        child: Container(
-          height: 150,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.grey[400]!,
-              width: 2,
+      Obx(
+        () => InkWell(
+          onTap: () {
+            controller.pickImage();
+          },
+          child: Container(
+            height: 150,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.grey[400]!,
+                width: 2,
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                Icons.add_a_photo,
-                size: 50,
-                color: Colors.grey[500],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Tap to upload image',
-                style: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 16,
-                ),
-              ),
-            ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                controller.currentImage.value != null
+                    ? Image.file(
+                        controller.currentImage.value!,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      )
+                    : Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey[500],
+                        size: 50,
+                      ),
+                const SizedBox(height: 10),
+                controller.currentImage.value != null
+                    ? const Text(
+                        "Change Image",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      )
+                    : const Text(
+                        "Upload Image",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+              ],
+            ),
           ),
         ),
       ),
@@ -337,7 +358,7 @@ class MitraRegisterPage extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              Get.toNamed('/mitra');
+              controller.submitRegister();
             },
             child: Container(
               width: 50,

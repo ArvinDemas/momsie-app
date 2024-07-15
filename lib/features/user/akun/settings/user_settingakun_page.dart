@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserSettingAkunPage extends StatelessWidget {
   const UserSettingAkunPage({super.key});
@@ -14,21 +18,20 @@ class UserSettingAkunPage extends StatelessWidget {
     final UserSettingAkunController controller =
         Get.put(UserSettingAkunController());
 
-    final Rx<TextEditingController> nameController =
-        TextEditingController().obs;
-    final Rx<TextEditingController> emailController =
-        TextEditingController().obs;
-
-    nameController.value.text = userController.username.value;
-    emailController.value.text = userController.email.value;
+    controller.nameController.value.text = userController.username.value;
+    controller.emailController.value.text = userController.email.value;
 
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(0),
         children: [
-          const AccountTopBar(
+          AccountTopBar(
             isEditPage: true,
             isBackPage: true,
+            onTap: () {
+              controller.pickImage();
+            },
+            additionalImage: controller.currentImage,
           ),
           const SizedBox(height: 100),
           Padding(
@@ -36,23 +39,20 @@ class UserSettingAkunPage extends StatelessWidget {
             child: Column(
               children: [
                 editTextField(
-                  nameController.value,
+                  controller.nameController.value,
                   "Nama Lengkap",
                   true,
                 ),
                 const SizedBox(height: 30),
                 editTextField(
-                  emailController.value,
+                  controller.emailController.value,
                   "Email",
                   false,
                 ),
                 const SizedBox(height: 30),
                 InkWell(
                   onTap: () {
-                    controller.updateData(
-                      userController.uid.value,
-                      nameController.value.text,
-                    );
+                    controller.updateUser();
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -129,17 +129,46 @@ class UserSettingAkunPage extends StatelessWidget {
 }
 
 class UserSettingAkunController extends GetxController {
-  Future<void> updateData(String uid, String username) async {
-    try {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      await firestore.collection('user').doc(uid).update({
-        'username': username,
-      });
-      UserController userController = Get.find<UserController>();
-      userController.updateUser(username);
-      Get.back();
-    } catch (e) {
-      Get.snackbar("Error", "Something Went Wrong");
+  final RxString downloadUrl = ''.obs;
+  final Rx<File?> currentImage = Rx<File?>(null);
+
+  final Rx<TextEditingController> nameController = TextEditingController().obs;
+  final Rx<TextEditingController> emailController = TextEditingController().obs;
+
+  Future<void> updateUser() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseStorage storage = FirebaseStorage.instance;
+    UserController userController = Get.find<UserController>();
+
+    if (currentImage.value != null) {
+      var uploadTask = await storage
+          .ref('user/${userController.uid.value}/profile.jpg')
+          .putFile(currentImage.value!);
+
+      downloadUrl.value = await uploadTask.ref.getDownloadURL();
+    }
+
+    await firestore.collection('user').doc(userController.uid.value).update({
+      'name': nameController.value.text,
+      'image': downloadUrl.value,
+    });
+
+    userController.updateUser(
+      nameController.value.text,
+      userController.isDoula.value,
+      downloadUrl.value.isEmpty
+          ? userController.image.value
+          : downloadUrl.value,
+    );
+
+    Get.back();
+  }
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      currentImage.value = File(image.path);
     }
   }
 }

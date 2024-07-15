@@ -38,6 +38,7 @@ class LoginController extends GetxController {
         email,
         userCredential.user!.uid,
         userDoc['image'],
+        userDoc['isDoula'],
       );
 
       Get.offAllNamed('/user');
@@ -78,6 +79,7 @@ class LoginController extends GetxController {
           'email': userCredential.user!.email,
           'image': userCredential.user!.photoURL,
           'uid': userCredential.user!.uid,
+          'isDoula': false,
         });
       }
 
@@ -87,6 +89,7 @@ class LoginController extends GetxController {
         userCredential.user!.email!,
         userCredential.user!.uid,
         userDoc['image'],
+        userDoc['isDoula'],
       );
 
       Get.offAllNamed('/user');
