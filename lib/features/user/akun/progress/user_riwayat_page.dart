@@ -1,5 +1,4 @@
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/doula_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -65,10 +64,10 @@ class UserRiwayatPage extends StatelessWidget {
       runSpacing: 50,
       alignment: WrapAlignment.spaceAround,
       children: [
-        DoulaContainer(),
-        DoulaContainer(),
-        DoulaContainer(),
-        DoulaContainer(),
+        // DoulaContainer(),
+        // DoulaContainer(),
+        // DoulaContainer(),
+        // DoulaContainer(),
       ],
     );
   }

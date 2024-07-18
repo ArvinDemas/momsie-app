@@ -64,7 +64,7 @@ class UserDetailGerakanPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
                 move.image,
-                height: 150,
+                height: MediaQuery.of(context).size.height * 0.3,
                 fit: BoxFit.cover,
               ),
             ),
@@ -220,19 +220,6 @@ class UserDetailGerakanPage extends StatelessWidget {
           destination: '/user',
           onTap: () {
             Get.offAllNamed('/user');
-            Get.toNamed(
-              '/user-detail-program',
-              arguments: {
-                'program': program,
-              },
-            );
-            Get.toNamed(
-              '/user-program-bulan',
-              arguments: {
-                'month': month,
-                'program': program,
-              },
-            );
           },
         );
       },

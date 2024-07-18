@@ -36,9 +36,9 @@ class DetailRumahSakitPage extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.heart_broken_rounded,
-                    color: ColorDouce.douceBase,
+                    color: Colors.transparent,
                   ),
                 ],
               ),

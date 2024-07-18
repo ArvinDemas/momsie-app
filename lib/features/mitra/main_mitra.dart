@@ -1,5 +1,6 @@
 import 'package:douce/features/mitra/akun/mitra_akun_page.dart';
 import 'package:douce/features/mitra/beranda/mitra_beranda_page.dart';
+import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_page.dart';
 import 'package:douce/features/mitra/status/mitra_status_page.dart';
 import 'package:douce/shared/widget/navbar.dart';
@@ -12,6 +13,7 @@ class MainMitraPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MainMitraController mitraController = Get.put(MainMitraController());
+    Get.put(MitraPekerjaanController());
     return PopScope(
       canPop: false,
       child: Scaffold(

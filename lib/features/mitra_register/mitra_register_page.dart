@@ -86,18 +86,12 @@ class MitraRegisterPage extends StatelessWidget {
       ),
       const SizedBox(height: 30),
       CustomTextField(
-        hintText: "Alamat",
+        hintText: "No. HP / WhatsApp",
         iconImage: const Icon(Icons.home),
         isPassword: false,
-        controller: controller.alamatController.value,
+        controller: controller.nohpController.value,
       ),
       const SizedBox(height: 30),
-      CustomTextField(
-        hintText: "Kota, Provinsi",
-        iconImage: const Icon(Icons.location_city),
-        isPassword: false,
-        controller: controller.kotaProvinsiController.value,
-      ),
       const SizedBox(height: 40),
       InkWell(
         onTap: () {
@@ -178,22 +172,6 @@ class MitraRegisterPage extends StatelessWidget {
         selectedItem: controller.educationSelect,
       ),
       const SizedBox(height: 10),
-      const Text(
-        "Religion",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.w300,
-        ),
-      ),
-      const SizedBox(height: 5),
-      CustomDropDown(
-        items: controller.religionList.value,
-        onChanged: (value) {
-          controller.religionSelect.value = value;
-        },
-        selectedItem: controller.religionSelect,
-      ),
       const SizedBox(height: 40),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

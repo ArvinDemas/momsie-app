@@ -149,7 +149,7 @@ class UserSettingAkunController extends GetxController {
     }
 
     await firestore.collection('user').doc(userController.uid.value).update({
-      'name': nameController.value.text,
+      'username': nameController.value.text,
       'image': downloadUrl.value,
     });
 

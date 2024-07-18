@@ -30,7 +30,18 @@ class UserBerandaPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset("assets/images/beranda.png"),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed('booking-doula');
+                  },
+                  child: Center(
+                    child: Image.asset(
+                      "assets/images/beranda.png",
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,16 +69,18 @@ class UserBerandaPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 40),
-                const SingleChildScrollView(
-                  clipBehavior: Clip.none,
-                  scrollDirection: Axis.horizontal,
-                  child: Wrap(
-                    spacing: 15,
-                    children: [
-                      DoulaContainer(),
-                      DoulaContainer(),
-                      DoulaContainer(),
-                    ],
+                Obx(
+                  () => SingleChildScrollView(
+                    clipBehavior: Clip.none,
+                    scrollDirection: Axis.horizontal,
+                    child: Wrap(
+                      spacing: 15,
+                      children: controller.getRandomDoula().map((doula) {
+                        return DoulaContainer(
+                          doula: doula,
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),

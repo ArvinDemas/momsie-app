@@ -1,4 +1,6 @@
+import 'package:douce/features/user/kesehatan/booking_doula_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/widget/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +9,8 @@ class ConfirmBookingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final BookingDoulaController controller =
+        Get.find<BookingDoulaController>();
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -26,7 +30,7 @@ class ConfirmBookingPage extends StatelessWidget {
                   ),
                 ),
                 const Text(
-                  "Booking",
+                  "Confirm Booking",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w500,
@@ -39,56 +43,7 @@ class ConfirmBookingPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Image.asset(
-                      "assets/images/topdoula.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Dr. Zahra",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text("Keperawatan"),
-                        Text(
-                          "Jl. Kaliurang KM 5,5 Yogyakarta",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: Colors.orange),
-                            Text(
-                              "4.9",
-                              style: TextStyle(fontSize: 14),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -100,11 +55,14 @@ class ConfirmBookingPage extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                Text(
-                  "Ubah",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: ColorDouce.douceBase,
+                InkWell(
+                  onTap: () => Get.back(),
+                  child: Text(
+                    "Ubah",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorDouce.douceBase,
+                    ),
                   ),
                 ),
               ],
@@ -118,9 +76,9 @@ class ConfirmBookingPage extends StatelessWidget {
                   size: 32,
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  "Rabu, Maret 23, 2024 | 02:00 PM",
-                  style: TextStyle(
+                Text(
+                  "${controller.selectedTanggal.value} ${controller.selectedDay} | ${controller.selectedJam.value}",
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black,
                   ),
@@ -139,11 +97,14 @@ class ConfirmBookingPage extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                Text(
-                  "Ubah",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: ColorDouce.douceBase,
+                InkWell(
+                  onTap: () => Get.back(),
+                  child: Text(
+                    "Ubah",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorDouce.douceBase,
+                    ),
                   ),
                 ),
               ],
@@ -157,9 +118,9 @@ class ConfirmBookingPage extends StatelessWidget {
                   size: 32,
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  "Panggilan Video",
-                  style: TextStyle(
+                Text(
+                  controller.selectedLayanan.value,
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black,
                   ),
@@ -176,19 +137,19 @@ class ConfirmBookingPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Panggilan Video",
-                  style: TextStyle(
+                  controller.selectedLayanan.value,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                 ),
                 Text(
-                  "Rp 70.0000",
-                  style: TextStyle(
+                  "Rp ${controller.harga.value}",
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -207,7 +168,7 @@ class ConfirmBookingPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Rp 1.000",
+                  "Rp 2000",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -227,7 +188,7 @@ class ConfirmBookingPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Rp 71.000",
+                  "Rp ${controller.harga.value + 2000}",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -238,7 +199,10 @@ class ConfirmBookingPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             InkWell(
-              onTap: () => Get.toNamed("/payment-method"),
+              onTap: () {
+                controller.createBooking();
+                showCustomDialog(context);
+              },
               child: Container(
                 padding: const EdgeInsets.all(12),
                 width: double.infinity,
@@ -260,6 +224,23 @@ class ConfirmBookingPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void showCustomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          isSuccess: true,
+          descText:
+              "Pembuatan Booking Telah Berhasil, Silahkan Lakukan Pembayaran dan Tunggu Konfirmasi dari Doula",
+          destination: '/chat-page',
+          onTap: () {
+            Get.offAllNamed('/user');
+          },
+        );
+      },
     );
   }
 }

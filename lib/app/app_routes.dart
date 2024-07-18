@@ -10,7 +10,6 @@ class AppRoutes {
   static const String mitra = '/mitra';
   static const String user = '/user';
   static const String mitraDataDiri = '/mitra-data-diri';
-  static const String mitraRiwayat = '/mitra-riwayat';
   static const String mitraPendapatan = '/mitra-pendapatan';
   static const String detailToko = '/detail-toko';
   static const String detailObat = '/detail-obat';
@@ -36,9 +35,10 @@ class AppRoutes {
   static const String detailDoula = '/detail-doula';
   static const String bookingDoula = '/booking-doula';
   static const String confirmBooking = '/confirm-booking';
-  static const String paymentMethod = '/payment-method';
   static const String chatPage = '/chat-page';
   static const String seeMore = '/see-more';
   static const String userSearch = '/user-search';
   static const String mitraRegister = '/mitra-register';
+  static const String userPesanan = '/user-pesanan';
+  static const String confirmRegister = '/confirm-register';
 }

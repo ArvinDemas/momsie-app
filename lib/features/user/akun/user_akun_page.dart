@@ -40,14 +40,14 @@ class UserAkunPage extends StatelessWidget {
                 onTap: () => Get.toNamed('/user-data-diri'),
               ),
               MenuContainer(
-                title: "My Progress",
-                icon: Icons.done_rounded,
-                onTap: () => Get.toNamed('/user-progress'),
-              ),
-              MenuContainer(
                 title: "Pengaturan",
                 icon: Icons.settings,
                 onTap: () => Get.toNamed('/user-settings'),
+              ),
+              MenuContainer(
+                title: "Pesanan Aktif",
+                icon: Icons.online_prediction_sharp,
+                onTap: () => Get.toNamed('/user-pesanan'),
               ),
               MenuContainer(
                 title: "Hubungi Kami",
@@ -64,12 +64,43 @@ class UserAkunPage extends StatelessWidget {
                     return ConfirmDialog(
                       descText: "Masuk Ke Halaman Doula ?",
                       onTap: () async {
-                        if (userController.isDoula.value) {
-                          final FirebaseFirestore firestore =
-                              FirebaseFirestore.instance;
-                          final UserController userController =
-                              Get.find<UserController>();
+                        final FirebaseFirestore firestore =
+                            FirebaseFirestore.instance;
+                        final UserController userController =
+                            Get.find<UserController>();
 
+                        final DocumentSnapshot checkRegister = await firestore
+                            .collection("register")
+                            .doc(userController.uid.value)
+                            .get();
+
+                        final DocumentSnapshot checkUser = await firestore
+                            .collection("user")
+                            .doc(userController.uid.value)
+                            .get();
+
+                        Map<String, dynamic>? userData =
+                            checkUser.data() as Map<String, dynamic>?;
+
+                        userController.updateUser(
+                          userData?['username'],
+                          userData?['isDoula'],
+                          userData?['image'],
+                        );
+
+                        if (checkRegister.exists) {
+                          final bool registerConfirmed =
+                              checkRegister['registerConfirmed'];
+                          final int payment = checkRegister['payment'];
+                          if (!registerConfirmed) {
+                            Get.offNamed('/confirm-register', arguments: {
+                              'payment': payment,
+                            });
+                            return;
+                          }
+                        }
+
+                        if (userController.isDoula.value) {
                           final DocumentSnapshot mitraData = await firestore
                               .collection('mitra')
                               .doc(userController.uid.value)
@@ -81,7 +112,7 @@ class UserAkunPage extends StatelessWidget {
                             mitraData['biografi'],
                             mitraData['image'],
                             mitraData['jenisKelamin'],
-                            mitraData['nik'], 
+                            mitraData['nik'],
                           );
 
                           Get.offAllNamed('/mitra');

@@ -1,5 +1,6 @@
 import 'package:douce/features/user/kesehatan/user_kesehatan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:douce/shared/widget/doula_container.dart';
 import 'package:douce/shared/widget/rumah_sakit_container.dart';
@@ -23,7 +24,7 @@ class UserKesehatanPage extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 )
               : userKesehatanController.kesehatanType.value == "Doula"
-                  ? doulaColumn()
+                  ? doulaColumn(userKesehatanController)
                   : rumahSakitColum(userKesehatanController),
         ),
         Positioned(
@@ -259,26 +260,40 @@ class UserKesehatanPage extends StatelessWidget {
     );
   }
 
-  Widget doulaColumn() {
+  Widget doulaColumn(UserKesehatanController controller) {
     return ListView(
       padding: const EdgeInsets.only(
-        top: 210,
+        top: 200,
         left: 20,
         right: 20,
       ),
-      children: const [
+      children: [
+        InkWell(
+          onTap: () {
+            Get.toNamed('booking-doula');
+          },
+          child: Center(
+            child: Image.asset(
+              "assets/images/beranda.png",
+            ),
+          ),
+        ),
+        const SizedBox(height: 50),
         Wrap(
           spacing: 10,
           runSpacing: 50,
           alignment: WrapAlignment.spaceAround,
-          children: [
-            DoulaContainer(),
-            DoulaContainer(),
-            DoulaContainer(),
-            DoulaContainer(),
-            DoulaContainer(),
-            DoulaContainer(),
-          ],
+          children: controller.searchValue.isEmpty
+              ? controller.doulaList
+                  .map((DoulaModel doula) => DoulaContainer(
+                        doula: doula,
+                      ))
+                  .toList()
+              : controller.listFilteredDoula
+                  .map((DoulaModel doula) => DoulaContainer(
+                        doula: doula,
+                      ))
+                  .toList(),
         ),
       ],
     );

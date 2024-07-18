@@ -1,13 +1,20 @@
+import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/pesanan_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
+import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MitraBerandaPage extends StatelessWidget {
   const MitraBerandaPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final MitraPekerjaanController controller =
+        Get.find<MitraPekerjaanController>();
     return BasePage(
+      isDoula: true,
       childWidget: ListView(
         padding: const EdgeInsets.all(0),
         children: [
@@ -16,53 +23,40 @@ class MitraBerandaPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Tanggal",
+                    Text(
+                      "Pekerjaan Aktif",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                      ),
-                    )
                   ],
                 ),
-                const SizedBox(height: 15),
-                jobContainer(),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Tersedia",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                      ),
-                    )
-                  ],
+                const SizedBox(height: 20),
+                Obx(
+                  () => controller.active.isEmpty
+                      ? Center(
+                          child: Text(
+                            "Belum Ada Pekerjaan Aktif",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorDouce.douceBase,
+                            ),
+                          ),
+                        )
+                      : Column(
+                          children: controller.active
+                              .map(
+                                (active) => jobContainer(context, active),
+                              )
+                              .toList(),
+                        ),
                 ),
                 const SizedBox(height: 15),
-                Wrap(
-                  runSpacing: 20,
-                  children: [
-                    serviceContainer(),
-                    serviceContainer(),
-                  ],
-                ),
               ],
             ),
           )
@@ -71,7 +65,7 @@ class MitraBerandaPage extends StatelessWidget {
     );
   }
 
-  Widget jobContainer() {
+  Widget jobContainer(context, ActiveModel active) {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
@@ -94,24 +88,24 @@ class MitraBerandaPage extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.video_call,
+                Icons.medical_information_outlined,
                 size: 60,
                 color: ColorDouce.douceBase,
               ),
               const SizedBox(width: 20),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Panggilan Video",
-                    style: TextStyle(
+                    active.layanan,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Al Ikhsan Akbar Fatahillah",
-                    style: TextStyle(
+                    active.namaUser,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black,
                     ),
@@ -125,7 +119,7 @@ class MitraBerandaPage extends StatelessWidget {
             height: 20,
             thickness: 0.5,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
@@ -133,19 +127,19 @@ class MitraBerandaPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.date_range),
-                      SizedBox(width: 15),
+                      const Icon(Icons.date_range),
+                      const SizedBox(width: 15),
                       Text(
-                        "21 Maret 2024",
+                        "${active.tanggal} ${active.day}",
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.wallet),
-                      SizedBox(width: 15),
-                      Text("Rp. 50.000")
+                      const Icon(Icons.wallet),
+                      const SizedBox(width: 15),
+                      Text(active.harga.toString()),
                     ],
                   )
                 ],
@@ -155,13 +149,13 @@ class MitraBerandaPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.access_time),
-                      SizedBox(width: 15),
-                      Text("02.00 PM")
+                      const Icon(Icons.access_time),
+                      const SizedBox(width: 15),
+                      Text(active.jam)
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
                       Icon(Icons.timelapse),
                       SizedBox(width: 15),
@@ -173,115 +167,89 @@ class MitraBerandaPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 30,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: ColorDouce.douceBase,
-                    width: 1,
+              InkWell(
+                onTap: () {
+                  Get.toNamed('/chat-page', arguments: {
+                    "user": active.pemesan,
+                    "doula": active.doula,
+                    "isDoula": true,
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 30,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorDouce.douceBase,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Chat",
+                        style: TextStyle(
+                          color: ColorDouce.douceBase,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Check In",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 30,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: ColorDouce.douceBase,
-                    width: 1,
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ConfirmDialog(
+                          descText:
+                              "Pastikan Kamu Sudah Selesai Memberikan Layanan Kepada User !",
+                          onTap: () async {
+                            await Get.find<MitraPekerjaanController>()
+                                .checkOut(active);
+                            Get.back();
+                          },
+                        );
+                      });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 30,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorDouce.douceBase,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Check Out",
+                        style: TextStyle(
+                          color: ColorDouce.douceBase,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Check Out",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget serviceContainer() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.video_call, size: 60, color: ColorDouce.douceBase),
-          const SizedBox(width: 20),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Panggilan Video",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                "Rp 50.000 / Jam",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          const Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("5 Maret 2024"),
             ],
           )
         ],

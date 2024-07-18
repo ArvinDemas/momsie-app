@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +8,8 @@ class DetailDoulaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DoulaModel doula = Get.arguments["doula"];
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -34,9 +37,9 @@ class DetailDoulaPage extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.heart_broken_rounded,
-                    color: ColorDouce.douceBase,
+                    color: Colors.transparent,
                   ),
                 ],
               ),
@@ -47,56 +50,68 @@ class DetailDoulaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Image.asset(
-                        "assets/images/topdoula.png",
+                      child: Image.network(
+                        doula.image,
+                        height: 150,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    const Expanded(
+                    const SizedBox(width: 15),
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Dr. Zahra",
-                            style: TextStyle(
+                            doula.name,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                             ),
                           ),
-                          Text("Keperawatan"),
+                          Text(doula.job),
                           Text(
-                            "Jl. Kaliurang KM 5,5 Yogyakarta",
-                            style: TextStyle(
+                            doula.alamat,
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black,
                             ),
                           ),
-                          Row(children: [
-                            Icon(Icons.star, color: Colors.orange),
-                            Text(
-                              "4.9",
-                              style: TextStyle(fontSize: 14),
-                            )
-                          ])
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                              ),
+                              Text(
+                                doula.rating,
+                                style: const TextStyle(fontSize: 14),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              const SizedBox(height: 15),
+              const Divider(
+                color: Colors.grey,
+                thickness: 1,
+              ),
+              const SizedBox(height: 15),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 25,
                 children: [
-                  informationCircle("Perempuan", Icons.female),
-                  informationCircle("4.9", Icons.star),
-                  informationCircle("10 Tahun", Icons.calendar_today),
-                  informationCircle("4.942", Icons.comment),
+                  informationCircle(doula.jenisKelamin, Icons.female),
+                  informationCircle(doula.rating, Icons.star),
+                  informationCircle(doula.job, Icons.work),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               const Text(
                 "Biografi",
                 style: TextStyle(
@@ -106,37 +121,7 @@ class DetailDoulaPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text("Desc Biografi blablablabla"),
-              const SizedBox(height: 20),
-              const Text(
-                "Layanan Kesehatan",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 20),
-              InkWell(
-                onTap: () => Get.toNamed("/booking-doula"),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: ColorDouce.douceBase,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Booking",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Text(doula.biografi),
             ],
           ),
         ),
@@ -145,29 +130,34 @@ class DetailDoulaPage extends StatelessWidget {
   }
 
   Widget informationCircle(String title, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9999),
-            color: ColorDouce.kindaRed,
+    return SizedBox(
+      width: 75,
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9999),
+              color: ColorDouce.kindaRed,
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Icon(
+              icon,
+              color: ColorDouce.douceBase,
+            ),
           ),
-          padding: const EdgeInsets.all(16),
-          child: Icon(
-            icon,
-            color: ColorDouce.douceBase,
+          const SizedBox(height: 5),
+          FittedBox(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: ColorDouce.douceBase,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: ColorDouce.douceBase,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

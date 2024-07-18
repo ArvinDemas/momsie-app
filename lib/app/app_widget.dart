@@ -5,8 +5,8 @@ import 'package:douce/features/forgot/verification_page.dart';
 import 'package:douce/features/login/login_page.dart';
 import 'package:douce/features/mitra/akun/mitra_datadiri_page.dart';
 import 'package:douce/features/mitra/akun/mitra_pendapatan_page.dart';
-import 'package:douce/features/mitra/akun/mitra_riwayat_page.dart';
 import 'package:douce/features/mitra/main_mitra.dart';
+import 'package:douce/features/mitra_register/confirmation_register_page.dart';
 import 'package:douce/features/mitra_register/mitra_register_page.dart';
 import 'package:douce/features/register/register_page.dart';
 import 'package:douce/features/register/success_register_page.dart';
@@ -26,6 +26,7 @@ import 'package:douce/features/user/akun/settings/user_settings_page.dart';
 import 'package:douce/features/user/beranda/detail_toko_page.dart';
 import 'package:douce/features/user/beranda/see_more_page.dart';
 import 'package:douce/features/user/beranda/user_notifikasi_page.dart';
+import 'package:douce/features/user/pesanan/user_pesanan_page.dart';
 import 'package:douce/features/user/search/user_search_page.dart';
 import 'package:douce/features/user/edukasi/user_artikel_page.dart';
 import 'package:douce/features/user/edukasi/user_detailgerakan_page.dart';
@@ -33,11 +34,10 @@ import 'package:douce/features/user/edukasi/user_detailprogram_page.dart';
 import 'package:douce/features/user/edukasi/user_programbulan_page.dart';
 import 'package:douce/features/user/edukasi/user_programminggu_page.dart';
 import 'package:douce/features/user/kesehatan/booking_doula_page.dart';
-import 'package:douce/features/user/kesehatan/chat_page.dart';
+import 'package:douce/features/user/chat/chat_page.dart';
 import 'package:douce/features/user/kesehatan/confirm_booking_page.dart';
 import 'package:douce/features/user/kesehatan/detail_doula_page.dart';
 import 'package:douce/features/user/kesehatan/detail_rumahsakit_page.dart';
-import 'package:douce/features/user/kesehatan/payment_method_page.dart';
 import 'package:douce/features/user/main_user.dart';
 import 'package:douce/features/user/obat/detail_obat_page.dart';
 import 'package:flutter/material.dart';
@@ -47,14 +47,14 @@ class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     return GetMaterialApp(
       theme: ThemeData(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
       ),
       debugShowCheckedModeBanner: false,
-      title: 'Doula',
+      title: 'Momsie',
       getPages: [
         GetPage(
           name: AppRoutes.login,
@@ -95,10 +95,6 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.mitraPendapatan,
           page: () => const MitraPendapatanPage(),
-        ),
-        GetPage(
-          name: AppRoutes.mitraRiwayat,
-          page: () => const MitraRiwayatPage(),
         ),
         GetPage(
           name: AppRoutes.user,
@@ -201,10 +197,6 @@ class AppWidget extends StatelessWidget {
           page: () => const ConfirmBookingPage(),
         ),
         GetPage(
-          name: AppRoutes.paymentMethod,
-          page: () => const PaymentMethodPage(),
-        ),
-        GetPage(
           name: AppRoutes.chatPage,
           page: () => const ChatPage(),
         ),
@@ -219,6 +211,14 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.mitraRegister,
           page: () => const MitraRegisterPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userPesanan,
+          page: () => const UserPesananPage(),
+        ),
+        GetPage(
+          name: AppRoutes.confirmRegister,
+          page: () => const ConfirmationRegisterPage(),
         ),
       ],
       initialRoute: AppRoutes.splash,

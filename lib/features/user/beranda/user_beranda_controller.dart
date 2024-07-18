@@ -1,9 +1,12 @@
 import 'package:douce/shared/util/model/artikel_model.dart';
+import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/util/service/artikel_service.dart';
+import 'package:douce/shared/util/service/doula_service.dart';
 import 'package:douce/shared/util/service/rumahsakit_service.dart';
 import 'package:douce/shared/util/service/tokobayi_service.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:get/get.dart';
 
 class UserBerandaController extends GetxController {
@@ -15,6 +18,9 @@ class UserBerandaController extends GetxController {
 
   RxList<RumahSakitModel> rumahSakitList = <RumahSakitModel>[].obs;
   RxBool isRumahSakitLoading = true.obs;
+
+  RxList<DoulaModel> doulaList = <DoulaModel>[].obs;
+  RxBool isDoulaLoading = true.obs;
 
   List<RumahSakitModel> getRandomRumahSakit() {
     var list = rumahSakitList.toList();
@@ -31,7 +37,15 @@ class UserBerandaController extends GetxController {
   List<TokoBayiModel> getRandomTokoBayi() {
     var list = tokoBayiList.toList();
     list.shuffle();
-    return list.take(2).toList();
+    return list.take(4).toList();
+  }
+
+  List<DoulaModel> getRandomDoula() {
+    final UserController userController = Get.find<UserController>();
+    var list =
+        doulaList.where((e) => e.uid != userController.uid.value).toList();
+    list.shuffle();
+    return list.take(4).toList();
   }
 
   @override
@@ -45,6 +59,10 @@ class UserBerandaController extends GetxController {
     getRumahSakit().then((_) {
       isRumahSakitLoading.value = false;
     });
+    getDoula().then((_) {
+      isDoulaLoading.value = false;
+    });
+
     super.onInit();
   }
 
@@ -54,6 +72,17 @@ class UserBerandaController extends GetxController {
       if (tokoBayi.isNotEmpty) {
         tokoBayiList.assignAll(
             tokoBayi.map((item) => TokoBayiModel.fromJson(item)).toList());
+      }
+    } catch (e) {
+      // print(e);
+    }
+  }
+
+  Future<void> getDoula() async {
+    try {
+      final List<DoulaModel> doula = await DoulaService().getDoula();
+      if (doula.isNotEmpty) {
+        doulaList.assignAll(doula);
       }
     } catch (e) {
       // print(e);

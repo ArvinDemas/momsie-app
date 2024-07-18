@@ -1,4 +1,6 @@
+import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
+import 'package:douce/shared/util/service/doula_service.dart';
 import 'package:douce/shared/util/service/rumahsakit_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -15,6 +17,9 @@ class UserKesehatanController extends GetxController {
   final RxList<RumahSakitModel> listFilteredRumahSakit =
       <RumahSakitModel>[].obs;
 
+  final RxList<DoulaModel> doulaList = <DoulaModel>[].obs;
+  final RxList<DoulaModel> listFilteredDoula = <DoulaModel>[].obs;
+
   final RxBool isLoading = true.obs;
 
   @override
@@ -24,6 +29,7 @@ class UserKesehatanController extends GetxController {
         isLoading.value = false;
       });
     });
+    getDoula();
     super.onInit();
   }
 
@@ -39,16 +45,25 @@ class UserKesehatanController extends GetxController {
     searchValue.value = value;
     if (searchValue.value.isEmpty) {
       listFilteredRumahSakit.clear();
+      listFilteredDoula.clear();
       return;
     }
 
     listFilteredRumahSakit.value = listRumahSakit
         .where((element) => element.nama.toLowerCase().contains(value))
         .toList();
+
+    listFilteredDoula.value = doulaList
+        .where((element) => element.name.toLowerCase().contains(value))
+        .toList();
   }
 
   Future<void> getRumahsakit() async {
     listRumahSakit.value = await RumahSakitService().getRumahSakit();
+  }
+
+  Future<void> getDoula() async {
+    doulaList.value = await DoulaService().getDoula();
   }
 
   Future<void> determinePosition() async {

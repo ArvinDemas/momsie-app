@@ -48,7 +48,7 @@ class UserHubungiPage extends StatelessWidget {
               Obx(
                 () => contactContainer(
                   "Customer Service",
-                  "(620) 555 - 1036",
+                  "+62 813-7367-3251",
                   userHubungiController.customerServiceToggle.value,
                   () => userHubungiController.toggleCustomerService(),
                   Icons.headset_mic_outlined,
@@ -63,7 +63,7 @@ class UserHubungiPage extends StatelessWidget {
               Obx(
                 () => contactContainer(
                   "WhatsApp",
-                  "0812 - 3456 - 7890",
+                  "+62 813-7367-3251",
                   userHubungiController.whatsAppToggle.value,
                   () => userHubungiController.toggleWhatsApp(),
                   Icons.call,
@@ -77,38 +77,8 @@ class UserHubungiPage extends StatelessWidget {
               ),
               Obx(
                 () => contactContainer(
-                  "Website",
-                  "www.doula.id",
-                  userHubungiController.websiteToggle.value,
-                  () => userHubungiController.toggleWebsite(),
-                  Icons.web_rounded,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Obx(
-                () => userHubungiController.websiteToggle.value
-                    ? const SizedBox(height: 40)
-                    : const SizedBox(),
-              ),
-              Obx(
-                () => contactContainer(
-                  "Facebook",
-                  "Doula Indonesia",
-                  userHubungiController.facebookToggle.value,
-                  () => userHubungiController.toggleFacebook(),
-                  Icons.facebook,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Obx(
-                () => userHubungiController.facebookToggle.value
-                    ? const SizedBox(height: 40)
-                    : const SizedBox(),
-              ),
-              Obx(
-                () => contactContainer(
                   "Instagram",
-                  "@doula.id",
+                  "@momsiee.id",
                   userHubungiController.instagramToggle.value,
                   () => userHubungiController.toggleInstagram(),
                   Icons.mobile_friendly_sharp,

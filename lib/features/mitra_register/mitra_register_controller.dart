@@ -17,8 +17,7 @@ class MitraRegisterController extends GetxController {
 
   final Rx<TextEditingController> nameController = TextEditingController().obs;
   final Rx<TextEditingController> nikController = TextEditingController().obs;
-  final Rx<TextEditingController> alamatController =
-      TextEditingController().obs;
+  final Rx<TextEditingController> nohpController = TextEditingController().obs;
   final Rx<TextEditingController> kotaProvinsiController =
       TextEditingController().obs;
   final Rx<TextEditingController> biografiController =
@@ -50,7 +49,7 @@ class MitraRegisterController extends GetxController {
           currentImage.value == null ||
           nameController.value.text.isEmpty ||
           nikController.value.text.isEmpty ||
-          alamatController.value.text.isEmpty ||
+          nohpController.value.text.isEmpty ||
           kotaProvinsiController.value.text.isEmpty ||
           biografiController.value.text.isEmpty) {
         Get.snackbar('Error', 'Data tidak boleh kosong');
@@ -66,44 +65,61 @@ class MitraRegisterController extends GetxController {
         await firestore.collection('mitra').doc(userController.uid.value).set({
           'name': nameController.value.text,
           'nik': nikController.value.text,
-          'alamat': alamatController.value.text,
-          'kotaProvinsi': kotaProvinsiController.value.text,
+          'nohp': nohpController.value.text,
           'biografi': biografiController.value.text,
           'pekerjaan': jobSelect.value,
           'pendidikan': educationSelect.value,
-          'agama': religionSelect.value,
           'jenisKelamin': genderSelect.value,
           'image': downloadUrl,
+          'rating': 5.0,
+          'saldo': 0,
         });
+
+        final int randomNumber = getRandomNumber();
 
         await firestore
-            .collection('user')
+            .collection('register')
             .doc(userController.uid.value)
-            .update({
-          'isDoula': true,
+            .set({
+          'registerConfirmed': false,
+          'payment': randomNumber,
         });
 
-        userController.updateUser(
-          userController.username.value,
-          true,
-          userController.image.value,
-        );
+        // await firestore
+        //     .collection('user')
+        //     .doc(userController.uid.value)
+        //     .update({
+        //   'isDoula': true,
+        // });
 
-        userController.setDoula(
-          nameController.value.text,
-          alamatController.value.text,
-          kotaProvinsiController.value.text,
-          biografiController.value.text,
-          downloadUrl,
-          genderSelect.value,
-          nikController.value.text,
-        );
+        // userController.updateUser(
+        //   userController.username.value,
+        //   true,
+        //   userController.image.value,
+        // );
 
-        Get.offAllNamed('/mitra');
+        // userController.setDoula(
+        //   nameController.value.text,
+        //   nohpController.value.text,
+        //   kotaProvinsiController.value.text,
+        //   biografiController.value.text,
+        //   downloadUrl,
+        //   genderSelect.value,
+        //   nikController.value.text,
+        // );
+
+        Get.offAllNamed('/user');
+        Get.toNamed('/confirm-register', arguments: {
+          'payment': randomNumber,
+        });
       }
     } catch (e) {
-      print(e);
+      // print(e);
     }
+  }
+
+  int getRandomNumber() {
+    return 50000 + DateTime.now().millisecondsSinceEpoch % 1000;
   }
 
   Rx<List<String>> genderList = Rx<List<String>>([

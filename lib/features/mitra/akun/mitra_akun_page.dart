@@ -37,11 +37,6 @@ class MitraAkunPage extends StatelessWidget {
                 onTap: () => Get.toNamed("/mitra-data-diri"),
               ),
               MenuContainer(
-                title: "Riwayat Kerja",
-                icon: Icons.done_rounded,
-                onTap: () => Get.toNamed("/mitra-riwayat"),
-              ),
-              MenuContainer(
                 title: "Pendapatan",
                 icon: Icons.settings,
                 onTap: () => Get.toNamed("/mitra-pendapatan"),

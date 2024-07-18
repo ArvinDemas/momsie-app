@@ -1,6 +1,9 @@
+import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/features/mitra/status/mitra_status_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/pesanan_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
+import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,9 +12,11 @@ class MitraStatusPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mitraStatusController = Get.put(MitraStatusController());
+    final MitraStatusController mitraStatusController =
+        Get.put(MitraStatusController());
 
     return BasePage(
+      isDoula: true,
       childWidget: ListView(
         padding: const EdgeInsets.all(0),
         children: [
@@ -94,7 +99,7 @@ class MitraStatusPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Obx(
                   () => mitraStatusController.status.value == "Berjalan"
-                      ? berjalanColumn()
+                      ? berjalanColumn(context)
                       : terkonfirmasiColumn(),
                 ),
               ],
@@ -105,29 +110,31 @@ class MitraStatusPage extends StatelessWidget {
     );
   }
 
-  Widget berjalanColumn() {
+  Widget berjalanColumn(context) {
     return Wrap(
       runSpacing: 20,
-      children: [
-        berjalanJobContainer(),
-        berjalanJobContainer(),
-        berjalanJobContainer(),
-      ],
+      children: Get.find<MitraPekerjaanController>()
+          .active
+          .map(
+            (active) => jobContainer(context, active),
+          )
+          .toList(),
     );
   }
 
   Widget terkonfirmasiColumn() {
     return Wrap(
       runSpacing: 20,
-      children: [
-        terkonfirmasiJobContainer(),
-        terkonfirmasiJobContainer(),
-        terkonfirmasiJobContainer(),
-      ],
+      children: Get.find<MitraPekerjaanController>()
+          .riwayat
+          .map(
+            (riwayat) => terkonfirmasiJobContainer(riwayat),
+          )
+          .toList(),
     );
   }
 
-  Widget berjalanJobContainer() {
+  Widget jobContainer(context, ActiveModel active) {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
@@ -150,24 +157,24 @@ class MitraStatusPage extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.video_call,
+                Icons.medical_information_outlined,
                 size: 60,
                 color: ColorDouce.douceBase,
               ),
               const SizedBox(width: 20),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Panggilan Video",
-                    style: TextStyle(
+                    active.layanan,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Al Ikhsan Akbar Fatahillah",
-                    style: TextStyle(
+                    active.namaUser,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black,
                     ),
@@ -181,7 +188,7 @@ class MitraStatusPage extends StatelessWidget {
             height: 20,
             thickness: 0.5,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
@@ -189,19 +196,19 @@ class MitraStatusPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.date_range),
-                      SizedBox(width: 15),
+                      const Icon(Icons.date_range),
+                      const SizedBox(width: 15),
                       Text(
-                        "21 Maret 2024",
+                        "${active.tanggal} ${active.day}",
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.wallet),
-                      SizedBox(width: 15),
-                      Text("Rp. 50.000")
+                      const Icon(Icons.wallet),
+                      const SizedBox(width: 15),
+                      Text(active.harga.toString()),
                     ],
                   )
                 ],
@@ -211,13 +218,13 @@ class MitraStatusPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.access_time),
-                      SizedBox(width: 15),
-                      Text("02.00 PM")
+                      const Icon(Icons.access_time),
+                      const SizedBox(width: 15),
+                      Text(active.jam)
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
                       Icon(Icons.timelapse),
                       SizedBox(width: 15),
@@ -229,61 +236,86 @@ class MitraStatusPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 30,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: ColorDouce.douceBase,
-                    width: 1,
+              InkWell(
+                onTap: () {
+                  Get.toNamed('/chat-page', arguments: {
+                    "user": active.pemesan,
+                    "doula": active.doula,
+                    "isDoula": true,
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 30,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Check In",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorDouce.douceBase,
+                      width: 1,
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Chat",
+                        style: TextStyle(
+                          color: ColorDouce.douceBase,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 30,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: ColorDouce.douceBase,
-                    width: 1,
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ConfirmDialog(
+                          descText:
+                              "Pastikan Kamu Sudah Selesai Memberikan Layanan Kepada User !",
+                          onTap: () {
+                            Get.find<MitraPekerjaanController>()
+                                .checkOut(active);
+                          },
+                        );
+                      });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 30,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Check Out",
-                      style: TextStyle(
-                        color: ColorDouce.douceBase,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ColorDouce.douceBase,
+                      width: 1,
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Check Out",
+                        style: TextStyle(
+                          color: ColorDouce.douceBase,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -293,7 +325,7 @@ class MitraStatusPage extends StatelessWidget {
     );
   }
 
-  Widget terkonfirmasiJobContainer() {
+  Widget terkonfirmasiJobContainer(ActiveModel riwayat) {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
@@ -316,24 +348,24 @@ class MitraStatusPage extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.video_call,
+                Icons.medical_information_outlined,
                 size: 60,
                 color: ColorDouce.douceBase,
               ),
               const SizedBox(width: 20),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Panggilan Video",
-                    style: TextStyle(
+                    riwayat.layanan,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Al Ikhsan Akbar Fatahillah",
-                    style: TextStyle(
+                    riwayat.namaUser,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black,
                     ),
@@ -347,27 +379,27 @@ class MitraStatusPage extends StatelessWidget {
             height: 20,
             thickness: 0.5,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Tanggal:"),
-              Text("9 Januari 2024"),
+              const Text("Tanggal:"),
+              Text("${riwayat.tanggal} ${riwayat.day}"),
             ],
           ),
           const SizedBox(height: 5),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Harga:"),
-              Text("Rp 70.000"),
+              Text(riwayat.harga.toString()),
             ],
           ),
           const SizedBox(height: 5),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Waktu:"),
-              Text("02.00 PM"),
+              const Text("Waktu:"),
+              Text(riwayat.jam),
             ],
           ),
           const SizedBox(height: 5),
@@ -386,14 +418,6 @@ class MitraStatusPage extends StatelessWidget {
               Text("-"),
             ],
           ),
-          const SizedBox(height: 5),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Pengajuan:"),
-              Text("8 Januari 2024"),
-            ],
-          )
         ],
       ),
     );

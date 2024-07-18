@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+  const TopBar({super.key, this.isDoula = false});
+
+  final bool isDoula;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,9 @@ class TopBar extends StatelessWidget {
                         ),
                         Obx(
                           () => Text(
-                            userController.username.value,
+                            isDoula
+                                ? userController.doulaUsername.value
+                                : userController.username.value,
                             style: const TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 20,
@@ -69,17 +73,23 @@ class TopBar extends StatelessWidget {
                         Obx(
                           () => ClipRRect(
                             borderRadius: BorderRadius.circular(100),
-                            child: userController.image.value.isEmpty
-                                ? Image.asset(
-                                    'assets/images/blank-profile.png',
+                            child: isDoula
+                                ? Image.network(
+                                    userController.doulaImage.value,
                                     width: 32,
                                     height: 32,
                                   )
-                                : Image.network(
-                                    userController.image.value,
-                                    width: 32,
-                                    height: 32,
-                                  ),
+                                : userController.image.value.isEmpty
+                                    ? Image.asset(
+                                        'assets/images/blank-profile.png',
+                                        width: 32,
+                                        height: 32,
+                                      )
+                                    : Image.network(
+                                        userController.image.value,
+                                        width: 32,
+                                        height: 32,
+                                      ),
                           ),
                         )
                       ],
@@ -90,7 +100,7 @@ class TopBar extends StatelessWidget {
             ],
           ),
           Positioned(
-            top: 100,
+            top: 115,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Container(
@@ -113,12 +123,15 @@ class TopBar extends StatelessWidget {
                 ),
                 child: TextFormField(
                   decoration: InputDecoration(
-                    hintText: 'Cari Kategori, Obat',
+                    hintText: isDoula
+                        ? 'Cari Pesanan | Pekerjaan'
+                        : 'Cari Kategori, Obat',
                     hintStyle: const TextStyle(
                       color: Colors.black,
                       fontFamily: 'Open-Sans',
                       fontWeight: FontWeight.w300,
                     ),
+                    enabled: isDoula ? false : true,
                     prefixIcon: const Icon(
                       Icons.search,
                       color: Colors.black,

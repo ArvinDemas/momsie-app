@@ -1,4 +1,6 @@
+import 'package:douce/features/mitra/akun/mitra_pendapatan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,6 +9,8 @@ class MitraPendapatanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MitraPendapatanController controller =
+        Get.put(MitraPendapatanController());
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(0),
@@ -34,11 +38,13 @@ class MitraPendapatanPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        "Rp. 150.000",
-                        style: TextStyle(
-                          color: ColorDouce.douceBase,
-                          fontSize: 16,
+                      Obx(
+                        () => Text(
+                          "Rp. ${controller.total.value}",
+                          style: TextStyle(
+                            color: ColorDouce.douceBase,
+                            fontSize: 16,
+                          ),
                         ),
                       )
                     ],
@@ -48,42 +54,53 @@ class MitraPendapatanPage extends StatelessWidget {
                     height: 20,
                     thickness: 0.5,
                   ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Maret 2024",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Tarik Pendapatan",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    hintText: "Via / Norek",
+                    iconImage: const Icon(Icons.wallet),
+                    isPassword: false,
+                    controller: controller.viaController.value,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    hintText: "Nominal",
+                    iconImage: const Icon(Icons.money),
+                    isPassword: false,
+                    controller: controller.tarikController.value,
+                  ),
+                  const SizedBox(height: 20),
+                  InkWell(
+                    onTap: () {
+                      controller.tarikPendapatan();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: ColorDouce.douceBase,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      width: double.infinity,
+                      height: 50,
+                      child: const Center(
+                        child: Text(
+                          "Tarik",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            "Juni 2024",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(Icons.calendar_month_outlined)
-                        ],
-                      )
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 25),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      calendarContainer("Sen", "21", false),
-                      calendarContainer("Sel", "22", false),
-                      calendarContainer("Rab", "23", true),
-                      calendarContainer("Kam", "24", false),
-                      calendarContainer("Jum", "25", false),
-                    ],
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
