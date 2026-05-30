@@ -115,7 +115,7 @@ class ChatPage extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                message.time,
+                                                message.formattedTime,
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,
@@ -155,7 +155,7 @@ class ChatPage extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                message.time,
+                                                message.formattedTime,
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,
@@ -209,7 +209,7 @@ class ChatPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             spreadRadius: 2,
                             blurRadius: 3,
                             offset: const Offset(0, 2),

@@ -41,7 +41,26 @@ class LoginController extends GetxController {
         userDoc['isDoula'],
       );
 
-      Get.offAllNamed('/user');
+      if (userDoc['isDoula'] == true) {
+        final DocumentSnapshot mitraData = await firestore
+            .collection('mitra')
+            .doc(userCredential.user!.uid)
+            .get();
+        if (mitraData.exists) {
+          userController.setDoula(
+            mitraData['name'],
+            mitraData['alamat'],
+            mitraData['kotaProvinsi'],
+            mitraData['biografi'],
+            mitraData['image'],
+            mitraData['jenisKelamin'],
+            mitraData['nik'],
+          );
+        }
+        Get.offAllNamed('/mitra');
+      } else {
+        Get.offAllNamed('/user');
+      }
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -73,26 +92,56 @@ class LoginController extends GetxController {
           .doc(userCredential.user!.uid)
           .get();
 
+      String username;
+      String? image;
+      bool isDoula;
+
       if (!userDoc.exists) {
-        firestore.collection('user').doc(userCredential.user!.uid).set({
-          'username': userCredential.user!.displayName,
+        username = userCredential.user!.displayName ?? 'User';
+        image = userCredential.user!.photoURL;
+        isDoula = false;
+        await firestore.collection('user').doc(userCredential.user!.uid).set({
+          'username': username,
           'email': userCredential.user!.email,
-          'image': userCredential.user!.photoURL,
+          'image': image,
           'uid': userCredential.user!.uid,
-          'isDoula': false,
+          'isDoula': isDoula,
         });
+      } else {
+        username = userDoc['username'];
+        image = userDoc['image'];
+        isDoula = userDoc['isDoula'] ?? false;
       }
 
       final UserController userController = Get.find<UserController>();
       userController.setUser(
-        userDoc['username'],
+        username,
         userCredential.user!.email!,
         userCredential.user!.uid,
-        userDoc['image'],
-        userDoc['isDoula'],
+        image ?? '',
+        isDoula,
       );
 
-      Get.offAllNamed('/user');
+      if (isDoula) {
+        final DocumentSnapshot mitraData = await firestore
+            .collection('mitra')
+            .doc(userCredential.user!.uid)
+            .get();
+        if (mitraData.exists) {
+          userController.setDoula(
+            mitraData['name'],
+            mitraData['alamat'],
+            mitraData['kotaProvinsi'],
+            mitraData['biografi'],
+            mitraData['image'],
+            mitraData['jenisKelamin'],
+            mitraData['nik'],
+          );
+        }
+        Get.offAllNamed('/mitra');
+      } else {
+        Get.offAllNamed('/user');
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(

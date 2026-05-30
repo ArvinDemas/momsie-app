@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/util/model/pesanan_model.dart';
 import 'package:douce/shared/util/service/pesanan_service.dart';
@@ -14,58 +15,140 @@ class MitraPekerjaanController extends GetxController {
   final RxList<ActiveModel> active = <ActiveModel>[].obs;
   final RxList<ActiveModel> riwayat = <ActiveModel>[].obs;
 
+  StreamSubscription<QuerySnapshot>? _pekerjaanSub;
+  StreamSubscription<QuerySnapshot>? _activeSub;
+  StreamSubscription<QuerySnapshot>? _riwayatSub;
+
   @override
   void onInit() {
     selectedTanggal.value =
         (DateTime.now().add(const Duration(days: 1)).day.toString());
-    getPekerjaan();
-    getActive();
-    getRiwayat();
-
+    _listenPekerjaan();
+    _listenActive();
+    _listenRiwayat();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    _pekerjaanSub?.cancel();
+    _activeSub?.cancel();
+    _riwayatSub?.cancel();
+    super.onClose();
   }
 
   List<DateTime> dates =
       List.generate(5, (i) => DateTime.now().add(Duration(days: i + 1)));
 
-  Future<void> getPekerjaan() async {
-    try {
-      final List<PesananModel> pekerjaanList =
-          await PesananService().getPekerjaan(true);
-      pekerjaan.assignAll(pekerjaanList);
-      await Future.delayed(const Duration(seconds: 1));
-      getPekerjaan();
-    } catch (e) {
-      // print(e);
-      await Future.delayed(const Duration(seconds: 1));
-      getPekerjaan();
-    }
+  void _listenPekerjaan() {
+    final firestore = FirebaseFirestore.instance;
+    _pekerjaanSub = firestore.collection('pekerjaan').snapshots().listen(
+      (snapshot) async {
+        try {
+          final List<String> userIds =
+              snapshot.docs.map((doc) => doc['user'] as String).toList();
+          final Map<String, String> usernameMap =
+              await PesananService().fetchUsernamesPublic(userIds);
+
+          final List<PesananModel> result = snapshot.docs.map((doc) {
+            final String uid = doc['user'] as String;
+            return PesananModel(
+              id: doc['id'],
+              pemesan: uid,
+              tanggal: doc['tanggal'],
+              day: doc['day'],
+              jam: doc['jam'],
+              layanan: doc['layanan'],
+              harga: doc['harga'].toString(),
+              namaUser: usernameMap[uid] ?? '',
+            );
+          }).toList();
+          pekerjaan.assignAll(result);
+        } catch (_) {}
+      },
+    );
   }
 
-  Future<void> getActive() async {
-    try {
-      final List<ActiveModel> activeList =
-          await ActiveService().getActive(true);
-      active.assignAll(activeList);
+  void _listenActive() {
+    final firestore = FirebaseFirestore.instance;
+    final UserController userController = Get.find<UserController>();
+    _activeSub = firestore
+        .collection('active')
+        .where('doula', isEqualTo: userController.uid.value)
+        .snapshots()
+        .listen(
+      (snapshot) async {
+        try {
+          final List<String> userIds =
+              snapshot.docs.map((doc) => doc['user'] as String).toList();
+          final List<String> doulaIds =
+              snapshot.docs.map((doc) => doc['doula'] as String).toList();
+          final Map<String, String> usernameMap =
+              await PesananService().fetchUsernamesPublic(userIds);
+          final Map<String, String> doulaNameMap =
+              await PesananService().fetchDolaNamePublic(doulaIds);
 
-      await Future.delayed(const Duration(seconds: 1));
-      getActive();
-    } catch (e) {
-      // print(e);
-    }
+          final List<ActiveModel> result = snapshot.docs.map((doc) {
+            final String uid = doc['user'] as String;
+            final String doulaId = doc['doula'] as String;
+            return ActiveModel(
+              id: doc['id'],
+              pemesan: uid,
+              doula: doulaId,
+              tanggal: doc['tanggal'],
+              day: doc['day'],
+              jam: doc['jam'],
+              layanan: doc['layanan'],
+              harga: doc['harga'].toString(),
+              namaUser: usernameMap[uid] ?? '',
+              namaDoula: doulaNameMap[doulaId] ?? '',
+            );
+          }).toList();
+          active.assignAll(result);
+        } catch (_) {}
+      },
+    );
   }
 
-  Future<void> getRiwayat() async {
-    try {
-      final List<ActiveModel> riwayatList =
-          await ActiveService().getRiwayat(true);
-      riwayat.assignAll(riwayatList);
+  void _listenRiwayat() {
+    final firestore = FirebaseFirestore.instance;
+    final UserController userController = Get.find<UserController>();
+    _riwayatSub = firestore
+        .collection('riwayat')
+        .where('doula', isEqualTo: userController.uid.value)
+        .snapshots()
+        .listen(
+      (snapshot) async {
+        try {
+          final List<String> userIds =
+              snapshot.docs.map((doc) => doc['user'] as String).toList();
+          final List<String> doulaIds =
+              snapshot.docs.map((doc) => doc['doula'] as String).toList();
+          final Map<String, String> usernameMap =
+              await PesananService().fetchUsernamesPublic(userIds);
+          final Map<String, String> doulaNameMap =
+              await PesananService().fetchDolaNamePublic(doulaIds);
 
-      await Future.delayed(const Duration(seconds: 1));
-      getRiwayat();
-    } catch (e) {
-      // print(e);
-    }
+          final List<ActiveModel> result = snapshot.docs.map((doc) {
+            final String uid = doc['user'] as String;
+            final String doulaId = doc['doula'] as String;
+            return ActiveModel(
+              id: doc['id'],
+              pemesan: uid,
+              doula: doulaId,
+              tanggal: doc['tanggal'],
+              day: doc['day'],
+              jam: doc['jam'],
+              layanan: doc['layanan'],
+              harga: doc['harga'].toString(),
+              namaUser: usernameMap[uid] ?? '',
+              namaDoula: doulaNameMap[doulaId] ?? '',
+            );
+          }).toList();
+          riwayat.assignAll(result);
+        } catch (_) {}
+      },
+    );
   }
 
   Future<void> klaimPekerjaan(PesananModel pekerjaan) async {
@@ -107,9 +190,7 @@ class MitraPekerjaanController extends GetxController {
           Get.snackbar('Error', 'Pekerjaan sudah diambil');
         }
       });
-    } catch (e) {
-      print(e);
-    }
+    } catch (_) {}
   }
 
   Future<void> checkOut(ActiveModel active) async {
@@ -142,8 +223,6 @@ class MitraPekerjaanController extends GetxController {
       await firestore.collection('mitra').doc(active.doula).update({
         'saldo': FieldValue.increment(int.parse(active.harga)),
       });
-    } catch (e) {
-      // print(e);
-    }
+    } catch (_) {}
   }
 }

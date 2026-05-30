@@ -90,7 +90,7 @@ class VerificationPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorDouce.lightPink.withOpacity(0.7),
+                          color: ColorDouce.lightPink.withValues(alpha: 0.7),
                           spreadRadius: 0,
                           blurRadius: 8,
                           offset: const Offset(0, 8),

@@ -20,7 +20,6 @@ class DoulaService {
         );
       }).toList();
     } catch (e) {
-      print(e);
       return [];
     }
   }

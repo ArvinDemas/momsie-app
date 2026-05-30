@@ -49,7 +49,7 @@ class UserPesananController extends GetxController {
           await ActiveService().getActive(false);
       active.assignAll(activeList);
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 
@@ -59,7 +59,7 @@ class UserPesananController extends GetxController {
           await ActiveService().getRiwayat(false);
       riwayat.assignAll(riwayatList);
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 }

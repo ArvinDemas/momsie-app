@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/features/user/chat/chat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class ChatController extends GetxController {
   final String doula;
@@ -63,32 +62,29 @@ class ChatController extends GetxController {
             .map((e) => ChatModel(
                   sender: e['sender'],
                   message: e['message'],
-                  time: (e['time']),
+                  time: e['time'] as Timestamp?,
                 ))
             .toList();
       });
-    } catch (e) {
-      print(e);
-    }
+    } catch (_) {}
   }
 
   Future<void> sendMessage() async {
     try {
       if (chatId.isNotEmpty) {
+        final text = messageController.value.text.trim();
+        if (text.isEmpty) return;
+        messageController.value.clear();
         await firestore
             .collection('chat')
             .doc(chatId.value)
             .collection('messages')
             .add({
           'sender': isDoula ? doula : user,
-          'message': messageController.value.text,
-          'time': DateFormat('h:mm').format(DateTime.now()),
+          'message': text,
+          'time': FieldValue.serverTimestamp(),
         });
-
-        messageController.value.clear();
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (_) {}
   }
 }
