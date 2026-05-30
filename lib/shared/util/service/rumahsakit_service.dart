@@ -6,24 +6,11 @@ class RumahSakitService {
 
   Future<List<RumahSakitModel>> getRumahSakit() async {
     try {
-      List<RumahSakitModel> listRumahSakit = [];
-
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await _firestore.collection('rumahsakit').get();
-      snapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
-        final Map<String, dynamic> data = e.data();
-        listRumahSakit.add(RumahSakitModel(
-          nama: data['nama'],
-          latitude: double.parse(data['latitude']),
-          longitude: double.parse(data['longitude']),
-          alamat: data['alamat'],
-          layanan: data['layanan'],
-          rating: data['rating'],
-          image: data['image'],
-        ));
-      }).toList();
-
-      return listRumahSakit;
+      return snapshot.docs
+          .map((doc) => RumahSakitModel.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       return [];
     }

@@ -7,18 +7,9 @@ class DoulaService {
       final FirebaseFirestore firestore = FirebaseFirestore.instance;
       final QuerySnapshot<Map<String, dynamic>> doulaSnapshot =
           await firestore.collection('mitra').get();
-      return doulaSnapshot.docs.map((doc) {
-        return DoulaModel(
-          uid: doc.id,
-          image: doc['image'],
-          name: doc['name'],
-          job: doc['pekerjaan'],
-          alamat: doc['alamat'],
-          jenisKelamin: doc['jenisKelamin'],
-          biografi: doc['biografi'],
-          rating: doc['rating'].toString(),
-        );
-      }).toList();
+      return doulaSnapshot.docs
+          .map((doc) => DoulaModel.fromMap(doc.data(), uid: doc.id))
+          .toList();
     } catch (e) {
       return [];
     }

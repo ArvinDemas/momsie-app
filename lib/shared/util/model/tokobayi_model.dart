@@ -15,14 +15,29 @@ class TokoBayiModel {
     required this.product,
   });
 
-  static TokoBayiModel fromJson(Map<String, dynamic> json) {
+  factory TokoBayiModel.fromMap(Map<String, dynamic> map) {
     return TokoBayiModel(
-      alamat: json['alamat'],
-      desc: json['desc'],
-      nama: json['nama'],
-      rating: json['rating'],
-      image: json['image'],
-      product: json['product'],
+      alamat: map['alamat'] ?? '',
+      desc: map['desc'] ?? '',
+      nama: map['nama'] ?? '',
+      rating: map['rating']?.toString() ?? '0',
+      image: map['image'] ?? '',
+      product: (map['product'] as List<dynamic>?) ?? [],
     );
+  }
+
+  // Alias untuk kompatibilitas dengan kode lama
+  static TokoBayiModel fromJson(Map<String, dynamic> json) =>
+      TokoBayiModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'alamat': alamat,
+      'desc': desc,
+      'nama': nama,
+      'rating': rating,
+      'image': image,
+      'product': product,
+    };
   }
 }

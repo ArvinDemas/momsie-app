@@ -69,19 +69,14 @@ class PesananService {
           .where('user', isEqualTo: userController.uid.value)
           .get();
 
-      final List<String> userIds = snapshot.docs.map((doc) => doc['user'] as String).toList();
+      final List<String> userIds =
+          snapshot.docs.map((doc) => doc['user'] as String).toList();
       final Map<String, String> usernameMap = await _fetchUsernames(userIds);
 
       return snapshot.docs.map((doc) {
-        final String uid = doc['user'];
-        return PesananModel(
-          id: doc['id'],
-          pemesan: uid,
-          tanggal: doc['tanggal'],
-          day: doc['day'],
-          jam: doc['jam'],
-          layanan: doc['layanan'],
-          harga: doc['harga'].toString(),
+        final String uid = doc['user'] as String;
+        return PesananModel.fromMap(
+          doc.data() as Map<String, dynamic>,
           namaUser: usernameMap[uid] ?? '',
         );
       }).toList();
@@ -102,19 +97,14 @@ class PesananService {
               .where('user', isEqualTo: userController.uid.value)
               .get();
 
-      final List<String> userIds = snapshot.docs.map((doc) => doc['user'] as String).toList();
+      final List<String> userIds =
+          snapshot.docs.map((doc) => doc['user'] as String).toList();
       final Map<String, String> usernameMap = await _fetchUsernames(userIds);
 
       return snapshot.docs.map((doc) {
-        final String uid = doc['user'];
-        return PesananModel(
-          id: doc['id'],
-          pemesan: uid,
-          tanggal: doc['tanggal'],
-          day: doc['day'],
-          jam: doc['jam'],
-          layanan: doc['layanan'],
-          harga: doc['harga'].toString(),
+        final String uid = doc['user'] as String;
+        return PesananModel.fromMap(
+          doc.data() as Map<String, dynamic>,
           namaUser: usernameMap[uid] ?? '',
         );
       }).toList();
@@ -125,53 +115,7 @@ class PesananService {
 }
 
 class ActiveService {
-  Future<Map<String, String>> _fetchUsernames(List<String> uids) async {
-    final Map<String, String> usernames = {};
-    if (uids.isEmpty) return usernames;
-
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final List<String> uniqueUids = uids.toSet().toList();
-
-    final List<List<String>> chunks = [];
-    for (var i = 0; i < uniqueUids.length; i += 30) {
-      chunks.add(uniqueUids.sublist(i, i + 30 > uniqueUids.length ? uniqueUids.length : i + 30));
-    }
-
-    for (var chunk in chunks) {
-      final querySnapshot = await firestore
-          .collection('user')
-          .where(FieldPath.documentId, whereIn: chunk)
-          .get();
-      for (var doc in querySnapshot.docs) {
-        usernames[doc.id] = doc.data()['username'] ?? '';
-      }
-    }
-    return usernames;
-  }
-
-  Future<Map<String, String>> _fetchDoulaNames(List<String> uids) async {
-    final Map<String, String> names = {};
-    if (uids.isEmpty) return names;
-
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final List<String> uniqueUids = uids.toSet().toList();
-
-    final List<List<String>> chunks = [];
-    for (var i = 0; i < uniqueUids.length; i += 30) {
-      chunks.add(uniqueUids.sublist(i, i + 30 > uniqueUids.length ? uniqueUids.length : i + 30));
-    }
-
-    for (var chunk in chunks) {
-      final querySnapshot = await firestore
-          .collection('mitra')
-          .where(FieldPath.documentId, whereIn: chunk)
-          .get();
-      for (var doc in querySnapshot.docs) {
-        names[doc.id] = doc.data()['name'] ?? '';
-      }
-    }
-    return names;
-  }
+  final PesananService _pesananService = PesananService();
 
   Future<List<ActiveModel>> getActive(bool isDoula) async {
     try {
@@ -188,24 +132,21 @@ class ActiveService {
               .where('user', isEqualTo: userController.uid.value)
               .get();
 
-      final List<String> userIds = snapshot.docs.map((doc) => doc['user'] as String).toList();
-      final List<String> doulaIds = snapshot.docs.map((doc) => doc['doula'] as String).toList();
+      final List<String> userIds =
+          snapshot.docs.map((doc) => doc['user'] as String).toList();
+      final List<String> doulaIds =
+          snapshot.docs.map((doc) => doc['doula'] as String).toList();
 
-      final Map<String, String> usernameMap = await _fetchUsernames(userIds);
-      final Map<String, String> doulaNameMap = await _fetchDoulaNames(doulaIds);
+      final Map<String, String> usernameMap =
+          await _pesananService.fetchUsernamesPublic(userIds);
+      final Map<String, String> doulaNameMap =
+          await _pesananService.fetchDolaNamePublic(doulaIds);
 
       return snapshot.docs.map((doc) {
-        final String uid = doc['user'];
-        final String doulaId = doc['doula'];
-        return ActiveModel(
-          id: doc['id'],
-          pemesan: uid,
-          doula: doulaId,
-          tanggal: doc['tanggal'],
-          day: doc['day'],
-          jam: doc['jam'],
-          layanan: doc['layanan'],
-          harga: doc['harga'].toString(),
+        final String uid = doc['user'] as String;
+        final String doulaId = doc['doula'] as String;
+        return ActiveModel.fromMap(
+          doc.data() as Map<String, dynamic>,
           namaUser: usernameMap[uid] ?? '',
           namaDoula: doulaNameMap[doulaId] ?? '',
         );
@@ -230,24 +171,21 @@ class ActiveService {
               .where('user', isEqualTo: userController.uid.value)
               .get();
 
-      final List<String> userIds = snapshot.docs.map((doc) => doc['user'] as String).toList();
-      final List<String> doulaIds = snapshot.docs.map((doc) => doc['doula'] as String).toList();
+      final List<String> userIds =
+          snapshot.docs.map((doc) => doc['user'] as String).toList();
+      final List<String> doulaIds =
+          snapshot.docs.map((doc) => doc['doula'] as String).toList();
 
-      final Map<String, String> usernameMap = await _fetchUsernames(userIds);
-      final Map<String, String> doulaNameMap = await _fetchDoulaNames(doulaIds);
+      final Map<String, String> usernameMap =
+          await _pesananService.fetchUsernamesPublic(userIds);
+      final Map<String, String> doulaNameMap =
+          await _pesananService.fetchDolaNamePublic(doulaIds);
 
       return snapshot.docs.map((doc) {
-        final String uid = doc['user'];
-        final String doulaId = doc['doula'];
-        return ActiveModel(
-          id: doc['id'],
-          pemesan: uid,
-          doula: doulaId,
-          tanggal: doc['tanggal'],
-          day: doc['day'],
-          jam: doc['jam'],
-          layanan: doc['layanan'],
-          harga: doc['harga'].toString(),
+        final String uid = doc['user'] as String;
+        final String doulaId = doc['doula'] as String;
+        return ActiveModel.fromMap(
+          doc.data() as Map<String, dynamic>,
           namaUser: usernameMap[uid] ?? '',
           namaDoula: doulaNameMap[doulaId] ?? '',
         );

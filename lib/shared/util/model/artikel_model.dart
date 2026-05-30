@@ -13,13 +13,27 @@ class ArtikelModel {
     required this.link,
   });
 
-  static ArtikelModel fromJson(Map<String, dynamic> json) {
+  factory ArtikelModel.fromMap(Map<String, dynamic> map) {
     return ArtikelModel(
-      title: json['title'],
-      description: json['description'],
-      thumbnail: json['thumbnail'],
-      pubDate: json['pubDate'],
-      link: json['link'],
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      thumbnail: map['thumbnail'] ?? '',
+      pubDate: map['pubDate'] ?? '',
+      link: map['link'] ?? '',
     );
+  }
+
+  // Alias untuk kompatibilitas dengan kode lama yang pakai fromJson
+  static ArtikelModel fromJson(Map<String, dynamic> json) =>
+      ArtikelModel.fromMap(json);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'description': description,
+      'thumbnail': thumbnail,
+      'pubDate': pubDate,
+      'link': link,
+    };
   }
 }
