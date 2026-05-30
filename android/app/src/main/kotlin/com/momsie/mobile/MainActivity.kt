@@ -1,4 +1,4 @@
-package com.example.douce
+package com.momsie.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

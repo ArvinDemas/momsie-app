@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     projectId: 'doula-6b8a2',
     storageBucket: 'doula-6b8a2.appspot.com',
     iosClientId: '1057882811150-6h7ge6a7ire515h7lcah8vbuff0iueab.apps.googleusercontent.com',
-    iosBundleId: 'com.example.douce',
+    iosBundleId: 'com.momsie.mobile',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -77,6 +77,6 @@ class DefaultFirebaseOptions {
     projectId: 'doula-6b8a2',
     storageBucket: 'doula-6b8a2.appspot.com',
     iosClientId: '1057882811150-48f832ds7j4treot5b2pmqbi9vqnj51f.apps.googleusercontent.com',
-    iosBundleId: 'com.example.douce.RunnerTests',
+    iosBundleId: 'com.momsie.mobile.RunnerTests',
   );
 }
