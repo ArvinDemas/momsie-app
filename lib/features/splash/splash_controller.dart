@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/util/user_controller.dart';
+import 'package:douce/shared/widget/health_consent_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,21 @@ class SplashController extends GetxController {
         userDoc['image'],
         userDoc['isDoula'],
       );
-      Get.offNamed('/user');
+
+      // Cek apakah consent sudah pernah diberikan.
+      // Jika belum, tampilkan dialog saat context tersedia via GetX overlay.
+      final alreadyConsented = await HealthConsentDialog.isConsentGiven();
+      if (alreadyConsented) {
+        Get.offNamed('/user');
+      } else {
+        // Tampilkan dialog lewat GetX dialog (tidak butuh BuildContext langsung)
+        await Get.dialog(
+          HealthConsentDialog(
+            onConsented: () => Get.offNamed('/user'),
+          ),
+          barrierDismissible: false,
+        );
+      }
     });
   }
 }

@@ -102,6 +102,35 @@ class DetailObatPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Disclaimer informasi obat — wajib untuk kepatuhan Google Play
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3CD),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFFCCA3)),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.warning_amber_rounded,
+                        color: Color(0xFF856404), size: 18),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "Informasi obat ini hanya untuk referensi umum dan bukan anjuran medis. Selalu konsultasikan penggunaan obat dengan apoteker atau dokter Anda.",
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF856404),
+                          fontFamily: 'OpenSans',
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               const Divider(
                 color: Colors.black,
                 height: 10,
