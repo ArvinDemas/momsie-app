@@ -116,64 +116,78 @@ class _AnimatedGradientBackgroundState
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Positioned.fill(
       child: AnimatedBuilder(
         animation: Listenable.merge(_controllers),
         builder: (context, _) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Latar belakang dasar pink sangat muda
-              Container(color: const Color(0xFFFFF0F3)),
-
-              // Gambar tiap orb
-              for (int i = 0; i < _orbConfigs.length; i++) ...[
-                _buildOrb(size, i),
-              ],
-            ],
+          return CustomPaint(
+            painter: _OrbPainter(
+              orbConfigs: _orbConfigs,
+              startPositions: _startPositions,
+              xValues: _xAnims.map((a) => a.value).toList(),
+              yValues: _yAnims.map((a) => a.value).toList(),
+              scaleValues: _scaleAnims.map((a) => a.value).toList(),
+            ),
           );
         },
       ),
     );
   }
+}
 
-  Widget _buildOrb(Size size, int i) {
-    final config = _orbConfigs[i];
-    final start = _startPositions[i];
-    final orbSize = min(size.width, size.height) * config.sizeFactor;
+class _OrbPainter extends CustomPainter {
+  final List<_OrbConfig> orbConfigs;
+  final List<Offset> startPositions;
+  final List<double> xValues;
+  final List<double> yValues;
+  final List<double> scaleValues;
 
-    final dx = (start.dx + _xAnims[i].value) * size.width;
-    final dy = (start.dy + _yAnims[i].value) * size.height;
-    final scale = _scaleAnims[i].value;
+  _OrbPainter({
+    required this.orbConfigs,
+    required this.startPositions,
+    required this.xValues,
+    required this.yValues,
+    required this.scaleValues,
+  });
 
-    return Positioned(
-      left: dx - orbSize / 2,
-      top: dy - orbSize / 2,
-      child: Transform.scale(
-        scale: scale,
-        child: Container(
-          width: orbSize,
-          height: orbSize,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: config.color,
-          ),
-          foregroundDecoration: BoxDecoration(
-            shape: BoxShape.circle,
-            // blur effect via gradient overlay (Flutter tidak punya blur 120px persis)
-            gradient: RadialGradient(
-              colors: [
-                config.color,
-                config.color.withOpacity(0.0),
-              ],
-              stops: const [0.0, 1.0],
-            ),
-          ),
-        ),
-      ),
-    );
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 1. Latar belakang dasar pink sangat muda
+    final bgPaint = Paint()..color = const Color(0xFFFFF0F3);
+    canvas.drawRect(Offset.zero & size, bgPaint);
+
+    // 2. Gambar tiap orb
+    final baseDimension = min(size.width, size.height);
+    for (int i = 0; i < orbConfigs.length; i++) {
+      final config = orbConfigs[i];
+      final start = startPositions[i];
+      final baseOrbSize = baseDimension * config.sizeFactor;
+      final scale = scaleValues[i];
+      final orbSize = baseOrbSize * scale;
+      final radius = orbSize / 2;
+
+      final dx = (start.dx + xValues[i]) * size.width;
+      final dy = (start.dy + yValues[i]) * size.height;
+      final center = Offset(dx, dy);
+
+      // Radial gradient untuk efek glow/blur
+      final paint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            config.color,
+            config.color.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+      canvas.drawCircle(center, radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _OrbPainter oldDelegate) {
+    // Selalu repaint karena nilai koordinat/skala berubah setiap frame
+    return true;
   }
 }
 
