@@ -6,6 +6,7 @@ import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/obat_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class SeeMorePage extends StatelessWidget {
@@ -36,7 +37,10 @@ class SeeMorePage extends StatelessWidget {
     }
 
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -66,6 +70,8 @@ class SeeMorePage extends StatelessWidget {
             contentWidget
           ],
         ),
+      ),
+        ],
       ),
     );
   }

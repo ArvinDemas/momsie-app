@@ -3,6 +3,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class MitraDataDiriPage extends StatelessWidget {
@@ -21,7 +22,10 @@ class MitraDataDiriPage extends StatelessWidget {
         userController.doulaBiografi.value;
 
     return Scaffold(
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           AccountTopBar(
@@ -89,6 +93,8 @@ class MitraDataDiriPage extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

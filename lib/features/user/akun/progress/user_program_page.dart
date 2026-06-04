@@ -1,5 +1,6 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class UserProgramPage extends StatelessWidget {
@@ -8,7 +9,10 @@ class UserProgramPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 15,
@@ -117,6 +121,8 @@ class UserProgramPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

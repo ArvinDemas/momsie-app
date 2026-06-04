@@ -2,6 +2,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/alert_dialog.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 
 class CreatePasswordPage extends StatelessWidget {
   const CreatePasswordPage({super.key});
@@ -12,7 +13,10 @@ class CreatePasswordPage extends StatelessWidget {
       canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: Column(
+        body: Stack(
+          children: [
+            const AnimatedGradientBackground(),
+            Column(
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
@@ -112,6 +116,8 @@ class CreatePasswordPage extends StatelessWidget {
                 ],
               ),
             ),
+          ],
+        ),
           ],
         ),
       ),

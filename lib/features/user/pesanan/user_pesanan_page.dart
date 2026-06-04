@@ -2,6 +2,7 @@ import 'package:douce/features/user/pesanan/user_pesanan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/pesanan_model.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class UserPesananPage extends StatelessWidget {
@@ -12,7 +13,10 @@ class UserPesananPage extends StatelessWidget {
     final UserPesananController controller = Get.put(UserPesananController());
 
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -118,6 +122,8 @@ class UserPesananPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

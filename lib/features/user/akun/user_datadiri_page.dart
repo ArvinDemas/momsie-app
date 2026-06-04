@@ -2,6 +2,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class UserDataDiriPage extends StatelessWidget {
@@ -20,7 +21,10 @@ class UserDataDiriPage extends StatelessWidget {
     emailController.value.text = userController.email.value;
 
     return Scaffold(
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           const AccountTopBar(
@@ -40,6 +44,8 @@ class UserDataDiriPage extends StatelessWidget {
               ),
             ),
           )
+        ],
+      ),
         ],
       ),
     );

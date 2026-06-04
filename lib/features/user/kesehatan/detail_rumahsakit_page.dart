@@ -1,6 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class DetailRumahSakitPage extends StatelessWidget {
@@ -10,7 +11,10 @@ class DetailRumahSakitPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final RumahSakitModel rumahSakit = Get.arguments;
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 15,
@@ -191,6 +195,8 @@ class DetailRumahSakitPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

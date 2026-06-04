@@ -1,6 +1,7 @@
 import 'package:douce/features/user/akun/user_hubungi_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class UserHubungiPage extends StatelessWidget {
@@ -12,7 +13,10 @@ class UserHubungiPage extends StatelessWidget {
         Get.put(UserHubungiController());
 
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -87,6 +91,8 @@ class UserHubungiPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

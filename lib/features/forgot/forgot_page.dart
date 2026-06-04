@@ -2,6 +2,7 @@ import 'package:douce/features/forgot/forgot_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -13,7 +14,10 @@ class ForgotPasswordPage extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          Column(
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
@@ -174,6 +178,8 @@ class ForgotPasswordPage extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:douce/features/user/kesehatan/booking_doula_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/alert_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class ConfirmBookingPage extends StatelessWidget {
@@ -12,7 +13,10 @@ class ConfirmBookingPage extends StatelessWidget {
     final BookingDoulaController controller =
         Get.find<BookingDoulaController>();
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -223,6 +227,8 @@ class ConfirmBookingPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

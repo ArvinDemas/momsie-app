@@ -2,6 +2,7 @@ import 'package:douce/features/register/register_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -13,7 +14,10 @@ class RegisterPage extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           Container(
@@ -257,6 +261,8 @@ class RegisterPage extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

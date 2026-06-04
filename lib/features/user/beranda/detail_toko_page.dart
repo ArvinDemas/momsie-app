@@ -1,6 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class DetailTokoPage extends StatelessWidget {
@@ -10,7 +11,10 @@ class DetailTokoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TokoBayiModel tokoBayi = Get.arguments as TokoBayiModel;
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 15,
@@ -139,6 +143,8 @@ class DetailTokoPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

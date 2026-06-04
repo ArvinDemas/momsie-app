@@ -3,6 +3,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/payment_container.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class ConfirmationRegisterPage extends StatelessWidget {
@@ -13,7 +14,10 @@ class ConfirmationRegisterPage extends StatelessWidget {
     final int payment = Get.arguments['payment'];
 
     return Scaffold(
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           Container(
@@ -109,6 +113,8 @@ class ConfirmationRegisterPage extends StatelessWidget {
               ],
             ),
           )
+        ],
+      ),
         ],
       ),
     );

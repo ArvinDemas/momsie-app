@@ -3,6 +3,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/custom_dropdown.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class MitraRegisterPage extends StatelessWidget {
@@ -20,7 +21,10 @@ class MitraRegisterPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           Container(
@@ -64,6 +68,8 @@ class MitraRegisterPage extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

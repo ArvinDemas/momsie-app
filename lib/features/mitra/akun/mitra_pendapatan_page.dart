@@ -2,6 +2,7 @@ import 'package:douce/features/mitra/akun/mitra_pendapatan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:get/get.dart';
 
 class MitraPendapatanPage extends StatelessWidget {
@@ -12,7 +13,10 @@ class MitraPendapatanPage extends StatelessWidget {
     final MitraPendapatanController controller =
         Get.put(MitraPendapatanController());
     return Scaffold(
-      body: ListView(
+      body: Stack(
+        children: [
+          const AnimatedGradientBackground(),
+          ListView(
         padding: const EdgeInsets.all(0),
         children: [
           pendapatanTopBar(),
@@ -105,6 +109,8 @@ class MitraPendapatanPage extends StatelessWidget {
               ),
             ),
           )
+        ],
+      ),
         ],
       ),
     );
