@@ -1,7 +1,7 @@
+import 'package:douce/shared/widget/animated_gradient_background.dart';
 import 'package:douce/shared/widget/apotek_topbar.dart';
 import 'package:douce/shared/widget/topbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class BasePage extends StatelessWidget {
   const BasePage(
@@ -16,21 +16,27 @@ class BasePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 150),
-          child: childWidget,
-        ),
-        Positioned(
-          top: 0,
-          child: isApotek
-              ? const ApotikTopBar()
-              : TopBar(
-                  isDoula: isDoula,
-                ),
-        ),
-      ],
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          // Animated orb background
+          const AnimatedGradientBackground(),
+          // Main content + top bar
+          Padding(
+            padding: const EdgeInsets.only(top: 150),
+            child: childWidget,
+          ),
+          Positioned(
+            top: 0,
+            child: isApotek
+                ? const ApotikTopBar()
+                : TopBar(
+                    isDoula: isDoula,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
