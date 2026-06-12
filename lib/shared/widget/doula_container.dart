@@ -74,43 +74,49 @@ class DoulaContainer extends StatelessWidget {
             ),
             Transform.translate(
               offset: const Offset(0, -15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FittedBox(
-                    child: Text(
-                      doula.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  Text(
+                    doula.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(
                         Icons.star,
-                        size: 20,
+                        size: 16,
                         color: Colors.orange,
                       ),
+                      const SizedBox(width: 4),
                       Text(
                         doula.rating,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
+            const SizedBox(height: 4),
             Transform.translate(
               offset: const Offset(0, -15),
               child: Text(
                 doula.job,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: ColorDouce.douceBase,
+                  fontSize: 11,
                 ),
               ),
             ),

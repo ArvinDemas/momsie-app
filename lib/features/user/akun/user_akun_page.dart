@@ -40,6 +40,11 @@ class UserAkunPage extends StatelessWidget {
                 onTap: () => Get.toNamed('/user-data-diri'),
               ),
               MenuContainer(
+                title: "Momsie AI Chatbot (Tanya AI)",
+                icon: Icons.assistant_navigation,
+                onTap: () => Get.toNamed('/ai-chat'),
+              ),
+              MenuContainer(
                 title: "Pengaturan",
                 icon: Icons.settings,
                 onTap: () => Get.toNamed('/user-settings'),

@@ -53,11 +53,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA8Mts3H5Yt6OEGfIfEtUOAUOvcLP1aFUI',
-    appId: '1:1057882811150:android:2a6203184997678b71855f',
-    messagingSenderId: '1057882811150',
-    projectId: 'doula-6b8a2',
-    storageBucket: 'doula-6b8a2.appspot.com',
+    apiKey: 'AIzaSyBqnzKGAHmeWEM5tYmT9a7ysE3E6Y_ouMk',
+    appId: '1:5481212381:android:f6b1ac338db03b3f6c6e34',
+    messagingSenderId: '5481212381',
+    projectId: 'momsie-app',
+    storageBucket: 'momsie-app.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

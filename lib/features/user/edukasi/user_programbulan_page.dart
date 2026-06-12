@@ -1,7 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class UserProgramBulanPage extends StatelessWidget {
@@ -14,7 +14,7 @@ class UserProgramBulanPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -49,11 +49,13 @@ class UserProgramBulanPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 30),
-            Wrap(
-              runSpacing: 25,
+            Column(
               children: month.weeks
                   .map(
-                    (week) => bulanContainer(program, month, week),
+                    (week) => Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: bulanContainer(program, month, week),
+                    ),
                   )
                   .toList(),
             )
@@ -92,25 +94,27 @@ class UserProgramBulanPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Minggu Ke - ${week.week}",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Minggu Ke - ${week.week}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    const Text(
-                      "Pengenalan Yoga Prenetal",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    )
-                  ],
+                      const Text(
+                        "Pengenalan Yoga Prenetal",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 Image.network(
                   program.image,

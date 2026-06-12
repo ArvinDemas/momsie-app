@@ -41,4 +41,15 @@ class AppRoutes {
   static const String mitraRegister = '/mitra-register';
   static const String userPesanan = '/user-pesanan';
   static const String confirmRegister = '/confirm-register';
+  static const String adminLogin = '/admin-login';
+  static const String adminDashboard = '/admin-dashboard';
+  static const String checklist = '/checklist';
+  static const String babyNames = '/baby-names';
+  static const String birthPlan = '/birth-plan';
+  static const String themePicker = '/theme-picker';
+  static const String diary = '/diary';
+  static const String diaryForm = '/diary-form';
+  static const String diaryDetail = '/diary-detail';
+  static const String diaryPdf = '/diary-pdf';
+  static const String aiChat = '/ai-chat';
 }

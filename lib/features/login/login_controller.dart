@@ -143,13 +143,16 @@ class LoginController extends GetxController {
         Get.offAllNamed('/user');
       }
     } on FirebaseAuthException catch (e) {
+      print("FirebaseAuthException: ${e.code} - ${e.message}");
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(
             "Error", "Email already exists with different login method");
         return;
       }
-    } catch (e) {
-      Get.snackbar("Error", "Something Went Wrong");
+      Get.snackbar("Error", "Auth Error: ${e.message}");
+    } catch (e, stack) {
+      print("Google Login Exception: $e\n$stack");
+      Get.snackbar("Error", "Google Login Failed: $e");
       return;
     }
   }

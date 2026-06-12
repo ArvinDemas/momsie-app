@@ -6,7 +6,7 @@ import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -25,7 +25,7 @@ class UserSettingAkunPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           ListView(
         padding: const EdgeInsets.all(0),
         children: [

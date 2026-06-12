@@ -1,8 +1,8 @@
 import 'package:douce/features/user/kesehatan/booking_doula_controller.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/widget/alert_dialog.dart';
+import 'package:douce/shared/widget/payment_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class ConfirmBookingPage extends StatelessWidget {
@@ -15,7 +15,7 @@ class ConfirmBookingPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -204,8 +204,14 @@ class ConfirmBookingPage extends StatelessWidget {
             const SizedBox(height: 20),
             InkWell(
               onTap: () {
-                controller.createBooking();
-                showCustomDialog(context);
+                final total = controller.harga.value + 2000;
+                showPaymentSheet(
+                  context,
+                  jenisLayanan: 'doula',
+                  deskripsi:
+                      'Booking Doula – ${controller.selectedLayanan.value}',
+                  nominal: total,
+                );
               },
               child: Container(
                 padding: const EdgeInsets.all(12),
@@ -216,7 +222,7 @@ class ConfirmBookingPage extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    "Booking",
+                    "Bayar & Booking",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -230,23 +236,6 @@ class ConfirmBookingPage extends StatelessWidget {
       ),
         ],
       ),
-    );
-  }
-
-  void showCustomDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomAlertDialog(
-          isSuccess: true,
-          descText:
-              "Pembuatan Booking Telah Berhasil, Silahkan Lakukan Pembayaran dan Tunggu Konfirmasi dari Doula",
-          destination: '/chat-page',
-          onTap: () {
-            Get.offAllNamed('/user');
-          },
-        );
-      },
     );
   }
 }

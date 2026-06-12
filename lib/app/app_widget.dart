@@ -40,6 +40,18 @@ import 'package:douce/features/user/kesehatan/detail_doula_page.dart';
 import 'package:douce/features/user/kesehatan/detail_rumahsakit_page.dart';
 import 'package:douce/features/user/main_user.dart';
 import 'package:douce/features/user/obat/detail_obat_page.dart';
+import 'package:douce/features/admin/login/admin_login_page.dart';
+import 'package:douce/features/admin/dashboard/admin_dashboard_page.dart';
+import 'package:douce/features/user/checklist/checklist_page.dart';
+import 'package:douce/features/user/babynames/baby_names_page.dart';
+import 'package:douce/features/user/birthplan/birth_plan_page.dart';
+import 'package:douce/features/user/theme/theme_picker_page.dart';
+import 'package:douce/features/user/diary/diary_list_page.dart';
+import 'package:douce/features/user/diary/diary_form_page.dart';
+import 'package:douce/features/user/diary/diary_detail_page.dart';
+import 'package:douce/features/user/diary/diary_pdf_page.dart';
+import 'package:douce/features/user/ai_chat/ai_chat_page.dart';
+import 'package:douce/shared/theme/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -55,6 +67,9 @@ class AppWidget extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Momsie',
+      initialBinding: BindingsBuilder(() {
+        Get.put<ThemeService>(ThemeService(), permanent: true);
+      }),
       getPages: [
         GetPage(
           name: AppRoutes.login,
@@ -219,6 +234,50 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.confirmRegister,
           page: () => const ConfirmationRegisterPage(),
+        ),
+        GetPage(
+          name: AppRoutes.adminLogin,
+          page: () => const AdminLoginPage(),
+        ),
+        GetPage(
+          name: AppRoutes.adminDashboard,
+          page: () => const AdminDashboardPage(),
+        ),
+        GetPage(
+          name: AppRoutes.checklist,
+          page: () => const ChecklistPage(),
+        ),
+        GetPage(
+          name: AppRoutes.babyNames,
+          page: () => const BabyNamesPage(),
+        ),
+        GetPage(
+          name: AppRoutes.birthPlan,
+          page: () => const BirthPlanPage(),
+        ),
+        GetPage(
+          name: AppRoutes.themePicker,
+          page: () => const ThemePickerPage(),
+        ),
+        GetPage(
+          name: AppRoutes.diary,
+          page: () => const DiaryListPage(),
+        ),
+        GetPage(
+          name: AppRoutes.diaryForm,
+          page: () => const DiaryFormPage(),
+        ),
+        GetPage(
+          name: AppRoutes.diaryDetail,
+          page: () => const DiaryDetailPage(),
+        ),
+        GetPage(
+          name: AppRoutes.diaryPdf,
+          page: () => const DiaryPdfPage(),
+        ),
+        GetPage(
+          name: AppRoutes.aiChat,
+          page: () => const AiChatPage(),
         ),
       ],
       initialRoute: AppRoutes.splash,

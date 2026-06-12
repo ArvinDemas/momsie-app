@@ -1,7 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/menu_container.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class UserSettingsPage extends StatelessWidget {
@@ -12,7 +12,7 @@ class UserSettingsPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -46,6 +46,11 @@ class UserSettingsPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
+              MenuContainer(
+                title: "Tema Aplikasi",
+                icon: Icons.palette_outlined,
+                onTap: () => Get.toNamed('/theme-picker'),
+              ),
               MenuContainer(
                 title: "Akun",
                 icon: Icons.person,

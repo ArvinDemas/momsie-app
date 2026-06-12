@@ -36,15 +36,27 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
-  geolocator: ^14.0.2
   get: ^4.6.6
-  google_maps_flutter: ^2.6.1
   google_sign_in: ^6.2.1
   html: ^0.15.4
   http: ^1.2.1
   image_picker: ^1.1.2
   intl: ^0.20.2
   shared_preferences: ^2.3.3
+  # Fitur baru Momsie 2026
+  sqflite: ^2.3.3+1
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  flutter_secure_storage: ^9.0.0
+  google_generative_ai: ^0.4.3
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  open_filex: ^4.4.1
+  fl_chart: ^0.69.0
+  csv: ^6.0.0
+  uuid: ^4.4.2
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0
@@ -71,6 +83,7 @@ flutter:
     - assets/images/
     - assets/images/navbar/
     - assets/images/icon/
+    - assets/statictext.db
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

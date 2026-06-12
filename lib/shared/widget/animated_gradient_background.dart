@@ -2,10 +2,19 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 /// Widget latar belakang animasi gradient orb —
-/// mereplikasi efek orb pink/rose/fuchsia dari website Momsie.
+/// mereplikasi efek orb dari tema aktif Momsie.
 /// Cukup bungkus konten dengan [Stack] dan letakkan widget ini di bawah.
 class AnimatedGradientBackground extends StatefulWidget {
-  const AnimatedGradientBackground({super.key});
+  const AnimatedGradientBackground({
+    super.key,
+    this.orbColors,
+    this.bgBase,
+  });
+
+  /// 4 warna orb override (ambil dari ThemeService jika null).
+  final List<Color>? orbColors;
+  /// Warna latar dasar override.
+  final Color? bgBase;
 
   @override
   State<AnimatedGradientBackground> createState() =>
@@ -19,12 +28,16 @@ class _AnimatedGradientBackgroundState
   late final List<Animation<double>> _yAnims;
   late final List<Animation<double>> _scaleAnims;
 
-  // Konfigurasi tiap orb: [durasi(detik), warna, ukuran relatif layar]
-  final _orbConfigs = const [
-    _OrbConfig(duration: 25, color: Color(0x66f9a8d4), sizeFactor: 0.80), // pink-300/40
-    _OrbConfig(duration: 30, color: Color(0x4ffda4af), sizeFactor: 0.95), // rose-300/30
-    _OrbConfig(duration: 22, color: Color(0x66e879f9), sizeFactor: 0.65), // fuchsia-400/40
-    _OrbConfig(duration: 28, color: Color(0x33f472b6), sizeFactor: 0.55), // pink-400/20
+  // Konfigurasi tiap orb: [durasi(detik), ukuran relatif layar]
+  // Warna diambil dari widget.orbColors (tema aktif) atau default pink
+  static const List<double> _durations  = [25, 30, 22, 28];
+  static const List<double> _sizeFactors = [0.80, 0.95, 0.65, 0.55];
+
+  static const List<Color> _defaultOrbColors = [
+    Color(0x66f9a8d4),
+    Color(0x4ffda4af),
+    Color(0x66e879f9),
+    Color(0x33f472b6),
   ];
 
   // Koordinat awal tiap orb (persentase layar)
@@ -47,15 +60,15 @@ class _AnimatedGradientBackgroundState
   void initState() {
     super.initState();
     _controllers = List.generate(
-      _orbConfigs.length,
+      4,
       (i) => AnimationController(
         vsync: this,
-        duration: Duration(seconds: _orbConfigs[i].duration),
+        duration: Duration(seconds: _durations[i].toInt()),
       )..repeat(),
     );
 
     // Animasi X
-    _xAnims = List.generate(_orbConfigs.length, (i) {
+    _xAnims = List.generate(4, (i) {
       final moves = _movements[i];
       return TweenSequence<double>([
         for (int j = 0; j < moves.length - 1; j++)
@@ -70,7 +83,7 @@ class _AnimatedGradientBackgroundState
     });
 
     // Animasi Y
-    _yAnims = List.generate(_orbConfigs.length, (i) {
+    _yAnims = List.generate(4, (i) {
       final moves = _movements[i];
       return TweenSequence<double>([
         for (int j = 0; j < moves.length - 1; j++)
@@ -91,7 +104,7 @@ class _AnimatedGradientBackgroundState
       [1.0, 0.8, 1.3, 1.0],
       [1.0, 1.2, 0.8, 1.0],
     ];
-    _scaleAnims = List.generate(_orbConfigs.length, (i) {
+    _scaleAnims = List.generate(4, (i) {
       final keys = scaleKeyframes[i];
       return TweenSequence<double>([
         for (int j = 0; j < keys.length - 1; j++)
@@ -116,13 +129,16 @@ class _AnimatedGradientBackgroundState
 
   @override
   Widget build(BuildContext context) {
+    final colors = widget.orbColors ?? _defaultOrbColors;
     return Positioned.fill(
       child: AnimatedBuilder(
         animation: Listenable.merge(_controllers),
         builder: (context, _) {
           return CustomPaint(
             painter: _OrbPainter(
-              orbConfigs: _orbConfigs,
+              orbColors: colors,
+              sizeFactors: _sizeFactors,
+              bgBase: widget.bgBase ?? const Color(0xFFFFF0F3),
               startPositions: _startPositions,
               xValues: _xAnims.map((a) => a.value).toList(),
               yValues: _yAnims.map((a) => a.value).toList(),
@@ -136,14 +152,18 @@ class _AnimatedGradientBackgroundState
 }
 
 class _OrbPainter extends CustomPainter {
-  final List<_OrbConfig> orbConfigs;
+  final List<Color> orbColors;
+  final List<double> sizeFactors;
+  final Color bgBase;
   final List<Offset> startPositions;
   final List<double> xValues;
   final List<double> yValues;
   final List<double> scaleValues;
 
   _OrbPainter({
-    required this.orbConfigs,
+    required this.orbColors,
+    required this.sizeFactors,
+    required this.bgBase,
     required this.startPositions,
     required this.xValues,
     required this.yValues,
@@ -152,16 +172,16 @@ class _OrbPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 1. Latar belakang dasar pink sangat muda
-    final bgPaint = Paint()..color = const Color(0xFFFFF0F3);
+    // 1. Latar belakang dasar
+    final bgPaint = Paint()..color = bgBase;
     canvas.drawRect(Offset.zero & size, bgPaint);
 
     // 2. Gambar tiap orb
     final baseDimension = min(size.width, size.height);
-    for (int i = 0; i < orbConfigs.length; i++) {
-      final config = orbConfigs[i];
+    for (int i = 0; i < orbColors.length; i++) {
+      final color = orbColors[i];
+      final baseOrbSize = baseDimension * sizeFactors[i];
       final start = startPositions[i];
-      final baseOrbSize = baseDimension * config.sizeFactor;
       final scale = scaleValues[i];
       final orbSize = baseOrbSize * scale;
       final radius = orbSize / 2;
@@ -170,12 +190,11 @@ class _OrbPainter extends CustomPainter {
       final dy = (start.dy + yValues[i]) * size.height;
       final center = Offset(dx, dy);
 
-      // Radial gradient untuk efek glow/blur
       final paint = Paint()
         ..shader = RadialGradient(
           colors: [
-            config.color,
-            config.color.withValues(alpha: 0.0),
+            color,
+            color.withValues(alpha: 0.0),
           ],
           stops: const [0.0, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: radius));
@@ -185,19 +204,5 @@ class _OrbPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _OrbPainter oldDelegate) {
-    // Selalu repaint karena nilai koordinat/skala berubah setiap frame
-    return true;
-  }
-}
-
-class _OrbConfig {
-  final int duration;
-  final Color color;
-  final double sizeFactor;
-  const _OrbConfig({
-    required this.duration,
-    required this.color,
-    required this.sizeFactor,
-  });
+  bool shouldRepaint(covariant _OrbPainter oldDelegate) => true;
 }

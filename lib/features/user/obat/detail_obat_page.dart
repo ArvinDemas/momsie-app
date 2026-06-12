@@ -1,8 +1,10 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
+import 'package:douce/shared/widget/payment_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class DetailObatPage extends StatelessWidget {
   const DetailObatPage({super.key});
@@ -14,7 +16,7 @@ class DetailObatPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -92,7 +94,11 @@ class DetailObatPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            "Rp ${obat.harga}",
+                            NumberFormat.currency(
+                              locale: 'id_ID',
+                              symbol: 'Rp ',
+                              decimalDigits: 0,
+                            ).format(int.tryParse(obat.harga) ?? 0),
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
@@ -173,6 +179,33 @@ class DetailObatPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Tombol Beli
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    final harga = int.tryParse(obat.harga) ?? 0;
+                    showPaymentSheet(
+                      context,
+                      jenisLayanan: 'obat',
+                      deskripsi: 'Beli ${obat.nama}',
+                      nominal: harga,
+                    );
+                  },
+                  icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                  label: const Text(
+                    'Beli Sekarang',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorDouce.douceBase,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

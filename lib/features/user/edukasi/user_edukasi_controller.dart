@@ -15,10 +15,10 @@ class UserEdukasiController extends GetxController {
 
   @override
   void onInit() {
-    getArtikel().then((_) {
+    getArtikel().whenComplete(() {
       isLoadingArtikel.value = false;
     });
-    getProgram().then((_) {
+    getProgram().whenComplete(() {
       isLoadingProgram.value = false;
     });
     super.onInit();

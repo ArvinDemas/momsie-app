@@ -1,7 +1,7 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class UserProgramMingguPage extends StatelessWidget {
@@ -16,7 +16,7 @@ class UserProgramMingguPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(
@@ -62,11 +62,13 @@ class UserProgramMingguPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Wrap(
-              runSpacing: 15,
+            Column(
               children: week.moves
                   .map(
-                    (move) => gerakanContainer(program, month, week, move),
+                    (move) => Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: gerakanContainer(program, month, week, move),
+                    ),
                   )
                   .toList(),
             )

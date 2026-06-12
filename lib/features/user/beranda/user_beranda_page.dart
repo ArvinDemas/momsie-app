@@ -1,9 +1,9 @@
 import 'package:douce/features/user/beranda/user_beranda_controller.dart';
+import 'package:douce/features/user/sizeguide/sizeguide_card.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/doula_container.dart';
-import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,7 +24,10 @@ class UserBerandaPage extends StatelessWidget {
       childWidget: ListView(
         padding: const EdgeInsets.all(0),
         children: [
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
+          // ── Hero Card: Ukuran Bayi Minggu Ini ──────────────────────
+          const SizeGuideCard(),
+          const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -41,6 +44,64 @@ class UserBerandaPage extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
+                ),
+                const SizedBox(height: 20),
+                // ── Quick Access: Fitur Baru (2×2) ───────────────────
+                Row(
+                  children: [
+                    Expanded(
+                      child: _quickAccessCard(
+                        icon: '🧳',
+                        label: 'Hospital Bag',
+                        color: const Color(0xFFFF6972),
+                        onTap: () => Get.toNamed('/checklist'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _quickAccessCard(
+                        icon: '📋',
+                        label: 'Birth Plan',
+                        color: const Color(0xFF9C6BFF),
+                        onTap: () => Get.toNamed('/birth-plan'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _quickAccessCard(
+                        icon: '📖',
+                        label: 'Diary',
+                        color: const Color(0xFFFF8C69),
+                        onTap: () => Get.toNamed('/diary'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _quickAccessCard(
+                        icon: '✨',
+                        label: 'Nama Bayi',
+                        color: const Color(0xFF6C63FF),
+                        onTap: () => Get.toNamed('/baby-names'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _quickAccessCard(
+                        icon: '💬',
+                        label: 'Momsie AI Chatbot (Tanya AI)',
+                        color: const Color(0xFF00B4D8),
+                        onTap: () => Get.toNamed('/ai-chat'),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -84,48 +145,6 @@ class UserBerandaPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Rumah Sakit Mitra",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        changeNavigation("Rumah Sakit");
-                      },
-                      child: Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: ColorDouce.douceBase,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Obx(
-                  () => controller.isRumahSakitLoading.value
-                      ? const Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : Wrap(
-                          runSpacing: 15,
-                          children: controller
-                              .getRandomRumahSakit()
-                              .map((rumahSakit) => RumahSakitContainer(
-                                    rumahSakit: rumahSakit,
-                                  ))
-                              .toList(),
-                        ),
-                ),
-                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -234,6 +253,53 @@ class UserBerandaPage extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _quickAccessCard({
+    required String icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [color, color.withValues(alpha: 0.78)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

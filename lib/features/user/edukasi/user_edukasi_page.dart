@@ -130,10 +130,12 @@ class UserEdukasiPage extends StatelessWidget {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Wrap(
-              runSpacing: 20,
+          : Column(
               children: controller.programList
-                  .map((program) => programKehamilanContainer(program))
+                  .map((program) => Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: programKehamilanContainer(program),
+                      ))
                   .toList(),
             ),
     );
@@ -165,14 +167,17 @@ class UserEdukasiPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Program ${program.name}",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w500,
-                color: ColorDouce.douceBase,
+            Expanded(
+              child: Text(
+                "Program ${program.name}",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: ColorDouce.douceBase,
+                ),
               ),
             ),
+            const SizedBox(width: 12),
             Image.network(
               program.image,
               width: 75,

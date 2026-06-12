@@ -4,16 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key, this.isDoula = false});
+  const TopBar({
+    super.key,
+    this.isDoula = false,
+    this.searchHint,
+    this.onSearchChanged,
+    this.onSearchSubmitted,
+    this.showSearch = true,
+  });
 
   final bool isDoula;
+  final String? searchHint;
+  final ValueChanged<String>? onSearchChanged;
+  final ValueChanged<String>? onSearchSubmitted;
+  final bool showSearch;
 
   @override
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
+    final double height = showSearch ? 150.0 : 100.0;
 
     return Container(
-      height: 150,
+      height: height,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: ColorDouce.douceBase,
@@ -99,61 +111,63 @@ class TopBar extends StatelessWidget {
               ),
             ],
           ),
-          Positioned(
-            top: 115,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.5),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                width: MediaQuery.of(context).size.width - 50,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 3,
-                ),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: isDoula
-                        ? 'Cari Pesanan | Pekerjaan'
-                        : 'Cari Kategori, Obat',
-                    hintStyle: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Open-Sans',
-                      fontWeight: FontWeight.w300,
-                    ),
-                    enabled: isDoula ? false : true,
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 0,
-                      horizontal: 0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(32),
-                    ),
+          if (showSearch)
+            Positioned(
+              top: 115,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.5),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  onFieldSubmitted: (value) {
-                    if (value.isNotEmpty) {
-                      Get.toNamed('/user-search', arguments: value);
-                    }
-                  },
+                  width: MediaQuery.of(context).size.width - 50,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 3,
+                  ),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      hintText: searchHint ?? (isDoula
+                          ? 'Cari Pesanan | Pekerjaan'
+                          : 'Cari Kategori, Obat'),
+                      hintStyle: const TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Open-Sans',
+                        fontWeight: FontWeight.w300,
+                      ),
+                      enabled: isDoula ? false : true,
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.black,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 0,
+                        horizontal: 0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                    ),
+                    onChanged: onSearchChanged,
+                    onFieldSubmitted: onSearchSubmitted ?? (value) {
+                      if (value.isNotEmpty) {
+                        Get.toNamed('/user-search', arguments: value);
+                      }
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

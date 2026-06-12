@@ -5,7 +5,7 @@ import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/widget/obat_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class UserSearchPage extends StatelessWidget {
@@ -24,7 +24,7 @@ class UserSearchPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(

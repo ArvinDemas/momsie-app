@@ -1,11 +1,7 @@
+import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
-import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
-import 'package:douce/shared/util/service/artikel_service.dart';
-import 'package:douce/shared/util/service/doula_service.dart';
-import 'package:douce/shared/util/service/rumahsakit_service.dart';
-import 'package:douce/shared/util/service/tokobayi_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:get/get.dart';
 
@@ -16,17 +12,8 @@ class UserBerandaController extends GetxController {
   RxList<ArtikelModel> artikelList = <ArtikelModel>[].obs;
   RxBool isArtikelLoading = true.obs;
 
-  RxList<RumahSakitModel> rumahSakitList = <RumahSakitModel>[].obs;
-  RxBool isRumahSakitLoading = true.obs;
-
   RxList<DoulaModel> doulaList = <DoulaModel>[].obs;
   RxBool isDoulaLoading = true.obs;
-
-  List<RumahSakitModel> getRandomRumahSakit() {
-    var list = rumahSakitList.toList();
-    list.shuffle();
-    return list.take(2).toList();
-  }
 
   List<ArtikelModel> getRandomArtikel() {
     var list = artikelList.toList();
@@ -50,65 +37,22 @@ class UserBerandaController extends GetxController {
 
   @override
   void onInit() {
-    getTokoBayi().then((_) {
+    // Simulasi loading 800ms dari dummy data (UI tidak berubah)
+    Future.delayed(const Duration(milliseconds: 800), () {
+      tokoBayiList.assignAll(DummyData.tokoBayis);
       isTokoBayiLoading.value = false;
     });
-    getArtikel().then((_) {
+
+    Future.delayed(const Duration(milliseconds: 600), () {
+      artikelList.assignAll(DummyData.artikels);
       isArtikelLoading.value = false;
     });
-    getRumahSakit().then((_) {
-      isRumahSakitLoading.value = false;
-    });
-    getDoula().then((_) {
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      doulaList.assignAll(DummyData.doulas);
       isDoulaLoading.value = false;
     });
 
     super.onInit();
-  }
-
-  Future<void> getTokoBayi() async {
-    try {
-      final tokoBayi = await TokoBayiService().getTokoBayi();
-      if (tokoBayi.isNotEmpty) {
-        tokoBayiList.assignAll(
-            tokoBayi.map((item) => TokoBayiModel.fromJson(item)).toList());
-      }
-    } catch (e) {
-      // print(e);
-    }
-  }
-
-  Future<void> getDoula() async {
-    try {
-      final List<DoulaModel> doula = await DoulaService().getDoula();
-      if (doula.isNotEmpty) {
-        doulaList.assignAll(doula);
-      }
-    } catch (e) {
-      // print(e);
-    }
-  }
-
-  Future<void> getArtikel() async {
-    try {
-      final List<ArtikelModel> artikel = await ArtikelService().getArtikel();
-      if (artikel.isNotEmpty) {
-        artikelList.assignAll(artikel);
-      }
-    } catch (e) {
-      // print(e);
-    }
-  }
-
-  Future<void> getRumahSakit() async {
-    try {
-      final List<RumahSakitModel> rumahSakit =
-          await RumahSakitService().getRumahSakit();
-      if (rumahSakit.isNotEmpty) {
-        rumahSakitList.assignAll(rumahSakit);
-      }
-    } catch (e) {
-      // print(e);
-    }
   }
 }

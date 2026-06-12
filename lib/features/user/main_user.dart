@@ -26,7 +26,6 @@ class MainUserPage extends StatelessWidget {
         },
       ),
       const UserKesehatanPage(),
-      const UserObatPage(),
       const UserEdukasiPage(),
       const UserAkunPage(),
     ];
@@ -43,9 +42,8 @@ class MainUserPage extends StatelessWidget {
             listItems: const [
               {'label': 'Beranda', 'count': 0},
               {'label': 'Kesehatan', 'count': 1},
-              {'label': 'Obat', 'count': 2},
-              {'label': 'Edukasi', 'count': 3},
-              {'label': 'Akun', 'count': 4},
+              {'label': 'Edukasi', 'count': 2},
+              {'label': 'Akun', 'count': 3},
             ],
             onChangeIndex: mainUserController.onItemTapped,
             selectedIndex: mainUserController.selectedIndex.value,

@@ -1,34 +1,49 @@
 {
   "project_info": {
-    "project_number": "1057882811150",
-    "project_id": "doula-6b8a2",
-    "storage_bucket": "doula-6b8a2.appspot.com"
+    "project_number": "5481212381",
+    "project_id": "momsie-app",
+    "storage_bucket": "momsie-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1057882811150:android:2a6203184997678b71855f",
+        "mobilesdk_app_id": "1:5481212381:android:f6b1ac338db03b3f6c6e34",
         "android_client_info": {
           "package_name": "com.momsie.mobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1057882811150-u4ern3an2cefkcd20l6ljs7big8u8nap.apps.googleusercontent.com",
+          "client_id": "5481212381-0tfa9ft0n2ll07ogjogf4hso53pb0ekv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.momsie.mobile",
+            "certificate_hash": "633bcd94bfb3e15d3c0d3a491a990960badde93e"
+          }
+        },
+        {
+          "client_id": "5481212381-5tltq0if3b3s54o0pu0m056jeiovugbj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA8Mts3H5Yt6OEGfIfEtUOAUOvcLP1aFUI"
+          "current_key": "AIzaSyBqnzKGAHmeWEM5tYmT9a7ysE3E6Y_ouMk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1057882811150-u4ern3an2cefkcd20l6ljs7big8u8nap.apps.googleusercontent.com",
+              "client_id": "5481212381-5tltq0if3b3s54o0pu0m056jeiovugbj.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "5481212381-h514iali1t38iuan5j3page488153m04.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.douce"
+              }
             }
           ]
         }

@@ -2,7 +2,7 @@ import 'package:douce/features/user/edukasi/user_artikel_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
-import 'package:douce/shared/widget/animated_gradient_background.dart';
+import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
 class UserArtikelPage extends StatelessWidget {
@@ -12,12 +12,15 @@ class UserArtikelPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ArtikelModel artikel = Get.arguments as ArtikelModel;
 
+    if (Get.isRegistered<UserArtikelController>()) {
+      Get.delete<UserArtikelController>();
+    }
     final UserArtikelController controller =
-        Get.put(UserArtikelController(artikel.link));
+        Get.put(UserArtikelController(artikel.link, artikel.description));
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedGradientBackground(),
+          const ThemedBackground(),
           SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
