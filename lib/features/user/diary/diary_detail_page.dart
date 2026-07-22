@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/features/user/diary/diary_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
@@ -174,15 +175,28 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
           controller: _pc,
           onPageChanged: (i) => setState(() => _current = i),
           itemCount: widget.urls.length,
-          itemBuilder: (_, i) => Image.network(
-            widget.urls[i],
-            fit: BoxFit.cover,
-            width: double.infinity,
-            errorBuilder: (_, __, ___) => const ColoredBox(
-              color: Color(0xFFEEEEEE),
-              child: Icon(Icons.broken_image, color: Colors.grey),
-            ),
-          ),
+          itemBuilder: (_, i) {
+            final url = widget.urls[i];
+            return (url.startsWith('http://') || url.startsWith('https://'))
+                ? Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (_, __, ___) => const ColoredBox(
+                      color: Color(0xFFEEEEEE),
+                      child: Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  )
+                : Image.file(
+                    File(url),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (_, __, ___) => const ColoredBox(
+                      color: Color(0xFFEEEEEE),
+                      child: Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  );
+          },
         ),
         if (widget.urls.length > 1)
           Positioned(

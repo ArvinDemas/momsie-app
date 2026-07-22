@@ -29,8 +29,6 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def googleMapsApiKey = localProperties.getProperty('GOOGLE_MAPS_API_KEY') ?: System.getenv('GOOGLE_MAPS_API_KEY') ?: ""
-
 android {
     namespace "com.momsie.mobile"
     compileSdk 36
@@ -71,7 +69,6 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        buildConfigField "String", "GOOGLE_MAPS_API_KEY", "\"${googleMapsApiKey}\""
     }
 
     buildTypes {

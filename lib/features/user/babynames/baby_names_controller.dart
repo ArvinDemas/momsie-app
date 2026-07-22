@@ -80,7 +80,13 @@ class BabyNamesController extends GetxController {
       if (q.isNotEmpty) {
         final boyMatch = n.boy.toLowerCase().contains(q);
         final girlMatch = n.girl.toLowerCase().contains(q);
-        return boyMatch || girlMatch;
+        if (selectedGender.value == 'Laki-laki') {
+          return boyMatch;
+        } else if (selectedGender.value == 'Perempuan') {
+          return girlMatch;
+        } else {
+          return boyMatch || girlMatch;
+        }
       }
       return true;
     }).toList();

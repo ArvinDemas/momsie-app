@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/util/service/app_config_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
@@ -93,7 +94,13 @@ class UserAkunPage extends StatelessWidget {
                           userData?['image'],
                         );
 
-                        if (checkRegister.exists) {
+                        // Cek feature flag: jika showPaymentFlow = false,
+                        // lewati halaman transfer OVO (untuk review Google Play)
+                        final AppConfigService configService =
+                            Get.find<AppConfigService>();
+
+                        if (configService.showPaymentFlow.value &&
+                            checkRegister.exists) {
                           final bool registerConfirmed =
                               checkRegister['registerConfirmed'];
                           final int payment = checkRegister['payment'];
@@ -110,14 +117,16 @@ class UserAkunPage extends StatelessWidget {
                               .collection('mitra')
                               .doc(userController.uid.value)
                               .get();
+
+                          final data = mitraData.data() as Map<String, dynamic>?;
                           userController.setDoula(
-                            mitraData['name'],
-                            mitraData['alamat'],
-                            mitraData['kotaProvinsi'],
-                            mitraData['biografi'],
-                            mitraData['image'],
-                            mitraData['jenisKelamin'],
-                            mitraData['nik'],
+                            data?['name'] ?? 'Tester',
+                            data?['alamat'] ?? '',
+                            data?['kotaProvinsi'] ?? '',
+                            data?['biografi'] ?? '',
+                            data?['image'] ?? '',
+                            data?['jenisKelamin'] ?? '',
+                            data?['nik'] ?? '',
                           );
 
                           Get.offAllNamed('/mitra');

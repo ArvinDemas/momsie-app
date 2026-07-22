@@ -70,39 +70,46 @@ class BabyNamesPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Filter row: Gender chips + Language dropdown
+                // Filter row: Gender chips (scrollable) + Language dropdown
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      // Gender filter
-                      Obx(() => Wrap(
-                            spacing: 6,
-                            children: ['Semua', 'Laki-laki', 'Perempuan']
-                                .map((g) {
-                              final sel = c.selectedGender.value == g;
-                              return ChoiceChip(
-                                label: Text(
-                                  g == 'Laki-laki'
-                                      ? '👦 Laki'
-                                      : g == 'Perempuan'
-                                          ? '👧 Perempuan'
-                                          : '✨ Semua',
-                                  style: TextStyle(
-                                    color: sel ? Colors.white : Colors.black87,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                                selected: sel,
-                                selectedColor: ColorDouce.douceBase,
-                                backgroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                visualDensity: VisualDensity.compact,
-                                onSelected: (_) => c.onGenderChanged(g),
-                              );
-                            }).toList(),
-                          )),
-                      const Spacer(),
+                      // Gender filter (scrollable)
+                      Expanded(
+                        child: Obx(() => SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: ['Semua', 'Laki-laki', 'Perempuan']
+                                    .map((g) {
+                                  final sel = c.selectedGender.value == g;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 6),
+                                    child: ChoiceChip(
+                                      label: Text(
+                                        g == 'Laki-laki'
+                                            ? '👦 Laki'
+                                            : g == 'Perempuan'
+                                                ? '👧 Perempuan'
+                                                : '✨ Semua',
+                                        style: TextStyle(
+                                          color: sel ? Colors.white : Colors.black87,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      selected: sel,
+                                      selectedColor: ColorDouce.douceBase,
+                                      backgroundColor: Colors.white,
+                                      padding: EdgeInsets.zero,
+                                      visualDensity: VisualDensity.compact,
+                                      onSelected: (_) => c.onGenderChanged(g),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            )),
+                      ),
+                      const SizedBox(width: 8),
                       // Language dropdown
                       Obx(() => Container(
                             height: 36,
@@ -139,60 +146,66 @@ class BabyNamesPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 // Column headers
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6C9EFF).withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('👦', style: TextStyle(fontSize: 16)),
-                              SizedBox(width: 6),
-                              Text(
-                                'Laki-laki',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF3B5FDB),
-                                ),
+                Obx(() {
+                  final gender = c.selectedGender.value;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        if (gender == 'Semua' || gender == 'Laki-laki')
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6C9EFF).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: ColorDouce.lightPink.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('👧', style: TextStyle(fontSize: 16)),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Perempuan',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorDouce.douceBase,
-                                ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('👦', style: TextStyle(fontSize: 16)),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Laki-laki',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF3B5FDB),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                        if (gender == 'Semua')
+                          const SizedBox(width: 8),
+                        if (gender == 'Semua' || gender == 'Perempuan')
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: ColorDouce.lightPink.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('👧', style: TextStyle(fontSize: 16)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Perempuan',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorDouce.douceBase,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
                 const SizedBox(height: 8),
 
                 // Names list
@@ -214,6 +227,7 @@ class BabyNamesPage extends StatelessWidget {
                       itemCount: c.filtered.length,
                       itemBuilder: (context, i) {
                         final n = c.filtered[i];
+                        final gender = c.selectedGender.value;
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
@@ -230,44 +244,47 @@ class BabyNamesPage extends StatelessWidget {
                           child: Row(
                             children: [
                               // Boy name
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Text(
-                                    n.boy.isEmpty ? '—' : n.boy,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: n.boy.isEmpty
-                                          ? Colors.grey[300]
-                                          : const Color(0xFF3B5FDB),
+                              if (gender == 'Semua' || gender == 'Laki-laki')
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14),
+                                    child: Text(
+                                      n.boy.isEmpty ? '—' : n.boy,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: n.boy.isEmpty
+                                            ? Colors.grey[300]
+                                            : const Color(0xFF3B5FDB),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                width: 1,
-                                height: 36,
-                                color: Colors.grey[200],
-                              ),
+                              if (gender == 'Semua')
+                                Container(
+                                  width: 1,
+                                  height: 36,
+                                  color: Colors.grey[200],
+                                ),
                               // Girl name
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Text(
-                                    n.girl.isEmpty ? '—' : n.girl,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: n.girl.isEmpty
-                                          ? Colors.grey[300]
-                                          : ColorDouce.douceBase,
+                              if (gender == 'Semua' || gender == 'Perempuan')
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14),
+                                    child: Text(
+                                      n.girl.isEmpty ? '—' : n.girl,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: n.girl.isEmpty
+                                            ? Colors.grey[300]
+                                            : ColorDouce.douceBase,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         );

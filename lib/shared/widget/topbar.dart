@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,52 @@ class TopBar extends StatelessWidget {
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
   final bool showSearch;
+
+  Widget _buildAvatar(String imagePath) {
+    if (imagePath.isEmpty) {
+      return Image.asset(
+        'assets/images/blank-profile.png',
+        width: 32,
+        height: 32,
+        fit: BoxFit.cover,
+      );
+    }
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        width: 32,
+        height: 32,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          'assets/images/blank-profile.png',
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    final file = File(imagePath);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        width: 32,
+        height: 32,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          'assets/images/blank-profile.png',
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    return Image.asset(
+      'assets/images/blank-profile.png',
+      width: 32,
+      height: 32,
+      fit: BoxFit.cover,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,31 +92,36 @@ class TopBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Text(
-                          'Halo, ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            fontSize: 20,
-                            fontFamily: 'Open-Sans',
-                            color: Colors.white,
-                          ),
-                        ),
-                        Obx(
-                          () => Text(
-                            isDoula
-                                ? userController.doulaUsername.value
-                                : userController.username.value,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
+                    Flexible(
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Halo, ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w300,
                               fontSize: 20,
                               fontFamily: 'Open-Sans',
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
+                          Flexible(
+                            child: Obx(
+                              () => Text(
+                                isDoula
+                                    ? userController.doulaUsername.value
+                                    : userController.username.value,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 20,
+                                  fontFamily: 'Open-Sans',
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
@@ -85,23 +137,11 @@ class TopBar extends StatelessWidget {
                         Obx(
                           () => ClipRRect(
                             borderRadius: BorderRadius.circular(100),
-                            child: isDoula
-                                ? Image.network(
-                                    userController.doulaImage.value,
-                                    width: 32,
-                                    height: 32,
-                                  )
-                                : userController.image.value.isEmpty
-                                    ? Image.asset(
-                                        'assets/images/blank-profile.png',
-                                        width: 32,
-                                        height: 32,
-                                      )
-                                    : Image.network(
-                                        userController.image.value,
-                                        width: 32,
-                                        height: 32,
-                                      ),
+                            child: _buildAvatar(
+                              isDoula
+                                  ? userController.doulaImage.value
+                                  : userController.image.value,
+                            ),
                           ),
                         )
                       ],
@@ -144,7 +184,7 @@ class TopBar extends StatelessWidget {
                         fontFamily: 'Open-Sans',
                         fontWeight: FontWeight.w300,
                       ),
-                      enabled: isDoula ? false : true,
+                      enabled: true,
                       prefixIcon: const Icon(
                         Icons.search,
                         color: Colors.black,
@@ -161,7 +201,15 @@ class TopBar extends StatelessWidget {
                     onChanged: onSearchChanged,
                     onFieldSubmitted: onSearchSubmitted ?? (value) {
                       if (value.isNotEmpty) {
-                        Get.toNamed('/user-search', arguments: value);
+                        if (isDoula) {
+                          Get.snackbar(
+                            'Pencarian',
+                            'Fitur pencarian untuk mitra sedang dalam pengembangan.',
+                            snackPosition: SnackPosition.TOP,
+                          );
+                        } else {
+                          Get.toNamed('/user-search', arguments: value);
+                        }
                       }
                     },
                   ),

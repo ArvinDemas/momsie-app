@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:flutter/material.dart';
@@ -45,12 +46,25 @@ class DoulaContainer extends StatelessWidget {
                     offset: const Offset(0, -30),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        doula.image,
-                        width: 75,
-                        height: 75,
-                        fit: BoxFit.cover,
-                      ),
+                      child: doula.image.startsWith('http')
+                          ? Image.network(
+                              doula.image,
+                              width: 75,
+                              height: 75,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(doula.image),
+                              width: 75,
+                              height: 75,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 75,
+                                height: 75,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.person, size: 40),
+                              ),
+                            ),
                     ),
                   ),
                 ),

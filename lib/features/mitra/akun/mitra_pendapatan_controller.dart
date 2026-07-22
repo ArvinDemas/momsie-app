@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/util/service/app_config_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,16 +19,34 @@ class MitraPendapatanController extends GetxController {
   Future<void> getPendapatan() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final UserController userController = Get.find<UserController>();
-    await firestore
-        .collection('mitra')
-        .doc(userController.uid.value)
-        .get()
-        .then((value) {
-      total.value = value['saldo'];
-    });
+    try {
+      final doc = await firestore
+          .collection('mitra')
+          .doc(userController.uid.value)
+          .get();
+      if (doc.exists) {
+        total.value = (doc.data()?['saldo'] ?? 0) as int;
+      } else {
+        total.value = 0;
+      }
+    } catch (e) {
+      total.value = 0;
+    }
   }
 
   Future<void> tarikPendapatan() async {
+    // Cek feature flag: jika showPaymentFlow = false (mode review Google Play),
+    // tampilkan pesan "dalam pengembangan" alih-alih memproses transaksi
+    final AppConfigService configService = Get.find<AppConfigService>();
+    if (!configService.showPaymentFlow.value) {
+      Get.snackbar(
+        'Dalam Pengembangan',
+        'Fitur tarik pendapatan sedang dalam pengembangan dan akan tersedia segera.',
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final UserController userController = Get.find<UserController>();
 

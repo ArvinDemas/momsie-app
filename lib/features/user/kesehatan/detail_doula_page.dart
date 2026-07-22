@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:flutter/material.dart';
@@ -54,11 +55,22 @@ class DetailDoulaPage extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Image.network(
-                        doula.image,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
+                      child: doula.image.startsWith('http')
+                          ? Image.network(
+                              doula.image,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(doula.image),
+                              height: 150,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                height: 150,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.person, size: 60),
+                              ),
+                            ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(

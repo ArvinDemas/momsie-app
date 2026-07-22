@@ -98,6 +98,13 @@ class MitraRegisterPage extends StatelessWidget {
         controller: controller.nohpController.value,
       ),
       const SizedBox(height: 30),
+      CustomTextField(
+        hintText: "Kota / Provinsi",
+        iconImage: const Icon(Icons.location_city),
+        isPassword: false,
+        controller: controller.kotaProvinsiController.value,
+      ),
+      const SizedBox(height: 30),
       const SizedBox(height: 40),
       InkWell(
         onTap: () {
@@ -127,6 +134,23 @@ class MitraRegisterPage extends StatelessWidget {
 
   List<Widget> secondFormField(MitraRegisterController controller) {
     return [
+      const Text(
+        "Agama",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.w300,
+        ),
+      ),
+      const SizedBox(height: 5),
+      CustomDropDown(
+        items: controller.religionList.value,
+        onChanged: (value) {
+          controller.religionSelect.value = value;
+        },
+        selectedItem: controller.religionSelect,
+      ),
+      const SizedBox(height: 10),
       const Text(
         "Gender",
         style: TextStyle(

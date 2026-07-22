@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:path_provider/path_provider.dart';
+
 class DiaryController extends GetxController {
   final RxList<DiaryModel> entries = <DiaryModel>[].obs;
   final RxBool isLoading = true.obs;
@@ -61,7 +63,7 @@ class DiaryController extends GetxController {
     selectedMood.value = 'happy';
     newPhotos.clear();
     existingPhotoUrls.clear();
-    editingWeek.value = 0;
+    editingWeek.value = 20;
   }
 
   Future<void> pickPhotos() async {
@@ -88,19 +90,30 @@ class DiaryController extends GetxController {
 
   Future<void> removeExistingPhoto(String url) async {
     existingPhotoUrls.remove(url);
-    // Delete from Storage
     try {
-      await _storage.refFromURL(url).delete();
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        await _storage.refFromURL(url).delete();
+      } else {
+        final file = File(url);
+        if (await file.exists()) {
+          await file.delete();
+        }
+      }
     } catch (_) {}
   }
 
   Future<List<String>> _uploadPhotos(List<XFile> photos) async {
     final urls = <String>[];
+    final appDir = await getApplicationDocumentsDirectory();
+    final diaryDir = Directory('${appDir.path}/diary_photos');
+    if (!await diaryDir.exists()) {
+      await diaryDir.create(recursive: true);
+    }
+
     for (final photo in photos) {
-      final ref = _storage
-          .ref('diary/$_uid/${DateTime.now().millisecondsSinceEpoch}_${photo.name}');
-      await ref.putFile(File(photo.path));
-      urls.add(await ref.getDownloadURL());
+      final targetPath = '${diaryDir.path}/${DateTime.now().millisecondsSinceEpoch}_${photo.name}';
+      await File(photo.path).copy(targetPath);
+      urls.add(targetPath);
     }
     return urls;
   }
@@ -146,10 +159,16 @@ class DiaryController extends GetxController {
   }
 
   Future<void> deleteEntry(DiaryModel entry) async {
-    // Delete photos from Storage
     for (final url in entry.photoUrls) {
       try {
-        await _storage.refFromURL(url).delete();
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          await _storage.refFromURL(url).delete();
+        } else {
+          final file = File(url);
+          if (await file.exists()) {
+            await file.delete();
+          }
+        }
       } catch (_) {}
     }
     await _col.doc(entry.id).delete();

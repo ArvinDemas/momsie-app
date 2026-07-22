@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/util/service/app_config_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MitraRegisterController extends GetxController {
   final RxInt currentPage = 0.obs;
@@ -42,41 +43,77 @@ class MitraRegisterController extends GetxController {
 
   Future<void> submitRegister() async {
     try {
-      if (jobSelect.value.isEmpty ||
-          educationSelect.value.isEmpty ||
-          religionSelect.value.isEmpty ||
-          genderSelect.value.isEmpty ||
-          currentImage.value == null ||
-          nameController.value.text.isEmpty ||
+      if (nameController.value.text.isEmpty ||
           nikController.value.text.isEmpty ||
           nohpController.value.text.isEmpty ||
-          kotaProvinsiController.value.text.isEmpty ||
-          biografiController.value.text.isEmpty) {
-        Get.snackbar('Error', 'Data tidak boleh kosong');
-      } else {
-        final FirebaseFirestore firestore = FirebaseFirestore.instance;
-        final FirebaseStorage storage = FirebaseStorage.instance;
-        final UserController userController = Get.find<UserController>();
+          kotaProvinsiController.value.text.isEmpty) {
+        Get.snackbar('Error', 'Lengkapi data diri di halaman pertama',
+            snackPosition: SnackPosition.TOP);
+        return;
+      }
+      if (religionSelect.value.isEmpty ||
+          genderSelect.value.isEmpty ||
+          jobSelect.value.isEmpty ||
+          educationSelect.value.isEmpty) {
+        Get.snackbar('Error', 'Lengkapi pilihan agama, gender, pekerjaan, dan pendidikan',
+            snackPosition: SnackPosition.TOP);
+        return;
+      }
+      if (biografiController.value.text.isEmpty) {
+        Get.snackbar('Error', 'Biografi tidak boleh kosong',
+            snackPosition: SnackPosition.TOP);
+        return;
+      }
+      if (currentImage.value == null) {
+        Get.snackbar('Error', 'Foto profil wajib diupload',
+            snackPosition: SnackPosition.TOP);
+        return;
+      }
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final UserController userController = Get.find<UserController>();
 
-        String filePath = 'mitra/${userController.uid.value}';
-        await storage.ref(filePath).putFile(currentImage.value!);
-        String downloadUrl = await storage.ref(filePath).getDownloadURL();
+      // Show loading while saving photo locally
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
 
-        await firestore.collection('mitra').doc(userController.uid.value).set({
-          'name': nameController.value.text,
-          'nik': nikController.value.text,
-          'nohp': nohpController.value.text,
-          'biografi': biografiController.value.text,
-          'pekerjaan': jobSelect.value,
-          'pendidikan': educationSelect.value,
-          'jenisKelamin': genderSelect.value,
-          'image': downloadUrl,
-          'rating': 5.0,
-          'saldo': 0,
-        });
+      // Save photo to local storage (same pattern as diary - no Firebase Storage cost)
+      final appDir = await getApplicationDocumentsDirectory();
+      final mitraDir = Directory('${appDir.path}/mitra_photos');
+      if (!await mitraDir.exists()) {
+        await mitraDir.create(recursive: true);
+      }
+      final String ext = currentImage.value!.path.split('.').last;
+      final String localPath =
+          '${mitraDir.path}/${userController.uid.value}_${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await currentImage.value!.copy(localPath);
 
-        final int randomNumber = getRandomNumber();
+      Get.back(); // close loading
 
+      await firestore.collection('mitra').doc(userController.uid.value).set({
+        'name': nameController.value.text,
+        'nik': nikController.value.text,
+        'nohp': nohpController.value.text,
+        'biografi': biografiController.value.text,
+        'pekerjaan': jobSelect.value,
+        'pendidikan': educationSelect.value,
+        'agama': religionSelect.value,
+        'jenisKelamin': genderSelect.value,
+        'kotaProvinsi': kotaProvinsiController.value.text,
+        'image': localPath,
+        'rating': 5.0,
+        'saldo': 0,
+      });
+
+      final int randomNumber = getRandomNumber();
+
+      // Cek feature flag: jika showPaymentFlow = false (mode review Google Play),
+      // jangan buat dokumen register dan jangan arahkan ke halaman OVO
+      final AppConfigService configService = Get.find<AppConfigService>();
+
+      if (configService.showPaymentFlow.value) {
+        // Mode normal: buat dokumen register untuk alur pembayaran OVO
         await firestore
             .collection('register')
             .doc(userController.uid.value)
@@ -85,36 +122,25 @@ class MitraRegisterController extends GetxController {
           'payment': randomNumber,
         });
 
-        // await firestore
-        //     .collection('user')
-        //     .doc(userController.uid.value)
-        //     .update({
-        //   'isDoula': true,
-        // });
-
-        // userController.updateUser(
-        //   userController.username.value,
-        //   true,
-        //   userController.image.value,
-        // );
-
-        // userController.setDoula(
-        //   nameController.value.text,
-        //   nohpController.value.text,
-        //   kotaProvinsiController.value.text,
-        //   biografiController.value.text,
-        //   downloadUrl,
-        //   genderSelect.value,
-        //   nikController.value.text,
-        // );
-
         Get.offAllNamed('/user');
         Get.toNamed('/confirm-register', arguments: {
           'payment': randomNumber,
         });
+      } else {
+        // Mode review Google Play: lewati halaman OVO
+        Get.offAllNamed('/user');
+        Get.snackbar(
+          'Pendaftaran Berhasil',
+          'Data pendaftaran mitra Anda telah dikirim. Tim kami akan meninjau dalam 1x24 jam.',
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 4),
+        );
       }
     } catch (e) {
-      // print(e);
+      // Make sure loading dialog is closed if Firestore write fails
+      if (Get.isDialogOpen ?? false) Get.back();
+      Get.snackbar('Error', 'Terjadi kesalahan: $e',
+          snackPosition: SnackPosition.TOP);
     }
   }
 

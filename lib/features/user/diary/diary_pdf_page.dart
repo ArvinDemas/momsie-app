@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/features/user/diary/diary_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/helper/file_helper.dart';
@@ -307,14 +308,21 @@ class _DiaryPdfPageState extends State<DiaryPdfPage> {
             '${entry.createdAt.month.toString().padLeft(2, '0')}/'
             '${entry.createdAt.year}';
 
-        // Download photos
+        // Download or load photos
         final photoImages = <pw.ImageProvider>[];
         for (final url in entry.photoUrls.take(4)) {
           try {
-            final response = await http.get(Uri.parse(url));
-            if (response.statusCode == 200) {
-              photoImages
-                  .add(pw.MemoryImage(response.bodyBytes));
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+              final response = await http.get(Uri.parse(url));
+              if (response.statusCode == 200) {
+                photoImages.add(pw.MemoryImage(response.bodyBytes));
+              }
+            } else {
+              final file = File(url);
+              if (await file.exists()) {
+                final bytes = await file.readAsBytes();
+                photoImages.add(pw.MemoryImage(bytes));
+              }
             }
           } catch (_) {}
         }

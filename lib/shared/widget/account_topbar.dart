@@ -21,6 +21,54 @@ class AccountTopBar extends StatelessWidget {
   final Function? onTap;
   final Rx<File?>? additionalImage;
 
+  /// Build profile image from URL or local file path
+  Widget _buildProfileImage(String imagePath, double size) {
+    if (imagePath.isEmpty) {
+      return Image.asset(
+        'assets/images/blank-profile.png',
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+      );
+    }
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          'assets/images/blank-profile.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    // Local file path
+    final file = File(imagePath);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          'assets/images/blank-profile.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    return Image.asset(
+      'assets/images/blank-profile.png',
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
@@ -54,11 +102,9 @@ class AccountTopBar extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : isDoula
-                          ? Image.network(
+                          ? _buildProfileImage(
                               userController.doulaImage.value,
-                              width: 150,
-                              height: 150,
-                              fit: BoxFit.cover,
+                              150,
                             )
                           : userController.image.value.isEmpty
                               ? Image.asset(
@@ -67,11 +113,9 @@ class AccountTopBar extends StatelessWidget {
                                   height: 150,
                                   fit: BoxFit.cover,
                                 )
-                              : Image.network(
+                              : _buildProfileImage(
                                   userController.image.value,
-                                  width: 150,
-                                  height: 150,
-                                  fit: BoxFit.cover,
+                                  150,
                                 ),
                 ),
               ),

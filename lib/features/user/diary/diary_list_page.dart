@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:douce/features/user/diary/diary_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
@@ -185,23 +186,39 @@ class _DiaryCard extends StatelessWidget {
                 child: SizedBox(
                   height: 140,
                   child: entry.photoUrls.length == 1
-                      ? Image.network(
-                          entry.photoUrls.first,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox.shrink(),
-                        )
+                      ? (entry.photoUrls.first.startsWith('http://') || entry.photoUrls.first.startsWith('https://')
+                          ? Image.network(
+                              entry.photoUrls.first,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox.shrink(),
+                            )
+                          : Image.file(
+                              File(entry.photoUrls.first),
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox.shrink(),
+                            ))
                       : Row(
                           children: entry.photoUrls.take(2).map((url) {
                             return Expanded(
-                              child: Image.network(
-                                url,
-                                height: 140,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    const SizedBox.shrink(),
-                              ),
+                              child: (url.startsWith('http://') || url.startsWith('https://'))
+                                  ? Image.network(
+                                      url,
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
+                                    )
+                                  : Image.file(
+                                      File(url),
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
+                                    ),
                             );
                           }).toList(),
                         ),
