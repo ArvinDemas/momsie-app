@@ -94,18 +94,6 @@ class DetailDoulaPage extends StatelessWidget {
                               color: Colors.black,
                             ),
                           ),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                              ),
-                              Text(
-                                doula.rating,
-                                style: const TextStyle(fontSize: 14),
-                              )
-                            ],
-                          )
                         ],
                       ),
                     ),

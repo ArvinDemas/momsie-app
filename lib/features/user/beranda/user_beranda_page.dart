@@ -103,48 +103,7 @@ class UserBerandaPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Top Doula",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        changeNavigation("Doula");
-                      },
-                      child: Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: ColorDouce.douceBase,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 40),
-                Obx(
-                  () => SingleChildScrollView(
-                    clipBehavior: Clip.none,
-                    scrollDirection: Axis.horizontal,
-                    child: Wrap(
-                      spacing: 15,
-                      children: controller.getRandomDoula().map((doula) {
-                        return DoulaContainer(
-                          doula: doula,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

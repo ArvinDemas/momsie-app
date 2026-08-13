@@ -100,24 +100,6 @@ class DoulaContainer extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        size: 16,
-                        color: Colors.orange,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        doula.rating,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
