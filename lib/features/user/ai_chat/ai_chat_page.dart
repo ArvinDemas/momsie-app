@@ -103,10 +103,12 @@ class _AiChatPageState extends State<AiChatPage> {
                       ),
                       // Key settings
                       Obx(() => IconButton(
-                            tooltip: 'Pengaturan API Key',
+                            tooltip: c.hasCustomApiKey.value
+                                ? 'Custom Key: ${c.apiKeyPreview.value}'
+                                : 'Pengaturan API Key',
                             icon: Icon(
                               Icons.key_rounded,
-                              color: c.hasApiKey.value
+                              color: c.hasCustomApiKey.value
                                   ? const Color(0xFFFF6B8B)
                                   : Colors.grey,
                             ),
@@ -348,7 +350,7 @@ class _AiChatPageState extends State<AiChatPage> {
                     ),
                   ),
                 )),
-            if (c.hasApiKey.value) ...[
+            if (c.hasCustomApiKey.value) ...[
               const SizedBox(height: 8),
               TextButton.icon(
                 onPressed: () {
