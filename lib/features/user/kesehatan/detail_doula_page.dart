@@ -85,7 +85,7 @@ class DetailDoulaPage extends StatelessWidget {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black90,
+                                        color: Colors.black87,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -178,7 +178,7 @@ class DetailDoulaPage extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        padding: const EdgeInsets.vertical(14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         elevation: 2,
                       ),
                       child: const Text(

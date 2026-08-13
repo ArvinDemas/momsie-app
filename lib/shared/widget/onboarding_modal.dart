@@ -54,7 +54,7 @@ class OnboardingModal extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.slate,
+                color: Color(0xFF64748B),
                 height: 1.4,
               ),
             ),
@@ -89,7 +89,7 @@ class OnboardingModal extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  padding: const EdgeInsets.vertical(14),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   elevation: 2,
                 ),
                 child: const Text(
@@ -143,7 +143,7 @@ class OnboardingModal extends StatelessWidget {
                 subtitle,
                 style: const TextStyle(
                   fontSize: 11,
-                  color: Colors.slate,
+                  color: Color(0xFF64748B),
                   height: 1.3,
                 ),
               ),

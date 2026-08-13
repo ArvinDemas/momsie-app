@@ -112,7 +112,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             const Text(
               'Bagaimana pengalaman Bunda menggunakan Momsie?',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.slate),
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 16),
             Row(
@@ -168,7 +168,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      padding: const EdgeInsets.vertical(12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: _isSubmitting
                         ? const SizedBox(

@@ -124,7 +124,7 @@ class NavBar extends StatelessWidget {
             Icon(
               iconData,
               size: isSelected ? 24 : 22,
-              color: isSelected ? const Color(0xFFFF6B8B) : Colors.slate[400],
+              color: isSelected ? const Color(0xFFFF6B8B) : Colors.grey[400],
             ),
             const SizedBox(height: 3),
             Text(
@@ -132,7 +132,7 @@ class NavBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? const Color(0xFFFF6B8B) : Colors.slate[600],
+                color: isSelected ? const Color(0xFFFF6B8B) : const Color(0xFF64748B),
               ),
             ),
           ],

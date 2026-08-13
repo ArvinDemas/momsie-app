@@ -316,7 +316,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Colors.white90,
+                              color: Colors.white70,
                               fontSize: 11,
                               height: 1.3,
                             ),
@@ -519,7 +519,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
               subtitle,
               style: const TextStyle(
                 fontSize: 11,
-                color: Colors.slate,
+                color: Color(0xFF64748B),
               ),
             ),
           ],
@@ -542,14 +542,14 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color, color.withValues(alpha: 0.85)],
+            colors: [color, color.withOpacity(0.85)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.3),
+              color: color.withOpacity(0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -560,7 +560,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: Colors.white.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.white, size: 26),
@@ -583,7 +583,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                     subtitle,
                     style: const TextStyle(
                       fontSize: 11,
-                      color: Colors.white90,
+                      color: Colors.white70,
                     ),
                   ),
                 ],
