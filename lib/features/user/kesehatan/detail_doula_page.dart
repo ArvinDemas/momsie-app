@@ -17,119 +17,184 @@ class DetailDoulaPage extends StatelessWidget {
         children: [
           const ThemedBackground(),
           SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 15,
-            horizontal: 20,
-          ),
-          child: ListView(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: Get.back,
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      color: ColorDouce.douceBase,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 20,
                     ),
-                  ),
-                  const Text(
-                    "Detail Doula",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.heart_broken_rounded,
-                    color: Colors.transparent,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              SizedBox(
-                width: double.infinity,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: doula.image.startsWith('http')
-                          ? Image.network(
-                              doula.image,
-                              height: 150,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(doula.image),
-                              height: 150,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                height: 150,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.person, size: 60),
+                    child: ListView(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: Get.back,
+                              child: Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                color: ColorDouce.douceBase,
                               ),
                             ),
+                            const Text(
+                              "Detail Doula",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                          ],
+                        ),
+                        const SizedBox(height: 25),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: doula.image.startsWith('http')
+                                    ? Image.network(
+                                        doula.image,
+                                        width: 120,
+                                        height: 140,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        File(doula.image),
+                                        width: 120,
+                                        height: 140,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          width: 120,
+                                          height: 140,
+                                          color: Colors.grey[200],
+                                          child: const Icon(Icons.person, size: 60, color: Colors.grey),
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      doula.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black90,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      doula.job,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorDouce.douceBase,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            doula.alamat,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Divider(color: Colors.black12, thickness: 1),
+                        const SizedBox(height: 15),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 20,
+                          children: [
+                            informationCircle(doula.jenisKelamin, Icons.female_rounded),
+                            informationCircle("Bersertifikasi", Icons.verified_user_rounded),
+                            informationCircle(doula.job, Icons.medical_services_rounded),
+                          ],
+                        ),
+                        const SizedBox(height: 25),
+                        const Text(
+                          "Biografi & Kualifikasi",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          doula.biografi,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            doula.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(doula.job),
-                          Text(
-                            doula.alamat,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
+                  ),
+                ),
+
+                // Bottom Sticky Booking Button
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.toNamed('/confirm-booking', arguments: {'doula': doula});
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorDouce.douceBase,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.vertical(14),
+                        elevation: 2,
+                      ),
+                      child: const Text(
+                        'Pesan / Booking Doula Sekarang',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Divider(
-                color: Colors.grey,
-                thickness: 1,
-              ),
-              const SizedBox(height: 15),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 25,
-                children: [
-                  informationCircle(doula.jenisKelamin, Icons.female),
-                  informationCircle(doula.rating, Icons.star),
-                  informationCircle(doula.job, Icons.work),
-                ],
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                "Biografi",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(doula.biografi),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
         ],
       ),
     );
@@ -137,27 +202,28 @@ class DetailDoulaPage extends StatelessWidget {
 
   Widget informationCircle(String title, IconData icon) {
     return SizedBox(
-      width: 75,
+      width: 85,
       child: Column(
         children: [
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(9999),
+              borderRadius: BorderRadius.circular(16),
               color: ColorDouce.kindaRed,
             ),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             child: Icon(
               icon,
               color: ColorDouce.douceBase,
+              size: 24,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 6),
           FittedBox(
             child: Text(
               title,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
                 color: ColorDouce.douceBase,
               ),
             ),
