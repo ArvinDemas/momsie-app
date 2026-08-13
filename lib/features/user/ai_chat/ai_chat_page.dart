@@ -45,9 +45,19 @@ class _AiChatPageState extends State<AiChatPage> {
           SafeArea(
             child: Column(
               children: [
-                // AppBar
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                // AppBar Header
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                   child: Row(
                     children: [
                       IconButton(
@@ -55,11 +65,17 @@ class _AiChatPageState extends State<AiChatPage> {
                         onPressed: () => Get.back(),
                       ),
                       // Avatar
-                      CircleAvatar(
-                        backgroundColor: ColorDouce.douceBase,
-                        radius: 18,
-                        child: const Text('🌸',
-                            style: TextStyle(fontSize: 18)),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B8B).withOpacity(0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.smart_toy_rounded,
+                          color: Color(0xFFFF6B8B),
+                          size: 22,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       const Expanded(
@@ -67,48 +83,45 @@ class _AiChatPageState extends State<AiChatPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Momsie AI',
+                              'Momsie AI Assistant',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'OpenSans',
+                                color: Color(0xFF0F172A),
                               ),
                             ),
                             Text(
-                              'Asisten kehamilan personalmu',
+                              'Spesialis Kehamilan & Laktasi 24/7',
                               style: TextStyle(
-                                  fontSize: 10, color: Colors.grey),
+                                fontSize: 11,
+                                color: Color(0xFF10B981),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      // API Key button
+                      // Key settings
                       Obx(() => IconButton(
-                            tooltip: c.hasApiKey.value
-                                ? 'API Key: ${c.apiKeyPreview.value}'
-                                : 'Atur API Key',
+                            tooltip: 'Pengaturan API Key',
                             icon: Icon(
-                              c.hasApiKey.value
-                                  ? Icons.vpn_key_rounded
-                                  : Icons.vpn_key_outlined,
+                              Icons.key_rounded,
                               color: c.hasApiKey.value
-                                  ? Colors.green
-                                  : Colors.orange,
+                                  ? const Color(0xFFFF6B8B)
+                                  : Colors.grey,
                             ),
-                            onPressed: () =>
-                                _showApiKeyDialog(context, c),
+                            onPressed: () => _showApiKeyDialog(context, c),
                           )),
                       // Clear history
                       IconButton(
                         tooltip: 'Hapus riwayat',
-                        icon: const Icon(Icons.delete_sweep_outlined),
+                        icon: const Icon(Icons.delete_sweep_rounded),
                         onPressed: () => Get.defaultDialog(
                           title: 'Hapus Riwayat?',
-                          middleText:
-                              'Semua pesan akan dihapus.',
+                          middleText: 'Semua pesan akan dibersihkan dari layar.',
                           textConfirm: 'Hapus',
                           textCancel: 'Batal',
-                          buttonColor: Colors.red,
+                          buttonColor: const Color(0xFFFF6B8B),
                           confirmTextColor: Colors.white,
                           onConfirm: () {
                             Get.back();
@@ -120,50 +133,32 @@ class _AiChatPageState extends State<AiChatPage> {
                   ),
                 ),
 
-                // No API key banner
-                Obx(() => !c.hasApiKey.value
-                    ? GestureDetector(
-                        onTap: () => _showApiKeyDialog(context, c),
-                        child: Container(
-                          margin:
-                              const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                                color: Colors.orange.shade200),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.warning_amber_rounded,
-                                  color: Colors.orange, size: 18),
-                              const SizedBox(width: 8),
-                              const Expanded(
-                                child: Text(
-                                  'Ketuk di sini untuk memasukkan Gemini API key '
-                                  'agar chatbot aktif. API key gratis dari Google AI Studio.',
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.orange),
-                                ),
-                              ),
-                              const Icon(Icons.chevron_right_rounded,
-                                  color: Colors.orange, size: 18),
-                            ],
-                          ),
+                // Medical Disclaimer Sub-header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  color: const Color(0xFF0284C7).withOpacity(0.08),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.shield_outlined, size: 14, color: Color(0xFF0284C7)),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Edukasi medis terverifikasi Kemenkes/WHO. Bukan pengganti diagnosis dokter.',
+                          style: TextStyle(fontSize: 10, color: Color(0xFF0284C7), fontWeight: FontWeight.w500),
                         ),
-                      )
-                    : const SizedBox.shrink()),
+                      ),
+                    ],
+                  ),
+                ),
 
-                // Messages
+                // Messages List
                 Expanded(
                   child: Obx(() {
                     _scrollToBottom();
                     return ListView.builder(
                       controller: _scroll,
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                       itemCount: c.messages.length,
                       itemBuilder: (_, i) {
                         final msg = c.messages[i];
@@ -179,28 +174,30 @@ class _AiChatPageState extends State<AiChatPage> {
                 // Typing indicator
                 Obx(() => c.isLoading.value
                     ? Padding(
-                        padding:
-                            const EdgeInsets.only(left: 20, bottom: 4),
+                        padding: const EdgeInsets.only(left: 20, bottom: 8),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              backgroundColor: ColorDouce.douceBase,
-                              radius: 14,
-                              child: const Text('🌸',
-                                  style: TextStyle(fontSize: 12)),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF6B8B).withOpacity(0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.smart_toy_rounded,
+                                color: Color(0xFFFF6B8B),
+                                size: 16,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(18),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.06),
+                                    color: Colors.black.withOpacity(0.06),
                                     blurRadius: 6,
                                   )
                                 ],
@@ -208,8 +205,7 @@ class _AiChatPageState extends State<AiChatPage> {
                               child: Row(
                                 children: List.generate(
                                   3,
-                                  (i) => _DotAnimation(
-                                      delay: i * 200),
+                                  (i) => _DotAnimation(delay: i * 200),
                                 ),
                               ),
                             ),
@@ -222,28 +218,24 @@ class _AiChatPageState extends State<AiChatPage> {
                 Obx(() => c.messages.length <= 1
                     ? SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                         child: Row(
                           children: [
-                            '🤰 Tips trimester 1',
-                            '🥗 Makanan ibu hamil',
-                            '💊 Vitamin prenatal',
-                            '😰 Mengatasi morning sickness',
+                            '🥑 Perkembangan janin minggu ini',
+                            '🥗 Nutrisi penambah sel darah ibu hamil',
+                            '💊 Panduan konsumsi Asam Folat & DHA',
+                            '😰 Solusi mual morning sickness',
                           ].map((s) {
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: ActionChip(
-                                label: Text(s,
-                                    style:
-                                        const TextStyle(fontSize: 11)),
+                                label: Text(s, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
                                 onPressed: () {
                                   c.messageCtrl.text = s;
                                   c.sendMessage();
                                 },
                                 backgroundColor: Colors.white,
-                                side: BorderSide(
-                                    color: ts.primary.withValues(
-                                        alpha: 0.3)),
+                                side: BorderSide(color: ts.primary.withOpacity(0.3)),
                               ),
                             );
                           }).toList(),
@@ -253,12 +245,12 @@ class _AiChatPageState extends State<AiChatPage> {
 
                 // Input bar
                 Container(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
+                        color: Colors.black.withOpacity(0.06),
                         blurRadius: 10,
                         offset: const Offset(0, -2),
                       )
@@ -273,36 +265,28 @@ class _AiChatPageState extends State<AiChatPage> {
                           minLines: 1,
                           textInputAction: TextInputAction.send,
                           onSubmitted: (_) => c.sendMessage(),
+                          style: const TextStyle(fontSize: 13),
                           decoration: InputDecoration(
-                            hintText:
-                                'Tanya seputar kehamilan...',
-                            hintStyle: const TextStyle(
-                                fontSize: 13, color: Colors.grey),
+                            hintText: 'Tanyakan seputar kehamilan & Si Kecil...',
+                            hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding:
-                                const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 10),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Obx(() => GestureDetector(
-                            onTap: c.isLoading.value
-                                ? null
-                                : c.sendMessage,
+                            onTap: c.isLoading.value ? null : c.sendMessage,
                             child: AnimatedContainer(
-                              duration:
-                                  const Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: c.isLoading.value
-                                    ? Colors.grey[300]
-                                    : ts.primary,
+                                color: c.isLoading.value ? Colors.grey[300] : ColorDouce.douceBase,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -329,13 +313,12 @@ class _AiChatPageState extends State<AiChatPage> {
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Row(
           children: [
-            Icon(Icons.vpn_key_rounded, color: Colors.orange),
+            Icon(Icons.key_rounded, color: Color(0xFFFF6B8B)),
             SizedBox(width: 8),
-            Text('Gemini API Key', style: TextStyle(fontSize: 16)),
+            Text('Gemini / Custom API Key', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -343,25 +326,24 @@ class _AiChatPageState extends State<AiChatPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Dapatkan API key gratis di:\ngoogle.aistudio.com',
+              'Aplikasi menggunakan API Key default aktif. Anda dapat menggantinya dengan Kunci API Anda sendiri:',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 12),
             Obx(() => TextField(
                   controller: keyCtrl,
                   obscureText: obscure.value,
+                  style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
-                    hintText: 'Masukkan API key...',
+                    hintText: 'Tempel API key custom...',
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
                     suffixIcon: IconButton(
-                      icon: Icon(obscure.value
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined),
+                      icon: Icon(obscure.value ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                       onPressed: () => obscure.value = !obscure.value,
                     ),
                   ),
@@ -373,26 +355,20 @@ class _AiChatPageState extends State<AiChatPage> {
                   c.removeApiKey();
                   Get.back();
                 },
-                icon: const Icon(Icons.delete_outline,
-                    color: Colors.red, size: 16),
-                label: const Text('Hapus API Key',
-                    style:
-                        TextStyle(color: Colors.red, fontSize: 12)),
+                icon: const Icon(Icons.refresh_rounded, color: Colors.blue, size: 16),
+                label: const Text('Reset ke Key Default', style: TextStyle(color: Colors.blue, fontSize: 12)),
               ),
             ],
           ],
         ),
         actions: [
-          TextButton(
-              onPressed: Get.back,
-              child: const Text('Batal')),
+          TextButton(onPressed: Get.back, child: const Text('Batal')),
           ElevatedButton(
             onPressed: () => c.saveApiKey(keyCtrl.text),
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorDouce.douceBase,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Simpan'),
           ),
@@ -405,59 +381,54 @@ class _AiChatPageState extends State<AiChatPage> {
 class _MessageBubble extends StatelessWidget {
   final ChatMessage msg;
   final Color themeColor;
-  const _MessageBubble(
-      {required this.msg, required this.themeColor});
+  const _MessageBubble({required this.msg, required this.themeColor});
 
   @override
   Widget build(BuildContext context) {
     final isUser = msg.role == 'user';
-    final timeStr =
-        '${msg.time.hour.toString().padLeft(2, '0')}:'
-        '${msg.time.minute.toString().padLeft(2, '0')}';
+    final timeStr = '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
-            CircleAvatar(
-              backgroundColor: ColorDouce.douceBase,
-              radius: 14,
-              child:
-                  const Text('🌸', style: TextStyle(fontSize: 12)),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF6B8B).withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                color: Color(0xFFFF6B8B),
+                size: 16,
+              ),
             ),
             const SizedBox(width: 6),
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: isUser
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.72,
+                    maxWidth: MediaQuery.of(context).size.width * 0.76,
                   ),
                   decoration: BoxDecoration(
-                    color: isUser ? themeColor : Colors.white,
+                    color: isUser ? ColorDouce.douceBase : Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(18),
-                      topRight: const Radius.circular(18),
-                      bottomLeft: isUser
-                          ? const Radius.circular(18)
-                          : const Radius.circular(4),
-                      bottomRight: isUser
-                          ? const Radius.circular(4)
-                          : const Radius.circular(18),
+                      topLeft: const Radius.circular(20),
+                      topRight: const Radius.circular(20),
+                      bottomLeft: isUser ? const Radius.circular(20) : const Radius.circular(4),
+                      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(20),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.07),
+                        color: Colors.black.withOpacity(0.06),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -467,16 +438,15 @@ class _MessageBubble extends StatelessWidget {
                     msg.text,
                     style: TextStyle(
                       fontSize: 13,
-                      color: isUser ? Colors.white : Colors.black87,
+                      color: isUser ? Colors.white : const Color(0xFF0F172A),
                       height: 1.5,
                     ),
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   timeStr,
-                  style: const TextStyle(
-                      fontSize: 9, color: Colors.grey),
+                  style: const TextStyle(fontSize: 9, color: Colors.grey),
                 ),
               ],
             ),
@@ -496,8 +466,7 @@ class _DotAnimation extends StatefulWidget {
   State<_DotAnimation> createState() => _DotAnimationState();
 }
 
-class _DotAnimationState extends State<_DotAnimation>
-    with SingleTickerProviderStateMixin {
+class _DotAnimationState extends State<_DotAnimation> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _anim;
 
@@ -534,7 +503,7 @@ class _DotAnimationState extends State<_DotAnimation>
             width: 7,
             height: 7,
             decoration: BoxDecoration(
-              color: ColorDouce.douceBase.withValues(alpha: 0.7),
+              color: ColorDouce.douceBase.withOpacity(0.7),
               shape: BoxShape.circle,
             ),
           ),
