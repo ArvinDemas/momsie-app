@@ -74,8 +74,19 @@ class LoginController extends GetxController {
   Future<void> tryGoogleLogin() async {
     try {
       final FirebaseAuth auth = FirebaseAuth.instance;
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: '5481212381-5tltq0if3b3s54o0pu0m056jeiovugbj.apps.googleusercontent.com',
+      );
+
+      // Disconnect session lama jika ada agar prompt akun Google selalu muncul
+      await googleSignIn.signOut();
+      
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // User membatalkan dialog login Google
+        return;
+      }
+
       final googleAuth = await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
@@ -143,16 +154,22 @@ class LoginController extends GetxController {
         Get.offAllNamed('/user');
       }
     } on FirebaseAuthException catch (e) {
-      print("FirebaseAuthException: ${e.code} - ${e.message}");
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(
-            "Error", "Email already exists with different login method");
+          "Gagal Login",
+          "Email ini sudah terdaftar dengan metode login biasa.",
+          snackPosition: SnackPosition.TOP,
+        );
         return;
       }
-      Get.snackbar("Error", "Auth Error: ${e.message}");
-    } catch (e, stack) {
-      print("Google Login Exception: $e\n$stack");
-      Get.snackbar("Error", "Google Login Failed: $e");
+      Get.snackbar("Gagal Login Google", e.message ?? "Terjadi kesalahan autentikasi.", snackPosition: SnackPosition.TOP);
+    } catch (e) {
+      Get.snackbar(
+        "Gagal Login Google",
+        "Pastikan SHA-1 Fingerprint telah terdaftar di Firebase Console & Provider Google diaktifkan.",
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 5),
+      );
       return;
     }
   }
