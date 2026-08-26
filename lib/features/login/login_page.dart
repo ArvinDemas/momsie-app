@@ -86,14 +86,16 @@ class LoginPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'Selamat datang, Ibu Hamil.',
-                        style: TextStyle(
+                      Obx(() => Text(
+                        loginController.isDoulaLogin.value
+                            ? 'Selamat datang, Mitra Doula.'
+                            : 'Selamat datang, Ibu Hamil.',
+                        style: const TextStyle(
                           fontSize: 14,
                           fontFamily: 'OpenSans',
                           fontWeight: FontWeight.w400,
                         ),
-                      ),
+                      )),
                       const Text(
                         'Langkah pertama menuju keajaiban',
                         style: TextStyle(
@@ -107,14 +109,14 @@ class LoginPage extends StatelessWidget {
                         hintText: "Email",
                         iconImage: const Icon(Icons.person_2_outlined),
                         isPassword: false,
-                        controller: loginController.emailController.value,
+                        controller: loginController.emailController,
                       ),
                       const SizedBox(height: 20),
                       CustomTextField(
                         hintText: "Password",
                         iconImage: const Icon(Icons.lock_outline),
                         isPassword: true,
-                        controller: loginController.passwordController.value,
+                        controller: loginController.passwordController,
                       ),
                       const SizedBox(height: 10),
                       Row(
@@ -134,6 +136,108 @@ class LoginPage extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 15),
+                      // Segmented Role Selector: [ Ibu Hamil ]  [ Mitra Doula ]
+                      Obx(() {
+                        final isDoula = loginController.isDoulaLogin.value;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(color: Colors.grey.shade300, width: 1),
+                          ),
+                          child: Row(
+                            children: [
+                              // Tab 1: Ibu Hamil
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => loginController.isDoulaLogin.value = false,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: !isDoula ? ColorDouce.douceBase : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(22),
+                                      boxShadow: !isDoula
+                                          ? [
+                                              BoxShadow(
+                                                color: ColorDouce.douceBase.withValues(alpha: 0.3),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.person_outline,
+                                          size: 16,
+                                          color: !isDoula ? Colors.white : Colors.grey.shade600,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          "Ibu Hamil",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: !isDoula ? FontWeight.bold : FontWeight.w500,
+                                            color: !isDoula ? Colors.white : Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Tab 2: Mitra Doula
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => loginController.isDoulaLogin.value = true,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: isDoula ? ColorDouce.douceBase : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(22),
+                                      boxShadow: isDoula
+                                          ? [
+                                              BoxShadow(
+                                                color: ColorDouce.douceBase.withValues(alpha: 0.3),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.medical_services_outlined,
+                                          size: 16,
+                                          color: isDoula ? Colors.white : Colors.grey.shade600,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          "Mitra Doula",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: isDoula ? FontWeight.bold : FontWeight.w500,
+                                            color: isDoula ? Colors.white : Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                       const SizedBox(height: 15),
                       InkWell(
                         onTap: () {

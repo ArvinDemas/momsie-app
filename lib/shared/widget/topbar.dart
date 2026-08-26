@@ -1,6 +1,10 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
+import 'package:douce/shared/widget/feature_search_modal.dart';
+import 'package:douce/shared/widget/job_search_modal.dart';
+import 'package:douce/shared/widget/yoga_streak_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +16,7 @@ class TopBar extends StatelessWidget {
     this.onSearchChanged,
     this.onSearchSubmitted,
     this.showSearch = true,
+    this.onAvatarTap,
   });
 
   final bool isDoula;
@@ -19,26 +24,41 @@ class TopBar extends StatelessWidget {
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
   final bool showSearch;
+  final VoidCallback? onAvatarTap;
 
   Widget _buildAvatar(String imagePath) {
     if (imagePath.isEmpty) {
       return Image.asset(
         'assets/images/blank-profile.png',
-        width: 32,
-        height: 32,
+        width: 38,
+        height: 38,
         fit: BoxFit.cover,
       );
     }
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return Image.network(
+    if (imagePath.startsWith('assets/')) {
+      return Image.asset(
         imagePath,
-        width: 32,
-        height: 32,
+        width: 38,
+        height: 38,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => Image.asset(
           'assets/images/blank-profile.png',
-          width: 32,
-          height: 32,
+          width: 38,
+          height: 38,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        width: 38,
+        height: 38,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => Image.asset(
+          'assets/images/blank-profile.png',
+          width: 38,
+          height: 38,
           fit: BoxFit.cover,
         ),
       );
@@ -47,21 +67,21 @@ class TopBar extends StatelessWidget {
     if (file.existsSync()) {
       return Image.file(
         file,
-        width: 32,
-        height: 32,
+        width: 38,
+        height: 38,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => Image.asset(
           'assets/images/blank-profile.png',
-          width: 32,
-          height: 32,
+          width: 38,
+          height: 38,
           fit: BoxFit.cover,
         ),
       );
     }
     return Image.asset(
       'assets/images/blank-profile.png',
-      width: 32,
-      height: 32,
+      width: 38,
+      height: 38,
       fit: BoxFit.cover,
     );
   }
@@ -69,149 +89,231 @@ class TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
-    final double height = showSearch ? 150.0 : 100.0;
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final double totalHeight = statusBarHeight + (showSearch ? 138.0 : 82.0);
 
     return Container(
-      height: height,
+      height: totalHeight,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        color: ColorDouce.douceBase,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(12),
-          bottomRight: Radius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            ColorDouce.douceBase,
+            const Color(0xFFFF7B93),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ColorDouce.douceBase.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Row(
-                        children: [
-                          const Text(
-                            'Halo, ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 20,
-                              fontFamily: 'Open-Sans',
-                              color: Colors.white,
+          // Greeting & Profile Bar
+          Positioned(
+            top: statusBarHeight + 8,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onAvatarTap ??
+                              () {
+                                if (isDoula) {
+                                  Get.toNamed('/mitra-akun');
+                                } else {
+                                  Get.toNamed('/user-akun');
+                                }
+                              },
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
-                          ),
-                          Flexible(
                             child: Obx(
-                              () => Text(
-                                isDoula
-                                    ? userController.doulaUsername.value
-                                    : userController.username.value,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 20,
-                                  fontFamily: 'Open-Sans',
-                                  color: Colors.white,
+                              () => ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: _buildAvatar(
+                                  isDoula
+                                      ? (userController.doulaImage.value.isNotEmpty
+                                          ? userController.doulaImage.value
+                                          : userController.image.value)
+                                      : userController.image.value,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        InkWell(
-                          onTap: () => Get.toNamed('/user-notification'),
-                          child: const Icon(
-                            Icons.notifications,
-                            color: Colors.white,
-                            size: 30,
-                          ),
                         ),
-                        const SizedBox(width: 10),
-                        Obx(
-                          () => ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: _buildAvatar(
-                              isDoula
-                                  ? userController.doulaImage.value
-                                  : userController.image.value,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Halo, Selamat Datang 👋',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (showSearch)
-            Positioned(
-              top: 115,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(32),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.5),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
+                            Obx(
+                              () {
+                                String displayName = '';
+                                if (isDoula) {
+                                  if (userController.doulaUsername.value.isNotEmpty) {
+                                    displayName = userController.doulaUsername.value;
+                                  } else if (userController.username.value.isNotEmpty) {
+                                    displayName = userController.username.value;
+                                  } else {
+                                    displayName = 'Mitra Doula';
+                                  }
+                                } else {
+                                  if (userController.username.value.isNotEmpty) {
+                                    displayName = userController.username.value;
+                                  } else {
+                                    displayName = 'Bunda Momsie';
+                                  }
+                                }
+                                return Text(
+                                  displayName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  width: MediaQuery.of(context).size.width - 50,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 3,
-                  ),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      hintText: searchHint ?? (isDoula
-                          ? 'Cari Pesanan | Pekerjaan'
-                          : 'Cari Kategori, Obat'),
-                      hintStyle: const TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Open-Sans',
-                        fontWeight: FontWeight.w300,
+                ),
+
+                // Live YogaStreakBadge (Only for User Mode)
+                if (!isDoula) ...[
+                  Obx(() => YogaStreakBadge(
+                        streak: userController.yogaStreak.value,
+                        compact: true,
+                      )),
+                  const SizedBox(width: 8),
+                ],
+
+                // Notification Icon Button
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Get.toNamed('/user-notification'),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.35),
+                        ),
                       ),
-                      enabled: true,
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.black,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 0,
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(32),
+                      child: const Icon(
+                        Icons.notifications_none_rounded,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ),
-                    onChanged: onSearchChanged,
-                    onFieldSubmitted: onSearchSubmitted ?? (value) {
-                      if (value.isNotEmpty) {
-                        if (isDoula) {
-                          Get.snackbar(
-                            'Pencarian',
-                            'Fitur pencarian untuk mitra sedang dalam pengembangan.',
-                            snackPosition: SnackPosition.TOP,
-                          );
-                        } else {
-                          Get.toNamed('/user-search', arguments: value);
-                        }
-                      }
-                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Search Bar
+          if (showSearch)
+            Positioned(
+              top: statusBarHeight + 62,
+              left: 20,
+              right: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    if (isDoula) {
+                      JobSearchModal.show(context);
+                    } else {
+                      FeatureSearchModal.show(context);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(22),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search_rounded,
+                          color: ColorDouce.douceBase,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            searchHint ?? (isDoula ? 'Cari pekerjaan, nama pemesan...' : 'Cari fitur, menu, atau obat...'),
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            'Cari',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: ColorDouce.douceBase,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -10,6 +10,10 @@ class TransaksiModel {
   final String? buktiPembayaran; // URL Firebase Storage
   final DateTime createdAt;
   final DateTime? paidAt;
+  // Split payment tracking (hanya untuk booking doula)
+  final int? platformFee; // 15% dari harga layanan
+  final int? doulaEarnings; // 85% dari harga layanan
+  final String? bookingId; // ID booking terkait
 
   TransaksiModel({
     required this.id,
@@ -23,6 +27,9 @@ class TransaksiModel {
     this.buktiPembayaran,
     required this.createdAt,
     this.paidAt,
+    this.platformFee,
+    this.doulaEarnings,
+    this.bookingId,
   });
 
   factory TransaksiModel.fromMap(Map<String, dynamic> map, {String? id}) {
@@ -42,6 +49,13 @@ class TransaksiModel {
       paidAt: map['paidAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['paidAt'])
           : null,
+      platformFee: map['platformFee'] != null
+          ? (map['platformFee'] as num).toInt()
+          : null,
+      doulaEarnings: map['doulaEarnings'] != null
+          ? (map['doulaEarnings'] as num).toInt()
+          : null,
+      bookingId: map['bookingId'] as String?,
     );
   }
 
@@ -58,10 +72,20 @@ class TransaksiModel {
       'buktiPembayaran': buktiPembayaran,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'paidAt': paidAt?.millisecondsSinceEpoch,
+      'platformFee': platformFee,
+      'doulaEarnings': doulaEarnings,
+      'bookingId': bookingId,
     };
   }
 
-  TransaksiModel copyWith({String? status, String? buktiPembayaran, DateTime? paidAt}) {
+  TransaksiModel copyWith({
+    String? status,
+    String? buktiPembayaran,
+    DateTime? paidAt,
+    int? platformFee,
+    int? doulaEarnings,
+    String? bookingId,
+  }) {
     return TransaksiModel(
       id: id,
       userId: userId,
@@ -74,6 +98,9 @@ class TransaksiModel {
       buktiPembayaran: buktiPembayaran ?? this.buktiPembayaran,
       createdAt: createdAt,
       paidAt: paidAt ?? this.paidAt,
+      platformFee: platformFee ?? this.platformFee,
+      doulaEarnings: doulaEarnings ?? this.doulaEarnings,
+      bookingId: bookingId ?? this.bookingId,
     );
   }
 }

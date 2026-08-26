@@ -91,10 +91,14 @@ class PesananService {
       final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
       QuerySnapshot snapshot = isDoula
-          ? await firestore.collection('pekerjaan').get()
+          ? await firestore
+              .collection('pekerjaan')
+              .limit(100)
+              .get()
           : await firestore
               .collection('pekerjaan')
               .where('user', isEqualTo: userController.uid.value)
+              .limit(100)
               .get();
 
       final List<String> userIds =

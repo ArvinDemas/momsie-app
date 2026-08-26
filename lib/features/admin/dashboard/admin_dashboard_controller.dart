@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:douce/shared/util/helper/file_helper.dart';
+import 'package:douce/shared/util/model/sop_submission_model.dart';
 import 'package:douce/shared/util/model/transaksi_model.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:url_launcher/url_launcher.dart';
 
 class AdminDashboardController extends GetxController {
   final PaymentService _paymentService = PaymentService();
@@ -31,10 +35,19 @@ class AdminDashboardController extends GetxController {
   final RxInt pendingCount = 0.obs;
   final RxInt monthlyRevenue = 0.obs;
 
+  // Mitra Panel
+  final RxList<SopSubmissionModel> allMitraSubmissions = <SopSubmissionModel>[].obs;
+  final RxList<SopSubmissionModel> filteredMitraSubmissions = <SopSubmissionModel>[].obs;
+  final RxString mitraSearchQuery = ''.obs;
+  final RxString mitraFilterStatus = 'Semua'.obs;
+  final RxBool isLoadingMitra = false.obs;
+  final RxBool showMitraPanel = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     _startListening();
+    _loadMitraSubmissions();
   }
 
   @override
@@ -165,9 +178,109 @@ class AdminDashboardController extends GetxController {
     }
   }
 
+  Future<void> _loadMitraSubmissions() async {
+    isLoadingMitra.value = true;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('sop_submissions')
+          .orderBy('submittedAt', descending: true)
+          .get();
+      allMitraSubmissions.value = snapshot.docs
+          .map((doc) => SopSubmissionModel.fromFirestore(doc))
+          .toList();
+      applyMitraFilters();
+    } catch (e) {
+      print('Error loading mitra submissions: $e');
+    } finally {
+      isLoadingMitra.value = false;
+    }
+  }
+
+  void applyMitraFilters() {
+    filteredMitraSubmissions.value = allMitraSubmissions.where((sub) {
+      if (mitraSearchQuery.value.isNotEmpty) {
+        final q = mitraSearchQuery.value.toLowerCase();
+        final match = sub.userName.toLowerCase().contains(q) ||
+            sub.userId.toLowerCase().contains(q) ||
+            sub.nik.contains(q);
+        if (!match) return false;
+      }
+      if (mitraFilterStatus.value != 'Semua') {
+        if (sub.status != mitraFilterStatus.value.toLowerCase()) return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  void toggleMitraPanel() {
+    showMitraPanel.value = !showMitraPanel.value;
+  }
+
+  Future<void> approveMitra(String submissionId, String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('sop_submissions')
+          .doc(submissionId)
+          .update({'status': 'approved'});
+      await FirebaseFirestore.instance.collection('user').doc(userId).update({
+        'role': 'mitra',
+        'hasSubmittedSOP': true,
+        'sopStatus': 'approved',
+      });
+      Get.snackbar(
+        'Berhasil',
+        'Mitra berhasil disetujui',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      _loadMitraSubmissions();
+    } catch (e) {
+      Get.snackbar('Gagal', 'Gagal menyetujui mitra: $e',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    }
+  }
+
+  Future<void> rejectMitra(String submissionId, String reason) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('sop_submissions')
+          .doc(submissionId)
+          .update({
+        'status': 'rejected',
+        'rejectionReason': reason,
+      });
+      Get.snackbar(
+        'Berhasil',
+        'Mitra ditolak',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      _loadMitraSubmissions();
+    } catch (e) {
+      Get.snackbar('Gagal', 'Gagal menolak mitra: $e',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    }
+  }
+
   Future<void> logoutAdmin() async {
     await FirebaseAuth.instance.signOut();
     Get.offAllNamed('/login');
+  }
+
+  /// Redirect ke web dashboard admin
+  Future<void> openWebDashboard() async {
+    final url = Uri.parse('https://momsie.id/dashboard');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar('Error', 'Tidak bisa membuka URL dashboard');
+    }
   }
 
   Future<void> exportToCSV() async {

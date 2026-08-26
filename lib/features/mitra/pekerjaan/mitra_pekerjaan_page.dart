@@ -1,8 +1,9 @@
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/util/model/pesanan_model.dart';
-import 'package:douce/shared/util/user_controller.dart';
+import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
+import 'package:douce/shared/widget/booking_detail_sheet.dart';
+import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -12,118 +13,691 @@ class MitraPekerjaanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MitraPekerjaanController controller =
-        Get.find<MitraPekerjaanController>();
-    final UserController userController = Get.find<UserController>();
+    final MitraPekerjaanController controller = Get.find<MitraPekerjaanController>();
+
     return BasePage(
       isDoula: true,
-      childWidget: ListView(
-        padding: const EdgeInsets.all(0),
-        children: [
-          const SizedBox(height: 50),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      childWidget: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            // Header Title & Subtitle (Ikut scroll ke atas saat list di-scroll)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 48, 20, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "${controller.currentMonth} ${controller.currentYear}",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 25),
-                Obx(
-                  () => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: controller.dates
-                        .map(
-                          (date) => calendarContainer(
-                            DateFormat('E').format(date),
-                            date.day.toString(),
-                            controller,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-                const SizedBox(height: 25),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Pekerjaan",
+                    const Text(
+                      "Daftar Pekerjaan",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
                       ),
-                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Kelola pekerjaan aktif dan pantau riwayat pekerjaan selesai",
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: controller.pekerjaan
-                        .where((element) =>
-                            element.tanggal == controller.selectedTanggal.value)
-                        .where((element) =>
-                            element.namaUser != userController.username.value)
-                        .map((pesanan) => jobContainer(pesanan))
-                        .toList(),
-                  ),
-                )
-              ],
+              ),
             ),
+            // Sticky Compact TabBar (Menempel ramping di paling atas saat scroll)
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverTabBarDelegate(
+                Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: TabBar(
+                    labelPadding: EdgeInsets.zero,
+                    indicator: BoxDecoration(
+                      color: ColorDouce.douceBase,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorDouce.douceBase.withValues(alpha: 0.25),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: const Color(0xFF64748B),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Pekerjaan Masuk"),
+                            const SizedBox(width: 6),
+                            Obx(() {
+                              final count = controller.pendingBookings.length + controller.activeBookings.length;
+                              if (count == 0) return const SizedBox();
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Riwayat Selesai"),
+                            const SizedBox(width: 6),
+                            Obx(() {
+                              final count = controller.completedBookings.length;
+                              if (count == 0) return const SizedBox();
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+          body: TabBarView(
+            children: [
+              // TAB 1: Pekerjaan Masuk & Sedang Berjalan
+              _PekerjaanMasukTab(controller: controller),
+
+              // TAB 2: Riwayat Pekerjaan Selesai
+              _RiwayatPekerjaanTab(controller: controller),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+}
 
-  Widget calendarContainer(
-    String day,
-    String date,
-    MitraPekerjaanController controller,
-  ) {
-    return InkWell(
-      onTap: () {
-        controller.selectedTanggal.value = date;
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: controller.selectedTanggal.value == date
-              ? ColorDouce.douceBase
-              : ColorDouce.kindaRed,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        padding: const EdgeInsets.all(15),
-        child: Column(
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIVER TAB BAR DELEGATE
+// ─────────────────────────────────────────────────────────────────────────────
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  _SliverTabBarDelegate(this.child);
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: child,
+    );
+  }
+
+  @override
+  double get maxExtent => 60;
+
+  @override
+  double get minExtent => 60;
+
+  @override
+  bool shouldRebuild(covariant _SliverTabBarDelegate oldDelegate) => true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB 1: PEKERJAAN MASUK & SEDANG BERJALAN
+// ─────────────────────────────────────────────────────────────────────────────
+class _PekerjaanMasukTab extends StatelessWidget {
+  final MitraPekerjaanController controller;
+  const _PekerjaanMasukTab({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+      children: [
+        // Section: Pekerjaan Masuk / Baru
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              day,
+              "Pekerjaan Masuk",
               style: TextStyle(
-                fontSize: 16,
-                color: controller.selectedTanggal.value == date
-                    ? Colors.white
-                    : Colors.black,
-                fontWeight: FontWeight.w300,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
               ),
             ),
-            Text(
-              date,
+          ],
+        ),
+        const SizedBox(height: 10),
+        Obx(
+          () => controller.pendingBookings.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.grey.shade500, size: 20),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Belum ada pekerjaan baru yang masuk",
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: controller.pendingBookings
+                      .map((pesanan) => _PendingJobCard(
+                            pesanan: pesanan,
+                            controller: controller,
+                          ))
+                      .toList(),
+                ),
+        ),
+        const SizedBox(height: 16),
+
+        // Section: Sedang Berjalan
+        const Text(
+          "Sedang Berjalan",
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Obx(
+          () => controller.activeBookings.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.play_circle_outline, color: Colors.grey.shade500, size: 20),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Tidak ada pekerjaan yang sedang berjalan",
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: controller.activeBookings
+                      .map((pesanan) => _ActiveJobCard(
+                            pesanan: pesanan,
+                            controller: controller,
+                          ))
+                      .toList(),
+                ),
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB 2: RIWAYAT PEKERJAAN SELESAI
+// ─────────────────────────────────────────────────────────────────────────────
+class _RiwayatPekerjaanTab extends StatelessWidget {
+  final MitraPekerjaanController controller;
+  const _RiwayatPekerjaanTab({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+      children: [
+        Row(
+          children: [
+            const Text(
+              "Riwayat Pekerjaan Selesai",
               style: TextStyle(
-                fontSize: 24,
-                color: controller.selectedTanggal.value == date
-                    ? Colors.white
-                    : Colors.black,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Obx(() => controller.completedBookings.isEmpty
+                ? const SizedBox()
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${controller.completedBookings.length}',
+                      style: TextStyle(
+                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Obx(
+          () => controller.completedBookings.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.history, size: 54, color: Colors.grey.shade300),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Belum Ada Riwayat Selesai",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Pekerjaan yang telah diselesaikan (check out) akan tersimpan di sini.",
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: controller.completedBookings
+                      .map((pesanan) => _CompletedJobCard(
+                            pesanan: pesanan,
+                            controller: controller,
+                          ))
+                      .toList(),
+                ),
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARDS & ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PendingJobCard extends StatelessWidget {
+  final BookingModel pesanan;
+  final MitraPekerjaanController controller;
+  const _PendingJobCard({required this.pesanan, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final current = controller.pendingBookings.firstWhereOrNull(
+            (b) => b.id == pesanan.id,
+          ) ??
+          pesanan;
+      final bool isConfirmed = current.status == 'confirmed';
+
+      return GestureDetector(
+        onTap: () => BookingDetailSheet.show(context, current, controller: controller),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          margin: const EdgeInsets.only(bottom: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+            border: isConfirmed
+                ? Border.all(color: ColorDouce.douceBase, width: 2)
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.medical_information_outlined,
+                    size: 42,
+                    color: ColorDouce.douceBase,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          current.layanan,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          current.namaUser.isNotEmpty ? current.namaUser : 'Client Momsie',
+                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                        ),
+                        if (isConfirmed)
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Sudah Diklaim — Siap Mulai',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: ColorDouce.douceBase,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text('Detail', style: TextStyle(fontSize: 12, color: ColorDouce.douceBase, fontWeight: FontWeight.bold)),
+                      Icon(Icons.chevron_right, color: ColorDouce.douceBase),
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(height: 18, thickness: 0.5, color: Colors.black12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        const Icon(Icons.date_range, size: 16),
+                        const SizedBox(width: 6),
+                        Text('${current.tanggal} (${current.day})',
+                            style: const TextStyle(fontSize: 13)),
+                      ]),
+                      const SizedBox(height: 6),
+                      Row(children: [
+                        const Icon(Icons.wallet, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Rp ${NumberFormat('#,###', 'id_ID').format(current.doulaEarnings > 0 ? current.doulaEarnings : (current.hargaLayanan * 0.85).round())}',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ]),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        const Icon(Icons.access_time, size: 16),
+                        const SizedBox(width: 6),
+                        Text(current.jam, style: const TextStyle(fontSize: 13)),
+                      ]),
+                      const SizedBox(height: 6),
+                      const Row(children: [
+                        Icon(Icons.timelapse, size: 16),
+                        SizedBox(width: 6),
+                        Text('1 Jam', style: TextStyle(fontSize: 13)),
+                      ]),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              // Tombol aksi utama
+              InkWell(
+                onTap: () {
+                  if (isConfirmed) {
+                    controller.startJob(current);
+                  } else {
+                    controller.klaimPekerjaan(current);
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isConfirmed ? Colors.orange.shade700 : ColorDouce.douceBase,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isConfirmed ? Icons.play_arrow_rounded : Icons.assignment_turned_in_outlined,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        isConfirmed ? 'Mulai Kerja Sekarang' : 'Klaim Pekerjaan',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _ActiveJobCard extends StatelessWidget {
+  final BookingModel pesanan;
+  final MitraPekerjaanController controller;
+  const _ActiveJobCard({required this.pesanan, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => BookingDetailSheet.show(context, pesanan, controller: controller),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        margin: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: Border.all(color: Colors.orange.shade300, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.medical_information_outlined,
+                    size: 42, color: Colors.orange.shade700),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        pesanan.layanan,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        pesanan.namaUser.isNotEmpty ? pesanan.namaUser : 'Client Momsie',
+                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '🟠 Sedang Berjalan',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.orange.shade800,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text('Detail', style: TextStyle(fontSize: 12, color: Colors.orange.shade800, fontWeight: FontWeight.bold)),
+                    Icon(Icons.chevron_right, color: Colors.orange.shade800),
+                  ],
+                ),
+              ],
+            ),
+            const Divider(height: 18, thickness: 0.5, color: Colors.black12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    const Icon(Icons.date_range, size: 16),
+                    const SizedBox(width: 6),
+                    Text('${pesanan.tanggal} (${pesanan.day})',
+                        style: const TextStyle(fontSize: 13)),
+                  ]),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    const Icon(Icons.wallet, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Rp ${NumberFormat('#,###', 'id_ID').format(pesanan.doulaEarnings > 0 ? pesanan.doulaEarnings : (pesanan.hargaLayanan * 0.85).round())}',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ]),
+                ]),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    const Icon(Icons.access_time, size: 16),
+                    const SizedBox(width: 6),
+                    Text(pesanan.jam, style: const TextStyle(fontSize: 13)),
+                  ]),
+                  const SizedBox(height: 6),
+                  const Row(children: [
+                    Icon(Icons.timelapse, size: 16),
+                    SizedBox(width: 6),
+                    Text('1 Jam', style: TextStyle(fontSize: 13)),
+                  ]),
+                ]),
+              ],
+            ),
+            const SizedBox(height: 14),
+            InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => ConfirmDialog(
+                    descText:
+                        'Apakah Anda yakin telah selesai memberikan pelayanan dan ingin melakukan Check Out?',
+                    onTap: () => controller.checkOut(pesanan),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_outline,
+                          color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        "Check Out (Selesaikan Pekerjaan)",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -131,139 +705,102 @@ class MitraPekerjaanPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget jobContainer(PesananModel pesanan) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(20),
-          ),
+class _CompletedJobCard extends StatelessWidget {
+  final BookingModel pesanan;
+  final MitraPekerjaanController controller;
+  const _CompletedJobCard({required this.pesanan, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => BookingDetailSheet.show(context, pesanan, controller: null),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.green.shade300, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.3),
-              spreadRadius: 1,
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
               offset: const Offset(0, 3),
             ),
-          ]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                size: 60,
-                color: ColorDouce.douceBase,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pesanan.layanan,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    pesanan.namaUser,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.black,
-            height: 20,
-            thickness: 0.5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.check_circle_rounded,
+                    size: 40, color: Colors.green.shade600),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 15),
                       Text(
-                        "${pesanan.tanggal} ${pesanan.day}",
+                        pesanan.layanan,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        pesanan.namaUser.isNotEmpty
+                            ? pesanan.namaUser
+                            : 'Client Momsie',
+                        style: TextStyle(
+                            fontSize: 13, color: Colors.grey.shade700),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(Icons.wallet),
-                      const SizedBox(width: 15),
-                      Text(
-                        pesanan.harga,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 15),
-                      Text(pesanan.jam),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Icon(Icons.timelapse),
-                      SizedBox(width: 15),
-                      Text("1 Jam")
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () =>
-                Get.find<MitraPekerjaanController>().klaimPekerjaan(pesanan),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: ColorDouce.douceBase,
-                  width: 1,
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Klaim",
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'Selesai',
                     style: TextStyle(
-                      color: ColorDouce.douceBase,
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
+                      color: Colors.green.shade800,
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(Icons.chevron_right, color: Colors.grey),
+              ],
             ),
-          )
-        ],
+            const Divider(height: 18, thickness: 0.5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(children: [
+                  const Icon(Icons.date_range, size: 16, color: Colors.grey),
+                  const SizedBox(width: 6),
+                  Text('${pesanan.tanggal} (${pesanan.day})',
+                      style: const TextStyle(fontSize: 13)),
+                ]),
+                Row(children: [
+                  const Icon(Icons.wallet, size: 16, color: Colors.grey),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Rp ${NumberFormat('#,###', 'id_ID').format(pesanan.doulaEarnings > 0 ? pesanan.doulaEarnings : (pesanan.hargaLayanan * 0.85).round())}',
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ]),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

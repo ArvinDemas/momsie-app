@@ -4,9 +4,11 @@ class DiaryModel {
   final String id;
   final String title;
   final String content;
-  final String mood; // 'happy','love','calm','tired','anxious','sad'
-  final int pregnancyWeek;
-  final List<String> photoUrls; // Firebase Storage URLs
+  final String mood; // 'happy','love','calm','tired','anxious','excited'
+  final int pregnancyWeek; // Store week number (1-42) or month/year number
+  final bool isBabyBorn;
+  final String babyAgeUnit; // 'bulan' or 'tahun'
+  final List<String> photoUrls;
   final DateTime createdAt;
 
   const DiaryModel({
@@ -15,6 +17,8 @@ class DiaryModel {
     required this.content,
     required this.mood,
     required this.pregnancyWeek,
+    this.isBabyBorn = false,
+    this.babyAgeUnit = 'bulan',
     required this.photoUrls,
     required this.createdAt,
   });
@@ -24,21 +28,29 @@ class DiaryModel {
     'love': '🥰',
     'calm': '😌',
     'tired': '😴',
-    'anxious': '😰',
-    'sad': '😢',
+    'anxious': '🥺',
+    'excited': '🤩',
   };
 
   static const moodLabels = {
-    'happy': 'Senang',
-    'love': 'Penuh Cinta',
+    'happy': 'Bahagia',
+    'love': 'Haru & Cinta',
     'calm': 'Tenang',
     'tired': 'Lelah',
     'anxious': 'Cemas',
-    'sad': 'Sedih',
+    'excited': 'Semangat',
   };
 
   String get moodEmoji => moodEmojis[mood] ?? '😊';
-  String get moodLabel => moodLabels[mood] ?? mood;
+  String get moodLabel => moodLabels[mood] ?? 'Bahagia';
+
+  String get ageLabel {
+    if (isBabyBorn) {
+      final unit = babyAgeUnit == 'tahun' ? 'Tahun' : 'Bulan';
+      return 'Bayi $pregnancyWeek $unit';
+    }
+    return 'Minggu $pregnancyWeek';
+  }
 
   factory DiaryModel.fromFirestore(DocumentSnapshot doc) {
     final d = doc.data() as Map<String, dynamic>;
@@ -47,7 +59,9 @@ class DiaryModel {
       title: d['title'] ?? '',
       content: d['content'] ?? '',
       mood: d['mood'] ?? 'happy',
-      pregnancyWeek: (d['pregnancyWeek'] ?? 0) as int,
+      pregnancyWeek: (d['pregnancyWeek'] ?? 20) as int,
+      isBabyBorn: (d['isBabyBorn'] ?? false) as bool,
+      babyAgeUnit: d['babyAgeUnit'] ?? 'bulan',
       photoUrls: List<String>.from(d['photoUrls'] ?? []),
       createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -58,6 +72,8 @@ class DiaryModel {
         'content': content,
         'mood': mood,
         'pregnancyWeek': pregnancyWeek,
+        'isBabyBorn': isBabyBorn,
+        'babyAgeUnit': babyAgeUnit,
         'photoUrls': photoUrls,
         'createdAt': Timestamp.fromDate(createdAt),
       };
@@ -68,6 +84,8 @@ class DiaryModel {
     String? content,
     String? mood,
     int? pregnancyWeek,
+    bool? isBabyBorn,
+    String? babyAgeUnit,
     List<String>? photoUrls,
     DateTime? createdAt,
   }) {
@@ -77,6 +95,8 @@ class DiaryModel {
       content: content ?? this.content,
       mood: mood ?? this.mood,
       pregnancyWeek: pregnancyWeek ?? this.pregnancyWeek,
+      isBabyBorn: isBabyBorn ?? this.isBabyBorn,
+      babyAgeUnit: babyAgeUnit ?? this.babyAgeUnit,
       photoUrls: photoUrls ?? this.photoUrls,
       createdAt: createdAt ?? this.createdAt,
     );

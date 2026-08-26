@@ -37,18 +37,25 @@ class BabyNamesPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Obx(() => Text(
-                            '${c.filtered.length} nama',
-                            style: TextStyle(
-                              color: ColorDouce.douceBase,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                      Obx(() => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${c.filtered.length} nama',
+                              style: TextStyle(
+                                color: ColorDouce.douceBase,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
                             ),
                           )),
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
 
                 // Search bar
                 Padding(
@@ -57,50 +64,60 @@ class BabyNamesPage extends StatelessWidget {
                     onChanged: c.onSearch,
                     decoration: InputDecoration(
                       hintText: 'Cari nama bayi...',
-                      prefixIcon: const Icon(Icons.search_rounded),
+                      prefixIcon: Icon(Icons.search_rounded, color: ColorDouce.douceBase),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
-                // Filter row: Gender chips (scrollable) + Language dropdown
+                // Filter row: Gender chips + Language dropdown
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      // Gender filter (scrollable)
+                      // Gender filter chips
                       Expanded(
                         child: Obx(() => SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
-                                children: ['Semua', 'Laki-laki', 'Perempuan']
-                                    .map((g) {
+                                children: ['Semua', 'Laki-laki', 'Perempuan'].map((g) {
                                   final sel = c.selectedGender.value == g;
+                                  IconData iconData;
+                                  if (g == 'Laki-laki') {
+                                    iconData = Icons.face_5_rounded;
+                                  } else if (g == 'Perempuan') {
+                                    iconData = Icons.face_3_rounded;
+                                  } else {
+                                    iconData = Icons.grid_view_rounded;
+                                  }
+
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 6),
                                     child: ChoiceChip(
+                                      avatar: Icon(
+                                        iconData,
+                                        size: 14,
+                                        color: sel ? Colors.white : Colors.grey.shade600,
+                                      ),
                                       label: Text(
-                                        g == 'Laki-laki'
-                                            ? '👦 Laki'
-                                            : g == 'Perempuan'
-                                                ? '👧 Perempuan'
-                                                : '✨ Semua',
+                                        g,
                                         style: TextStyle(
                                           color: sel ? Colors.white : Colors.black87,
-                                          fontSize: 11,
+                                          fontSize: 12,
+                                          fontWeight: sel ? FontWeight.bold : FontWeight.normal,
                                         ),
                                       ),
                                       selected: sel,
                                       selectedColor: ColorDouce.douceBase,
                                       backgroundColor: Colors.white,
-                                      padding: EdgeInsets.zero,
+                                      padding: const EdgeInsets.symmetric(horizontal: 4),
                                       visualDensity: VisualDensity.compact,
                                       onSelected: (_) => c.onGenderChanged(g),
                                     ),
@@ -116,18 +133,18 @@ class BabyNamesPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: c.selectedLang.value,
-                                icon: const Icon(Icons.expand_more_rounded,
-                                    size: 18),
+                                icon: const Icon(Icons.expand_more_rounded, size: 18),
                                 style: const TextStyle(
                                   color: Colors.black87,
                                   fontSize: 12,
                                   fontFamily: 'OpenSans',
+                                  fontWeight: FontWeight.w600,
                                 ),
                                 items: c.languages.map((lang) {
                                   return DropdownMenuItem(
@@ -135,15 +152,14 @@ class BabyNamesPage extends StatelessWidget {
                                     child: Text(lang),
                                   );
                                 }).toList(),
-                                onChanged: (v) =>
-                                    v != null ? c.onLangChanged(v) : null,
+                                onChanged: (v) => v != null ? c.onLangChanged(v) : null,
                               ),
                             ),
                           )),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
                 // Column headers
                 Obx(() {
@@ -158,12 +174,12 @@ class BabyNamesPage extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6C9EFF).withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text('👦', style: TextStyle(fontSize: 16)),
+                                  Icon(Icons.face_5_rounded, size: 18, color: Color(0xFF3B5FDB)),
                                   SizedBox(width: 6),
                                   Text(
                                     'Laki-laki',
@@ -176,20 +192,19 @@ class BabyNamesPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                        if (gender == 'Semua')
-                          const SizedBox(width: 8),
+                        if (gender == 'Semua') const SizedBox(width: 8),
                         if (gender == 'Semua' || gender == 'Perempuan')
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               decoration: BoxDecoration(
                                 color: ColorDouce.lightPink.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text('👧', style: TextStyle(fontSize: 16)),
+                                  Icon(Icons.face_3_rounded, size: 18, color: ColorDouce.douceBase),
                                   const SizedBox(width: 6),
                                   Text(
                                     'Perempuan',
@@ -232,10 +247,10 @@ class BabyNamesPage extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color: Colors.black.withValues(alpha: 0.04),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -253,9 +268,9 @@ class BabyNamesPage extends StatelessWidget {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 15,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.bold,
                                         color: n.boy.isEmpty
-                                            ? Colors.grey[300]
+                                            ? Colors.grey.shade300
                                             : const Color(0xFF3B5FDB),
                                       ),
                                     ),
@@ -265,7 +280,7 @@ class BabyNamesPage extends StatelessWidget {
                                 Container(
                                   width: 1,
                                   height: 36,
-                                  color: Colors.grey[200],
+                                  color: Colors.grey.shade200,
                                 ),
                               // Girl name
                               if (gender == 'Semua' || gender == 'Perempuan')
@@ -277,9 +292,9 @@ class BabyNamesPage extends StatelessWidget {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 15,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.bold,
                                         color: n.girl.isEmpty
-                                            ? Colors.grey[300]
+                                            ? Colors.grey.shade300
                                             : ColorDouce.douceBase,
                                       ),
                                     ),

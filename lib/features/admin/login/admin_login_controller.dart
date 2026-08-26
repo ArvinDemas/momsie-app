@@ -4,8 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class AdminLoginController extends GetxController {
-  final Rx<TextEditingController> emailController = TextEditingController().obs;
-  final Rx<TextEditingController> passwordController = TextEditingController().obs;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   RxBool isLoading = false.obs;
   RxBool showPassword = false.obs;
 
@@ -20,35 +20,10 @@ class AdminLoginController extends GetxController {
     }
 
     isLoading.value = true;
-    final String emailLower = email.trim().toLowerCase();
 
     try {
-      UserCredential userCredential;
-      try {
-        userCredential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: emailLower, password: password);
-      } on FirebaseAuthException catch (e) {
-        // Jika user tidak ditemukan dan kredensial cocok dengan admin default, buat otomatis
-        if ((e.code == 'user-not-found' || e.code == 'invalid-credential') &&
-            emailLower == 'admin@momsie.com' &&
-            password == 'admin12345') {
-          userCredential = await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(email: emailLower, password: password);
-          await FirebaseFirestore.instance
-              .collection('user')
-              .doc(userCredential.user!.uid)
-              .set({
-            'username': 'Admin Momsie',
-            'email': emailLower,
-            'image': '',
-            'uid': userCredential.user!.uid,
-            'isDoula': false,
-            'role': 'admin',
-          });
-        } else {
-          rethrow;
-        }
-      }
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email.trim().toLowerCase(), password: password);
 
       // Cek status role di Firestore
       final DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -60,22 +35,6 @@ class AdminLoginController extends GetxController {
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>;
         isAdmin = data['role'] == 'admin';
-      }
-
-      // Bypass tambahan untuk default admin email
-      if (emailLower == 'admin@momsie.com') {
-        isAdmin = true;
-        await FirebaseFirestore.instance
-            .collection('user')
-            .doc(userCredential.user!.uid)
-            .set({
-          'username': 'Admin Momsie',
-          'email': emailLower,
-          'image': '',
-          'uid': userCredential.user!.uid,
-          'isDoula': false,
-          'role': 'admin',
-        }, SetOptions(merge: true));
       }
 
       if (isAdmin) {
@@ -101,5 +60,12 @@ class AdminLoginController extends GetxController {
 
   void toggleShowPassword() {
     showPassword.value = !showPassword.value;
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 }

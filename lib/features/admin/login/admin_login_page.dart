@@ -80,7 +80,7 @@ class AdminLoginPage extends StatelessWidget {
                     const SizedBox(height: 32),
                     // Email Field
                     TextField(
-                      controller: controller.emailController.value,
+                      controller: controller.emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: 'Email Admin',
@@ -98,7 +98,7 @@ class AdminLoginPage extends StatelessWidget {
                     // Password Field
                     Obx(
                       () => TextField(
-                        controller: controller.passwordController.value,
+                        controller: controller.passwordController,
                         obscureText: !controller.showPassword.value,
                         decoration: InputDecoration(
                           labelText: 'Password',

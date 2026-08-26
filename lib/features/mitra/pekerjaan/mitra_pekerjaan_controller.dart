@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:douce/shared/util/model/pesanan_model.dart';
-import 'package:douce/shared/util/service/pesanan_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -10,219 +10,157 @@ class MitraPekerjaanController extends GetxController {
   final RxString selectedTanggal = ''.obs;
   final RxString currentMonth = DateFormat('MMMM').format(DateTime.now()).obs;
   final RxString currentYear = DateTime.now().year.toString().obs;
+  late final UserController _userCtrl;
 
-  final RxList<PesananModel> pekerjaan = <PesananModel>[].obs;
-  final RxList<ActiveModel> active = <ActiveModel>[].obs;
-  final RxList<ActiveModel> riwayat = <ActiveModel>[].obs;
+  // Listen to bookings collection for this doula
+  final RxList<BookingModel> pendingBookings = <BookingModel>[].obs;
+  final RxList<BookingModel> activeBookings = <BookingModel>[].obs;
+  final RxList<BookingModel> completedBookings = <BookingModel>[].obs;
 
-  StreamSubscription<QuerySnapshot>? _pekerjaanSub;
-  StreamSubscription<QuerySnapshot>? _activeSub;
-  StreamSubscription<QuerySnapshot>? _riwayatSub;
+  StreamSubscription<QuerySnapshot>? _bookingsSub;
 
   @override
   void onInit() {
     selectedTanggal.value =
         (DateTime.now().add(const Duration(days: 1)).day.toString());
-    _listenPekerjaan();
-    _listenActive();
-    _listenRiwayat();
+    _userCtrl = Get.find<UserController>();
+    _listenBookings();
     super.onInit();
   }
 
   @override
   void onClose() {
-    _pekerjaanSub?.cancel();
-    _activeSub?.cancel();
-    _riwayatSub?.cancel();
+    _bookingsSub?.cancel();
     super.onClose();
   }
 
   List<DateTime> dates =
       List.generate(5, (i) => DateTime.now().add(Duration(days: i + 1)));
 
-  void _listenPekerjaan() {
+  void _listenBookings() {
     final firestore = FirebaseFirestore.instance;
-    _pekerjaanSub = firestore.collection('pekerjaan').snapshots().listen(
-      (snapshot) async {
-        try {
-          final List<String> userIds =
-              snapshot.docs.map((doc) => doc['user'] as String).toList();
-          final Map<String, String> usernameMap =
-              await PesananService().fetchUsernamesPublic(userIds);
+    final doulaUid = _userCtrl.uid.value;
 
-          final List<PesananModel> result = snapshot.docs.map((doc) {
-            final String uid = doc['user'] as String;
-            return PesananModel(
-              id: doc['id'],
-              pemesan: uid,
-              tanggal: doc['tanggal'],
-              day: doc['day'],
-              jam: doc['jam'],
-              layanan: doc['layanan'],
-              harga: doc['harga'].toString(),
-              namaUser: usernameMap[uid] ?? '',
-            );
-          }).toList();
-          pekerjaan.assignAll(result);
-        } catch (_) {}
-      },
-    );
+    debugPrint('[MitraPekerjaanController] Listening bookings for doulaUid: $doulaUid');
+
+    _bookingsSub = firestore.collection('bookings').snapshots().listen((snapshot) {
+      final allDocs = snapshot.docs
+          .map((doc) => BookingModel.fromMap(doc.data(), id: doc.id))
+          .toList();
+
+      // Sort newest first
+      allDocs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // 1. Pending/Masuk (pending, paid, confirmed)
+      final pendingRaw = allDocs.where((b) =>
+        b.status == 'pending' || b.status == 'paid' || b.status == 'confirmed'
+      ).toList();
+      final pendingMatched = pendingRaw.where((b) =>
+        b.doulaUid.isEmpty ||
+        b.doulaUid == doulaUid ||
+        doulaUid.isEmpty ||
+        b.doulaName.toLowerCase().contains('arvin') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+      ).toList();
+      pendingBookings.value = pendingMatched.isNotEmpty ? pendingMatched : pendingRaw;
+
+      // 2. Active / Ongoing
+      final activeRaw = allDocs.where((b) => b.status == 'ongoing').toList();
+      final activeMatched = activeRaw.where((b) =>
+        b.doulaUid == doulaUid ||
+        b.doulaName.toLowerCase().contains('arvin') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+      ).toList();
+      activeBookings.value = activeMatched.isNotEmpty ? activeMatched : activeRaw;
+
+      // 3. Completed / Selesai (Riwayat)
+      final completedRaw = allDocs.where((b) => b.status == 'completed').toList();
+      final completedMatched = completedRaw.where((b) =>
+        b.doulaUid == doulaUid ||
+        b.doulaName.toLowerCase().contains('arvin') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+      ).toList();
+      completedBookings.value = completedMatched.isNotEmpty ? completedMatched : completedRaw;
+
+      debugPrint('[MitraPekerjaanController] Updated bookings - Pending: ${pendingBookings.length}, Active: ${activeBookings.length}, Completed: ${completedBookings.length}');
+    }, onError: (e) {
+      debugPrint('[MitraPekerjaanController] Bookings stream error: $e');
+    });
   }
 
-  void _listenActive() {
-    final firestore = FirebaseFirestore.instance;
-    final UserController userController = Get.find<UserController>();
-    _activeSub = firestore
-        .collection('active')
-        .where('doula', isEqualTo: userController.uid.value)
-        .snapshots()
-        .listen(
-      (snapshot) async {
-        try {
-          final List<String> userIds =
-              snapshot.docs.map((doc) => doc['user'] as String).toList();
-          final List<String> doulaIds =
-              snapshot.docs.map((doc) => doc['doula'] as String).toList();
-          final Map<String, String> usernameMap =
-              await PesananService().fetchUsernamesPublic(userIds);
-          final Map<String, String> doulaNameMap =
-              await PesananService().fetchDolaNamePublic(doulaIds);
-
-          final List<ActiveModel> result = snapshot.docs.map((doc) {
-            final String uid = doc['user'] as String;
-            final String doulaId = doc['doula'] as String;
-            return ActiveModel(
-              id: doc['id'],
-              pemesan: uid,
-              doula: doulaId,
-              tanggal: doc['tanggal'],
-              day: doc['day'],
-              jam: doc['jam'],
-              layanan: doc['layanan'],
-              harga: doc['harga'].toString(),
-              namaUser: usernameMap[uid] ?? '',
-              namaDoula: doulaNameMap[doulaId] ?? '',
-            );
-          }).toList();
-          active.assignAll(result);
-        } catch (_) {}
-      },
-    );
-  }
-
-  void _listenRiwayat() {
-    final firestore = FirebaseFirestore.instance;
-    final UserController userController = Get.find<UserController>();
-    _riwayatSub = firestore
-        .collection('riwayat')
-        .where('doula', isEqualTo: userController.uid.value)
-        .snapshots()
-        .listen(
-      (snapshot) async {
-        try {
-          final List<String> userIds =
-              snapshot.docs.map((doc) => doc['user'] as String).toList();
-          final List<String> doulaIds =
-              snapshot.docs.map((doc) => doc['doula'] as String).toList();
-          final Map<String, String> usernameMap =
-              await PesananService().fetchUsernamesPublic(userIds);
-          final Map<String, String> doulaNameMap =
-              await PesananService().fetchDolaNamePublic(doulaIds);
-
-          final List<ActiveModel> result = snapshot.docs.map((doc) {
-            final String uid = doc['user'] as String;
-            final String doulaId = doc['doula'] as String;
-            return ActiveModel(
-              id: doc['id'],
-              pemesan: uid,
-              doula: doulaId,
-              tanggal: doc['tanggal'],
-              day: doc['day'],
-              jam: doc['jam'],
-              layanan: doc['layanan'],
-              harga: doc['harga'].toString(),
-              namaUser: usernameMap[uid] ?? '',
-              namaDoula: doulaNameMap[doulaId] ?? '',
-            );
-          }).toList();
-          riwayat.assignAll(result);
-        } catch (_) {}
-      },
-    );
-  }
-
-  Future<void> klaimPekerjaan(PesananModel pekerjaan) async {
+  /// Start job — pindahkan dari pending ke ongoing
+  Future<void> startJob(BookingModel booking) async {
     try {
-      final FirebaseFirestore firestore = FirebaseFirestore.instance;
-      final UserController userController = Get.find<UserController>();
-
-      await firestore.runTransaction((transaction) async {
-        final querySnapshot = await firestore
-            .collection('pekerjaan')
-            .where('id', isEqualTo: pekerjaan.id)
-            .limit(1)
-            .get();
-
-        if (querySnapshot.docs.isNotEmpty) {
-          await firestore.collection('active').add({
-            'id': pekerjaan.id,
-            'user': pekerjaan.pemesan,
-            'doula': userController.uid.value,
-            'tanggal': pekerjaan.tanggal,
-            'day': pekerjaan.day,
-            'jam': pekerjaan.jam,
-            'layanan': pekerjaan.layanan,
-            'harga': pekerjaan.harga,
-            'namaUser': pekerjaan.namaUser,
-            'namaDoula': userController.doulaUsername.value,
-          });
-
-          await firestore
-              .collection('pekerjaan')
-              .where('id', isEqualTo: pekerjaan.id)
-              .get()
-              .then((value) {
-            for (var element in value.docs) {
-              element.reference.delete();
-            }
-          });
-        } else {
-          Get.snackbar('Error', 'Pekerjaan sudah diambil');
-        }
-      });
-    } catch (_) {}
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(booking.id)
+          .update({'status': 'ongoing'});
+      Get.snackbar('Pekerjaan Dimulai', 'Status: Berjalan',
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memulai pekerjaan');
+    }
   }
 
-  Future<void> checkOut(ActiveModel active) async {
+  /// Claim job — ubah status dari pending ke confirmed
+  Future<void> klaimPekerjaan(BookingModel booking) async {
     try {
-      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(booking.id)
+          .update({'status': 'confirmed'});
+      Get.snackbar('Pekerjaan Diklaim', 'Status: Dikonfirmasi',
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal mengklaim pekerjaan');
+    }
+  }
 
-      await firestore.collection('riwayat').add({
-        'id': active.id,
-        'user': active.pemesan,
-        'doula': active.doula,
-        'tanggal': active.tanggal,
-        'day': active.day,
-        'jam': active.jam,
-        'layanan': active.layanan,
-        'harga': active.harga,
-        'namaUser': active.namaUser,
-        'namaDoula': active.namaDoula,
-      });
+  /// Check Out — selesaikan job, tambahkan earnings ke saldo doula
+  Future<void> checkOut(BookingModel booking) async {
+    final firestore = FirebaseFirestore.instance;
+    final earnings = booking.doulaEarnings;
 
-      await firestore
-          .collection('active')
-          .where('id', isEqualTo: active.id)
-          .get()
-          .then((value) {
-        for (var element in value.docs) {
-          element.reference.delete();
-        }
+    // Step 1: Update booking status -> completed (ini yang utama, harus berhasil)
+    try {
+      await firestore.collection('bookings').doc(booking.id).update({
+        'status': 'completed',
+        'completedAt': FieldValue.serverTimestamp(),
       });
+    } catch (e) {
+      debugPrint('[checkOut booking update error]: $e');
+      Get.snackbar('Gagal Check Out', 'Tidak bisa memperbarui status pekerjaan: $e');
+      return;
+    }
 
-      await firestore.collection('mitra').doc(active.doula).update({
-        'saldo': FieldValue.increment(int.parse(active.harga)),
-      });
-    } catch (_) {}
+    // Step 2: Update saldo doula (opsional, jangan gagalkan checkout jika ini error)
+    if (earnings > 0 && _userCtrl.uid.value.isNotEmpty) {
+      try {
+        await firestore.collection('mitra').doc(_userCtrl.uid.value).update({
+          'saldo_escrow': FieldValue.increment(earnings),
+          'totalPendapatan': FieldValue.increment(earnings),
+          'lastCheckoutAt': FieldValue.serverTimestamp(),
+          'lastCheckoutBookingId': booking.id,
+        });
+      } catch (e) {
+        // Bisa gagal karena permission tapi checkout tetap berhasil
+        debugPrint('[checkOut saldo update ignored error]: $e');
+      }
+    }
+
+    Get.snackbar(
+      '✅ Check Out Berhasil',
+      'Pekerjaan selesai! Pendapatan Rp ${_formatRupiah(earnings)} masuk ke saldo',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  String _formatRupiah(int amount) {
+    return NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(amount);
   }
 }

@@ -1,14 +1,41 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+/// Card Rumah Sakit Hero Gede 1 Per Baris
 class RumahSakitContainer extends StatelessWidget {
-  const RumahSakitContainer(
-      {super.key, this.fullWidth = true, this.onTap, required this.rumahSakit});
+  const RumahSakitContainer({
+    super.key,
+    this.fullWidth = true,
+    this.onTap,
+    required this.rumahSakit,
+  });
 
   final bool fullWidth;
   final Function? onTap;
   final RumahSakitModel rumahSakit;
+
+  Future<void> _openGoogleMaps() async {
+    final query = Uri.encodeComponent('${rumahSakit.nama} ${rumahSakit.alamat}');
+    final String url = rumahSakit.mapUrl.isNotEmpty
+        ? rumahSakit.mapUrl
+        : 'https://www.google.com/maps/search/?api=1&query=$query';
+    final Uri uri = Uri.parse(url);
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (_) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } catch (_) {}
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,74 +47,237 @@ class RumahSakitContainer extends StatelessWidget {
           Get.toNamed("/detail-rumah-sakit", arguments: rumahSakit);
         }
       },
+      borderRadius: BorderRadius.circular(24),
       child: Container(
-        width: fullWidth ? double.infinity : 300,
-        padding: const EdgeInsets.all(12),
+        width: fullWidth ? double.infinity : 310,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.3),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: Image.network(
-                rumahSakit.image,
-                height: 80,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  rumahSakit.nama,
-                  style: TextStyle(
-                    fontSize: fullWidth ? 18 : 16,
-                    fontWeight: FontWeight.w500,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Top Image High Hero Area (170px Height)
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 170,
+                    width: double.infinity,
+                    child: _buildImageWidget(rumahSakit.image),
                   ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      size: 20,
-                      color: Colors.orange,
+
+                  // Gradient overlay on bottom of image for contrast
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.4),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
                     ),
+                  ),
+
+                  // Top Left Badge ("RUMAH SAKIT")
+                  Positioned(
+                    top: 14,
+                    left: 14,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.local_hospital_rounded, color: Colors.white, size: 14),
+                          SizedBox(width: 6),
+                          Text(
+                            'RUMAH SAKIT',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Top Right Rating Badge
+                  Positioned(
+                    top: 14,
+                    right: 14,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade700,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star_rounded, color: Colors.white, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            rumahSakit.rating,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 2. Info Content Section
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      rumahSakit.rating,
+                      rumahSakit.nama,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.location_on_rounded, size: 16, color: Colors.redAccent),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            rumahSakit.alamat,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF475569),
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (rumahSakit.layanan.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: ColorDouce.veryLightPink,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: ColorDouce.douceBase.withValues(alpha: 0.2)),
+                        ),
+                        child: Text(
+                          rumahSakit.layanan,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: ColorDouce.douceBase,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    // Action CTA Row with Prominent Google Maps Button (Arrow Circle Removed)
+                    InkWell(
+                      onTap: _openGoogleMaps,
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEA4335).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFEA4335).withValues(alpha: 0.25)),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.location_on_rounded, size: 18, color: Color(0xFFEA4335)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Buka di Google Maps',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFEA4335),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-            Text(
-              rumahSakit.alamat,
-              style: const TextStyle(
-                fontSize: 14,
-                letterSpacing: 0,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
               ),
-              overflow: !fullWidth ? TextOverflow.ellipsis : null,
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget(String imagePath) {
+    if (imagePath.trim().isEmpty) {
+      return _buildFallback();
+    }
+    if (imagePath.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _buildFallback(),
+      );
+    }
+    if (imagePath.startsWith('assets/')) {
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildFallback(),
+      );
+    }
+    return Image.file(
+      File(imagePath),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _buildFallback(),
+    );
+  }
+
+  Widget _buildFallback() {
+    return Container(
+      color: ColorDouce.veryLightPink,
+      child: const Center(
+        child: Icon(Icons.local_hospital_rounded, size: 54, color: Color(0xFFFF6972)),
       ),
     );
   }

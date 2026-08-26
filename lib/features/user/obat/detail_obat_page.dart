@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:douce/shared/widget/payment_sheet.dart';
@@ -62,8 +63,8 @@ class DetailObatPage extends StatelessWidget {
                           color: ColorDouce.douceBase,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Image.network(
-                          obat.image,
+                        child: CachedNetworkImage(
+                          imageUrl: obat.image,
                           height: 100,
                           fit: BoxFit.cover,
                         ),

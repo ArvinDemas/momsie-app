@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import 'package:douce/features/user/chat/chat_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -30,12 +32,13 @@ class ChatController extends GetxController {
   final RxString chatId = ''.obs;
   final RxString pengguna = ''.obs;
 
-  final Rx<TextEditingController> messageController =
-      TextEditingController().obs;
+  final TextEditingController messageController = TextEditingController();
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   RxList<ChatModel> messages = <ChatModel>[].obs;
+
+  StreamSubscription? _chatSubscription;
 
   Future<void> getData() async {
     await firestore.collection('mitra').doc(doula).get().then((value) {
@@ -51,22 +54,31 @@ class ChatController extends GetxController {
 
   Future<void> getChat() async {
     try {
-      firestore
+      _chatSubscription = firestore
           .collection('chat')
           .doc(chatId.value)
           .collection('messages')
           .orderBy('time', descending: false)
           .snapshots()
           .listen((event) {
-        messages.value = event.docs
-            .map((e) => ChatModel(
+            messages.value = event.docs
+                .map((e) => ChatModel(
                   sender: e['sender'],
                   message: e['message'],
                   time: e['time'] as Timestamp?,
                 ))
             .toList();
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Chat error: $e');
+    }
+  }
+
+  @override
+  void onClose() {
+    _chatSubscription?.cancel();
+    messageController.dispose();
+    super.onClose();
   }
 
   Future<void> sendMessage() async {
@@ -74,7 +86,7 @@ class ChatController extends GetxController {
       if (chatId.isNotEmpty) {
         final text = messageController.value.text.trim();
         if (text.isEmpty) return;
-        messageController.value.clear();
+        messageController.clear();
         await firestore
             .collection('chat')
             .doc(chatId.value)
@@ -85,6 +97,8 @@ class ChatController extends GetxController {
           'time': FieldValue.serverTimestamp(),
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Send message error: $e');
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:douce/features/user/ai_chat/ai_chat_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/theme/theme_service.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,20 @@ class AiChatPage extends StatefulWidget {
 
 class _AiChatPageState extends State<AiChatPage> {
   final ScrollController _scroll = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        SubscriptionService.to.showPaywall(
+          context: context,
+          featureName: 'AI Chatbot Unlimited',
+          canDismissToAccess: true,
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -31,6 +46,270 @@ class _AiChatPageState extends State<AiChatPage> {
         );
       }
     });
+  }
+
+  void _showHistoryModal(BuildContext context, AiChatController c) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.history_rounded, color: Color(0xFFFF6B8B)),
+                    SizedBox(width: 8),
+                    Text(
+                      'Riwayat Percakapan AI',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Get.back(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.45,
+              ),
+              child: Obx(() {
+                if (c.sessions.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'Belum ada riwayat percakapan.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: c.sessions.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, i) {
+                    final session = c.sessions[i];
+                    final isSelected = session.id == c.currentSessionId.value;
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      leading: CircleAvatar(
+                        backgroundColor: isSelected
+                            ? const Color(0xFFFF6B8B).withOpacity(0.2)
+                            : Colors.grey.shade100,
+                        child: Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          color: isSelected ? const Color(0xFFFF6B8B) : Colors.grey,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        session.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? const Color(0xFFFF6B8B) : const Color(0xFF0F172A),
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${session.messages.length} pesan • ${_formatDate(session.createdAt)}',
+                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
+                        onPressed: () => Get.defaultDialog(
+                          title: 'Hapus Percakapan?',
+                          middleText: 'Sesi percakapan ini akan dihapus permanen.',
+                          textConfirm: 'Hapus',
+                          textCancel: 'Batal',
+                          buttonColor: Colors.red,
+                          confirmTextColor: Colors.white,
+                          onConfirm: () {
+                            Get.back();
+                            c.deleteSession(session.id);
+                          },
+                        ),
+                      ),
+                      onTap: () {
+                        c.switchSession(session);
+                        Get.back();
+                      },
+                    );
+                  },
+                );
+              }),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Get.back();
+                c.createNewChat();
+              },
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Mulai Chat Baru'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorDouce.douceBase,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Gemini AI Style Welcoming Canvas (Sparkle Icon + Centered Headline + Quick Suggestion Chips)
+  Widget _buildGeminiWelcomingCanvas(BuildContext context, AiChatController c) {
+    final List<Map<String, String>> suggestionChips = [
+      {
+        'title': 'Pertanda Awal Persalinan',
+        'prompt': 'Apa saja tanda-tanda awal persalinan yang perlu diperhatikan?',
+        'icon': '🌸',
+      },
+      {
+        'title': 'Yoga Trimester 3',
+        'prompt': 'Apa saja gerakan yoga yang aman dan bermanfaat untuk trimester 3?',
+        'icon': '🧘‍♀️',
+      },
+      {
+        'title': 'Nutrisi Cegah Anemia',
+        'prompt': 'Makanan dan nutrisi apa saja yang ampuh mencegah anemia saat hamil?',
+        'icon': '🍏',
+      },
+      {
+        'title': 'Tas Bersalin ke RS',
+        'prompt': 'Apa saja daftar barang wajib di dalam Hospital Bag untuk persalinan?',
+        'icon': '🎒',
+      },
+    ];
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 24),
+          // 1. Glowing Robot Logo (Consistent Momsie AI Icon)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  spreadRadius: 4,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.smart_toy_rounded,
+              color: Colors.white,
+              size: 38,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 2. Large Centered Welcoming Headline (Exact Gemini Style)
+          const Text(
+            "Halo Bunda, apa yang ingin\nAnda tanyakan hari ini?",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            "Tanyakan seputar nutrisi, kesehatan janin, persalinan & laktasi 24/7",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: Color(0xFF64748B),
+            ),
+          ),
+
+          const SizedBox(height: 36),
+
+          // 3. Suggestion Chips
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: suggestionChips.map((chip) {
+              return InkWell(
+                onTap: () {
+                  c.messageCtrl.text = chip['prompt']!;
+                  c.sendMessage();
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(chip['icon']!, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 8),
+                      Text(
+                        chip['title']!,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF334155),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -64,16 +343,16 @@ class _AiChatPageState extends State<AiChatPage> {
                         icon: const Icon(Icons.arrow_back_ios_new_rounded),
                         onPressed: () => Get.back(),
                       ),
-                      // Avatar
+                      // Avatar Gemini AI
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B8B).withOpacity(0.12),
+                          color: const Color(0xFF2563EB).withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.smart_toy_rounded,
-                          color: Color(0xFFFF6B8B),
+                          color: Color(0xFF2563EB),
                           size: 22,
                         ),
                       ),
@@ -101,35 +380,26 @@ class _AiChatPageState extends State<AiChatPage> {
                           ],
                         ),
                       ),
-                      // Key settings
-                      Obx(() => IconButton(
-                            tooltip: c.hasCustomApiKey.value
-                                ? 'Custom Key: ${c.apiKeyPreview.value}'
-                                : 'Pengaturan API Key',
-                            icon: Icon(
-                              Icons.key_rounded,
-                              color: c.hasCustomApiKey.value
-                                  ? const Color(0xFFFF6B8B)
-                                  : Colors.grey,
-                            ),
-                            onPressed: () => _showApiKeyDialog(context, c),
-                          )),
-                      // Clear history
+
+                      // Button Tambah Chat Baru (+)
                       IconButton(
-                        tooltip: 'Hapus riwayat',
-                        icon: const Icon(Icons.delete_sweep_rounded),
-                        onPressed: () => Get.defaultDialog(
-                          title: 'Hapus Riwayat?',
-                          middleText: 'Semua pesan akan dibersihkan dari layar.',
-                          textConfirm: 'Hapus',
-                          textCancel: 'Batal',
-                          buttonColor: const Color(0xFFFF6B8B),
-                          confirmTextColor: Colors.white,
-                          onConfirm: () {
-                            Get.back();
-                            c.clearHistory();
-                          },
+                        tooltip: 'Tambah Chat Baru',
+                        icon: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: ColorDouce.douceBase.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.add_rounded, color: Color(0xFFFF6B8B), size: 20),
                         ),
+                        onPressed: () => c.createNewChat(),
+                      ),
+
+                      // Button Menu Riwayat Chat
+                      IconButton(
+                        tooltip: 'Riwayat Chat',
+                        icon: const Icon(Icons.history_rounded, color: Color(0xFF64748B)),
+                        onPressed: () => _showHistoryModal(context, c),
                       ),
                     ],
                   ),
@@ -154,9 +424,12 @@ class _AiChatPageState extends State<AiChatPage> {
                   ),
                 ),
 
-                // Messages List
+                // Messages List OR Gemini Welcoming Canvas
                 Expanded(
                   child: Obx(() {
+                    if (c.showWelcomingCanvas) {
+                      return _buildGeminiWelcomingCanvas(context, c);
+                    }
                     _scrollToBottom();
                     return ListView.builder(
                       controller: _scroll,
@@ -180,35 +453,38 @@ class _AiChatPageState extends State<AiChatPage> {
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF6B8B).withOpacity(0.12),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.smart_toy_rounded,
-                                color: Color(0xFFFF6B8B),
-                                size: 16,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.06),
+                                    color: Colors.black.withOpacity(0.04),
                                     blurRadius: 6,
-                                  )
+                                  ),
                                 ],
                               ),
                               child: Row(
-                                children: List.generate(
-                                  3,
-                                  (i) => _DotAnimation(delay: i * 200),
-                                ),
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6B8B)),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Momsie AI sedang berpikir...',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -216,46 +492,17 @@ class _AiChatPageState extends State<AiChatPage> {
                       )
                     : const SizedBox.shrink()),
 
-                // Quick suggestion chips
-                Obx(() => c.messages.length <= 1
-                    ? SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        child: Row(
-                          children: [
-                            '🥑 Perkembangan janin minggu ini',
-                            '🥗 Nutrisi penambah sel darah ibu hamil',
-                            '💊 Panduan konsumsi Asam Folat & DHA',
-                            '😰 Solusi mual morning sickness',
-                          ].map((s) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: ActionChip(
-                                label: Text(s, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
-                                onPressed: () {
-                                  c.messageCtrl.text = s;
-                                  c.sendMessage();
-                                },
-                                backgroundColor: Colors.white,
-                                side: BorderSide(color: ts.primary.withOpacity(0.3)),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    : const SizedBox.shrink()),
-
-                // Input bar
+                // Input Bar
                 Container(
-                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.95),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
                         offset: const Offset(0, -2),
-                      )
+                      ),
                     ],
                   ),
                   child: Row(
@@ -263,38 +510,70 @@ class _AiChatPageState extends State<AiChatPage> {
                       Expanded(
                         child: TextField(
                           controller: c.messageCtrl,
-                          maxLines: 4,
+                          textCapitalization: TextCapitalization.sentences,
                           minLines: 1,
-                          textInputAction: TextInputAction.send,
-                          onSubmitted: (_) => c.sendMessage(),
-                          style: const TextStyle(fontSize: 13),
+                          maxLines: 4,
                           decoration: InputDecoration(
-                            hintText: 'Tanyakan seputar kehamilan & Si Kecil...',
-                            hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                            hintText: 'Tanyakan sesuatu tentang kehamilan...',
+                            hintStyle: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade400,
+                            ),
                             filled: true,
-                            fillColor: Colors.grey[100],
+                            fillColor: const Color(0xFFF8FAFC),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(24),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade200,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFFF6B8B),
+                                width: 1.5,
+                              ),
+                            ),
                           ),
+                          onSubmitted: (_) => c.sendMessage(),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Obx(() => GestureDetector(
-                            onTap: c.isLoading.value ? null : c.sendMessage,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: c.isLoading.value ? Colors.grey[300] : ColorDouce.douceBase,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.send_rounded,
-                                color: Colors.white,
-                                size: 20,
+                      Obx(() => Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: c.isLoading.value ? null : c.sendMessage,
+                              borderRadius: BorderRadius.circular(24),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: c.isLoading.value
+                                      ? Colors.grey.shade300
+                                      : ColorDouce.douceBase,
+                                  shape: BoxShape.circle,
+                                  boxShadow: c.isLoading.value
+                                      ? []
+                                      : [
+                                          BoxShadow(
+                                            color: ColorDouce.douceBase.withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                ),
+                                child: const Icon(
+                                  Icons.send_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                               ),
                             ),
                           )),
@@ -308,209 +587,154 @@ class _AiChatPageState extends State<AiChatPage> {
       ),
     );
   }
-
-  void _showApiKeyDialog(BuildContext context, AiChatController c) {
-    final keyCtrl = TextEditingController();
-    final obscure = true.obs;
-
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
-          children: [
-            Icon(Icons.key_rounded, color: Color(0xFFFF6B8B)),
-            SizedBox(width: 8),
-            Text('Gemini / Custom API Key', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Aplikasi menggunakan API Key default aktif. Anda dapat menggantinya dengan Kunci API Anda sendiri:',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const SizedBox(height: 12),
-            Obx(() => TextField(
-                  controller: keyCtrl,
-                  obscureText: obscure.value,
-                  style: const TextStyle(fontSize: 13),
-                  decoration: InputDecoration(
-                    hintText: 'Tempel API key custom...',
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(obscure.value ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                      onPressed: () => obscure.value = !obscure.value,
-                    ),
-                  ),
-                )),
-            if (c.hasCustomApiKey.value) ...[
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: () {
-                  c.removeApiKey();
-                  Get.back();
-                },
-                icon: const Icon(Icons.refresh_rounded, color: Colors.blue, size: 16),
-                label: const Text('Reset ke Key Default', style: TextStyle(color: Colors.blue, fontSize: 12)),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () => c.saveApiKey(keyCtrl.text),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ColorDouce.douceBase,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _MessageBubble extends StatelessWidget {
   final ChatMessage msg;
   final Color themeColor;
-  const _MessageBubble({required this.msg, required this.themeColor});
+
+  const _MessageBubble({
+    required this.msg,
+    required this.themeColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isUser = msg.role == 'user';
-    final timeStr = '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF6B8B).withOpacity(0.12),
+                color: const Color(0xFF2563EB).withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.smart_toy_rounded,
-                color: Color(0xFFFF6B8B),
+                color: Color(0xFF2563EB),
                 size: 16,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
           ],
           Flexible(
-            child: Column(
-              crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.76,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isUser ? ColorDouce.douceBase : Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(20),
-                      topRight: const Radius.circular(20),
-                      bottomLeft: isUser ? const Radius.circular(20) : const Radius.circular(4),
-                      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isUser ? ColorDouce.douceBase : Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isUser ? 18 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 18),
+                ),
+                boxShadow: isUser
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildFormattedText(msg.text, isUser),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isUser ? Colors.white.withOpacity(0.7) : Colors.grey.shade400,
+                        ),
                       ),
                     ],
                   ),
-                  child: SelectableText(
-                    msg.text,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isUser ? Colors.white : const Color(0xFF0F172A),
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  timeStr,
-                  style: const TextStyle(fontSize: 9, color: Colors.grey),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          if (isUser) const SizedBox(width: 6),
+          if (isUser) ...[
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 14,
+              backgroundColor: ColorDouce.douceBase.withOpacity(0.2),
+              child: Icon(
+                Icons.person_rounded,
+                color: ColorDouce.douceBase,
+                size: 16,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
-}
 
-class _DotAnimation extends StatefulWidget {
-  final int delay;
-  const _DotAnimation({required this.delay});
-
-  @override
-  State<_DotAnimation> createState() => _DotAnimationState();
-}
-
-class _DotAnimationState extends State<_DotAnimation> with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
+  Widget _buildFormattedText(String rawText, bool isUser) {
+    final baseStyle = TextStyle(
+      fontSize: 14,
+      height: 1.45,
+      color: isUser ? Colors.white : const Color(0xFF0F172A),
     );
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _ctrl.repeat(reverse: true);
-    });
-    _anim = Tween<double>(begin: 0, end: -6).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
-  }
 
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+    // Replace list bullet asterisks at the beginning of lines
+    String cleaned = rawText.replaceAll(RegExp(r'^\*\s+', multiLine: true), '• ');
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, __) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 3),
-        child: Transform.translate(
-          offset: Offset(0, _anim.value),
-          child: Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              color: ColorDouce.douceBase.withOpacity(0.7),
-              shape: BoxShape.circle,
+    if (!cleaned.contains('*')) {
+      return SelectableText(cleaned, style: baseStyle);
+    }
+
+    final spans = <TextSpan>[];
+    final regExp = RegExp(r'(\*\*.*?\*\*|\*.*?\*|[^\*]+)');
+    final matches = regExp.allMatches(cleaned);
+
+    for (final match in matches) {
+      final str = match.group(0) ?? '';
+      if (str.isEmpty) continue;
+
+      if (str.startsWith('**') && str.endsWith('**') && str.length > 4) {
+        final content = str.substring(2, str.length - 2);
+        spans.add(
+          TextSpan(
+            text: content,
+            style: baseStyle.copyWith(
+              fontWeight: FontWeight.bold,
+              color: isUser ? Colors.white : const Color(0xFF0284C7),
             ),
           ),
-        ),
-      ),
+        );
+      } else if (str.startsWith('*') && str.endsWith('*') && str.length > 2) {
+        final content = str.substring(1, str.length - 1);
+        spans.add(
+          TextSpan(
+            text: content,
+            style: baseStyle.copyWith(
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      } else {
+        final cleanStr = str.replaceAll('*', '');
+        spans.add(TextSpan(text: cleanStr, style: baseStyle));
+      }
+    }
+
+    return SelectableText.rich(
+      TextSpan(children: spans),
     );
   }
 }

@@ -13,6 +13,7 @@ class BasePage extends StatelessWidget {
     this.searchHint,
     this.onSearchChanged,
     this.onSearchSubmitted,
+    this.onAvatarTap,
   });
 
   final Widget childWidget;
@@ -22,23 +23,28 @@ class BasePage extends StatelessWidget {
   final String? searchHint;
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
-    final double topPadding = showSearch ? 150.0 : 100.0;
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final double topPadding = statusBarHeight + (showSearch ? 144.0 : 85.0);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // Animated orb background
           const ThemedBackground(),
-          // Main content + top bar
+          // Main content + top bar with safe spacing
           Padding(
             padding: EdgeInsets.only(top: topPadding),
             child: childWidget,
           ),
           Positioned(
             top: 0,
+            left: 0,
+            right: 0,
             child: isApotek
                 ? const ApotikTopBar()
                 : TopBar(
@@ -47,6 +53,7 @@ class BasePage extends StatelessWidget {
                     searchHint: searchHint,
                     onSearchChanged: onSearchChanged,
                     onSearchSubmitted: onSearchSubmitted,
+                    onAvatarTap: onAvatarTap,
                   ),
           ),
         ],

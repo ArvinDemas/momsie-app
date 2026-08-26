@@ -6,6 +6,7 @@ class RumahSakitModel {
   final String layanan;
   final String rating;
   final String image;
+  final String mapUrl;
 
   RumahSakitModel({
     required this.nama,
@@ -15,6 +16,7 @@ class RumahSakitModel {
     required this.layanan,
     required this.rating,
     required this.image,
+    this.mapUrl = '',
   });
 
   factory RumahSakitModel.fromMap(Map<String, dynamic> map) {
@@ -26,6 +28,7 @@ class RumahSakitModel {
       layanan: map['layanan'] ?? '',
       rating: map['rating']?.toString() ?? '0',
       image: map['image'] ?? '',
+      mapUrl: map['mapUrl'] ?? '',
     );
   }
 
@@ -38,6 +41,7 @@ class RumahSakitModel {
       'layanan': layanan,
       'rating': rating,
       'image': image,
+      'mapUrl': mapUrl,
     };
   }
 }

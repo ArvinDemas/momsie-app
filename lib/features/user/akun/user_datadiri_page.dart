@@ -12,13 +12,8 @@ class UserDataDiriPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
 
-    final Rx<TextEditingController> nameController =
-        TextEditingController().obs;
-    final Rx<TextEditingController> emailController =
-        TextEditingController().obs;
-
-    nameController.value.text = userController.username.value;
-    emailController.value.text = userController.email.value;
+    final TextEditingController nameController = TextEditingController(text: userController.username.value);
+    final TextEditingController emailController = TextEditingController(text: userController.email.value);
 
     return Scaffold(
       body: Stack(
@@ -34,14 +29,12 @@ class UserDataDiriPage extends StatelessWidget {
           const SizedBox(height: 100),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Obx(
-              () => Column(
-                children: [
-                  editTextField(nameController.value, "Nama Lengkap"),
-                  const SizedBox(height: 30),
-                  editTextField(emailController.value, "Email"),
-                ],
-              ),
+            child: Column(
+              children: [
+                editTextField(nameController, "Nama Lengkap"),
+                const SizedBox(height: 30),
+                editTextField(emailController, "Email"),
+              ],
             ),
           )
         ],

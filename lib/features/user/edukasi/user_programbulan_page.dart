@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,25 @@ import 'package:get/get.dart';
 
 class UserProgramBulanPage extends StatelessWidget {
   const UserProgramBulanPage({super.key});
+
+  static final List<Map<String, String>> _weekDetails = [
+    {
+      'title': 'Sesi Pernapasan & Relaksasi Diafragma',
+      'image': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Sesi Kelenturan Otot Panggul & Pinggul',
+      'image': 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Sesi Penguatan Kaki & Otot Inti Hamil',
+      'image': 'https://images.unsplash.com/photo-1599447421416-3414500d18a5?w=500&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Sesi Persiapan Persalinan & Yoga Restoratif',
+      'image': 'https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?w=500&auto=format&fit=crop&q=80',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +70,13 @@ class UserProgramBulanPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             Column(
-              children: month.weeks
-                  .map(
-                    (week) => Padding(
-                      padding: const EdgeInsets.only(bottom: 25),
-                      child: bulanContainer(program, month, week),
-                    ),
-                  )
-                  .toList(),
+              children: List.generate(month.weeks.length, (index) {
+                final week = month.weeks[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: bulanContainer(program, month, week, index),
+                );
+              }),
             )
           ],
         ),
@@ -67,7 +86,13 @@ class UserProgramBulanPage extends StatelessWidget {
     );
   }
 
-  Widget bulanContainer(ProgramModel program, Month month, Week week) {
+  Widget bulanContainer(ProgramModel program, Month month, Week week, int index) {
+    final detail = _weekDetails[index % _weekDetails.length];
+    final String weekImage = (week.image.isNotEmpty && !week.image.contains('picsum') && !week.image.contains('flowers'))
+        ? week.image
+        : detail['image']!;
+    final String weekSubtitle = detail['title']!;
+
     return InkWell(
       onTap: () => Get.toNamed('/user-program-minggu', arguments: {
         'week': week,
@@ -106,24 +131,36 @@ class UserProgramBulanPage extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      const Text(
-                        "Pengenalan Yoga Prenetal",
+                      const SizedBox(height: 4),
+                      Text(
+                        weekSubtitle,
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
+                          fontSize: 13,
+                          color: Colors.black.withValues(alpha: 0.7),
                         ),
                       )
                     ],
                   ),
                 ),
-                Image.network(
-                  program.image,
-                  width: 75,
-                  height: 75,
+                const SizedBox(width: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: weekImage,
+                    width: 75,
+                    height: 75,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, __, ___) => Container(
+                      width: 75,
+                      height: 75,
+                      color: Colors.pink.shade50,
+                      child: Icon(Icons.self_improvement_rounded, size: 36, color: ColorDouce.douceBase),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             LinearProgressIndicator(
               value: 1,
               color: ColorDouce.douceBase,

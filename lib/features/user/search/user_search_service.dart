@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
+import 'package:flutter/foundation.dart';
 
 class SearchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -23,7 +24,7 @@ class SearchService {
 
       return obatList;
     } catch (e) {
-      // print(e);
+      debugPrint('Search obat error: $e');
       return [];
     }
   }
@@ -47,7 +48,7 @@ class SearchService {
 
       return tokoBayiList;
     } catch (e) {
-      // print(e);
+      debugPrint('Search toko bayi error: $e');
       return [];
     }
   }

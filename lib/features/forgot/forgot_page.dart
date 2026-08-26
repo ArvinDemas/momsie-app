@@ -72,7 +72,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   hintText: "Email",
                   iconImage: const Icon(Icons.email_outlined),
                   isPassword: false,
-                  controller: controller.emailController.value,
+                  controller: controller.emailController,
                 ),
                 const SizedBox(height: 30),
                 Obx(
@@ -111,69 +111,119 @@ class ForgotPasswordPage extends StatelessWidget {
                 const SizedBox(
                   height: 25,
                 ),
-                InkWell(
-                  onTap: () {
-                    controller.resetPassword();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ColorDouce.douceBase,
-                      borderRadius: BorderRadius.circular(26),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorDouce.lightPink.withValues(alpha: 0.7),
-                          spreadRadius: 0,
-                          blurRadius: 8,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      "Kirim",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontFamily: 'OpenSans',
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
                 Obx(
                   () => controller.isSent.value
-                      ? InkWell(
-                          onTap: () {
-                            Get.offNamed('/login');
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 30,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(26),
-                              border: Border.all(
-                                color: ColorDouce.douceBase,
-                              ),
-                            ),
-                            child: Text(
-                              "Kembali",
+                      ? Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Cek email Anda untuk link reset password",
                               style: TextStyle(
-                                color: ColorDouce.douceBase,
-                                fontSize: 16,
+                                color: Colors.black54,
+                                fontSize: 14,
                                 fontFamily: 'OpenSans',
-                                fontWeight: FontWeight.w300,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            InkWell(
+                              onTap: () {
+                                controller.navigateToVerification();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ColorDouce.douceBase,
+                                  borderRadius: BorderRadius.circular(26),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: ColorDouce.lightPink.withValues(alpha: 0.7),
+                                      spreadRadius: 0,
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  "Lanjut Verifikasi",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontFamily: 'OpenSans',
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 12),
+                            InkWell(
+                              onTap: () {
+                                Get.offNamed('/login');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(26),
+                                  border: Border.all(
+                                    color: ColorDouce.douceBase,
+                                  ),
+                                ),
+                                child: Text(
+                                  "Kembali",
+                                  style: TextStyle(
+                                    color: ColorDouce.douceBase,
+                                    fontSize: 16,
+                                    fontFamily: 'OpenSans',
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         )
-                      : const SizedBox(),
+                      : Column(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                controller.resetPassword();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ColorDouce.douceBase,
+                                  borderRadius: BorderRadius.circular(26),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: ColorDouce.lightPink.withValues(alpha: 0.7),
+                                      spreadRadius: 0,
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  "Kirim",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontFamily: 'OpenSans',
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ],
             ),

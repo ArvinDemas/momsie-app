@@ -8,7 +8,9 @@ class ThemePickerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeService ts = Get.find<ThemeService>();
+    final ThemeService ts = Get.isRegistered<ThemeService>()
+        ? Get.find<ThemeService>()
+        : Get.put(ThemeService());
 
     return Scaffold(
       body: Stack(

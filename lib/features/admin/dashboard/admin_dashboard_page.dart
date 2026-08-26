@@ -47,336 +47,636 @@ class AdminDashboardPage extends StatelessWidget {
             ),
           // Konten Utama
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Utama & Tombol Ekspor
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            child: Obx(() {
+              if (controller.showMitraPanel.value) {
+                return _buildMitraPanel(context, controller, currencyFormat, dateFormat);
+              }
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Utama & Tombol Ekspor
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Dashboard Penjualan',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                fontFamily: 'OpenSans',
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Pantau transaksi masuk Momsie App secara realtime',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontFamily: 'OpenSans',
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Tombol Export & Buka Dashboard Web
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () => controller.exportToCSV(),
+                              icon: const Icon(Icons.file_download_outlined, size: 18),
+                              label: const Text('CSV'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.teal[700],
+                                side: BorderSide(color: Colors.teal[600]!, width: 1),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              onPressed: () => controller.exportToPDF(),
+                              icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+                              label: const Text('PDF'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[50],
+                                foregroundColor: Colors.red[700],
+                                side: BorderSide(color: Colors.red[200]!, width: 1),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              onPressed: () => controller.openWebDashboard(),
+                              icon: const Icon(Icons.open_in_browser_outlined, size: 18),
+                              label: const Text('Web'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorDouce.douceBase,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+
+                    // KPI Cards Grid (Responsive)
+                    Obx(() {
+                      final double screenWidth = MediaQuery.of(context).size.width;
+                      int crossAxisCount = 4;
+                      if (screenWidth < 600) {
+                        crossAxisCount = 1;
+                      } else if (screenWidth < 1100) {
+                        crossAxisCount = 2;
+                      }
+
+                      return GridView.count(
+                        crossAxisCount: crossAxisCount,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: screenWidth < 600 ? 4 : 2.2,
                         children: [
-                          const Text(
-                            'Dashboard Penjualan',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                              fontFamily: 'OpenSans',
-                            ),
+                          KpiCard(
+                            title: 'Total Pendapatan',
+                            value: currencyFormat.format(controller.totalRevenue.value),
+                            icon: Icons.monetization_on_outlined,
+                            color: Colors.teal,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Pantau transaksi masuk Momsie App secara realtime',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              fontFamily: 'OpenSans',
-                            ),
+                          KpiCard(
+                            title: 'Bulan Ini',
+                            value: currencyFormat.format(controller.monthlyRevenue.value),
+                            icon: Icons.calendar_today_outlined,
+                            color: Colors.indigo,
+                          ),
+                          KpiCard(
+                            title: 'Pending Verifikasi',
+                            value: '${controller.pendingCount.value} Transaksi',
+                            icon: Icons.hourglass_empty_rounded,
+                            color: Colors.amber[700]!,
+                          ),
+                          KpiCard(
+                            title: 'Total Transaksi',
+                            value: '${controller.totalCount.value}',
+                            icon: Icons.shopping_bag_outlined,
+                            color: ColorDouce.douceBase,
                           ),
                         ],
+                      );
+                    }),
+                    const SizedBox(height: 28),
+
+                    // Section Charts (Responsive Row/Column)
+                    Obx(() {
+                      final double screenWidth = MediaQuery.of(context).size.width;
+                      final chartList = [
+                        Expanded(
+                          flex: screenWidth >= 1100 ? 1 : 0,
+                          child: SalesLineChart(transactions: controller.allTransactions),
+                        ),
+                        if (screenWidth < 1100) const SizedBox(height: 16),
+                        Expanded(
+                          flex: screenWidth >= 1100 ? 1 : 0,
+                          child: CategoryBarChart(transactions: controller.allTransactions),
+                        ),
+                      ];
+
+                      return screenWidth >= 1100
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                chartList[0],
+                                const SizedBox(width: 16),
+                                chartList[2],
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                SizedBox(width: double.infinity, child: chartList[0]),
+                                const SizedBox(height: 16),
+                                SizedBox(width: double.infinity, child: chartList[2]),
+                              ],
+                            );
+                    }),
+                    const SizedBox(height: 28),
+
+                    // Filter & Search Panel
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Filter & Pencarian',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'OpenSans',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final double width = constraints.maxWidth;
+                                final isMobile = width < 700;
+
+                                final searchField = TextField(
+                                  onChanged: (val) {
+                                    controller.searchQuery.value = val;
+                                    controller.applyFilters();
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Cari ID, Nama, Deskripsi...',
+                                    prefixIcon: const Icon(Icons.search_rounded),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12)),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                                  ),
+                                );
+
+                                final filterRow = [
+                                  _buildDropdownFilter(
+                                    label: 'Status',
+                                    value: controller.selectedStatus,
+                                    items: ['Semua', 'Pending', 'Paid', 'Cancelled'],
+                                    onChanged: controller.applyFilters,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildDropdownFilter(
+                                    label: 'Kategori',
+                                    value: controller.selectedCategory,
+                                    items: ['Semua', 'Doula', 'Obat', 'Tema', 'Diary'],
+                                    onChanged: controller.applyFilters,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildDropdownFilter(
+                                    label: 'Waktu',
+                                    value: controller.selectedDateFilter,
+                                    items: ['Semua', 'Hari Ini', 'Minggu Ini', 'Bulan Ini'],
+                                    onChanged: controller.applyFilters,
+                                  ),
+                                ];
+
+                                return isMobile
+                                    ? Column(
+                                        children: [
+                                          searchField,
+                                          const SizedBox(height: 12),
+                                          Row(
+                                            children: [
+                                              Expanded(child: filterRow[0]),
+                                              const SizedBox(width: 8),
+                                              Expanded(child: filterRow[2]),
+                                              const SizedBox(width: 8),
+                                              Expanded(child: filterRow[4]),
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    : Row(
+                                        children: [
+                                          Expanded(flex: 3, child: searchField),
+                                          const SizedBox(width: 16),
+                                          Expanded(flex: 2, child: filterRow[0]),
+                                          const SizedBox(width: 12),
+                                          Expanded(flex: 2, child: filterRow[2]),
+                                          const SizedBox(width: 12),
+                                          Expanded(flex: 2, child: filterRow[4]),
+                                        ],
+                                      );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                      // Tombol Export Sesi 5
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () => controller.exportToCSV(),
-                            icon: const Icon(Icons.file_download_outlined, size: 18),
-                            label: const Text('CSV'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.teal[700],
-                              side: BorderSide(color: Colors.teal[600]!, width: 1),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Data Table Transaksi
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Daftar Transaksi Masuk',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'OpenSans',
+                                  ),
+                                ),
+                                Obx(() => Text(
+                                      'Menampilkan ${controller.filteredTransactions.length} item',
+                                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                                    )),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          ElevatedButton.icon(
-                            onPressed: () => controller.exportToPDF(),
-                            icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-                            label: const Text('PDF Report'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red[50],
-                              foregroundColor: Colors.red[700],
-                              side: BorderSide(color: Colors.red[200]!, width: 1),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            Obx(() {
+                              if (controller.filteredTransactions.isEmpty) {
+                                return const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 40),
+                                    child: Text('Tidak ada data transaksi yang cocok.'),
+                                  ),
+                                );
+                              }
+
+                              return Scrollbar(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: DataTable(
+                                    columnSpacing: 20,
+                                    columns: const [
+                                      DataColumn(label: Text('ID Transaksi', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Tanggal', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Pengguna', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Layanan', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Deskripsi', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Nominal', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Metode', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Bukti', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold))),
+                                      DataColumn(label: Text('Aksi', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    ],
+                                    rows: controller.filteredTransactions.map((tx) {
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(Text(tx.id, style: const TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.w600))),
+                                          DataCell(Text(dateFormat.format(tx.createdAt), style: const TextStyle(fontSize: 12))),
+                                          DataCell(Text(tx.namaUser)),
+                                          DataCell(Chip(
+                                            label: Text(_getLayananName(tx.jenisLayanan), style: const TextStyle(fontSize: 11, color: Colors.white)),
+                                            backgroundColor: _getLayananColor(tx.jenisLayanan),
+                                            padding: EdgeInsets.zero,
+                                            visualDensity: VisualDensity.compact,
+                                          )),
+                                          DataCell(Text(tx.deskripsi, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                          DataCell(Text(currencyFormat.format(tx.nominal), style: const TextStyle(fontWeight: FontWeight.w600))),
+                                          DataCell(Text(tx.metodePembayaran.replaceAll('_', ' ').toUpperCase(), style: const TextStyle(fontSize: 12))),
+                                          DataCell(_buildBuktiCell(context, tx)),
+                                          DataCell(_buildStatusChip(tx.status)),
+                                          DataCell(_buildActionCell(tx, controller)),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMitraPanel(
+    BuildContext context,
+    AdminDashboardController controller,
+    NumberFormat currencyFormat,
+    DateFormat dateFormat,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Panel Mitra',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              Obx(() => Text(
+                    'Total: ${controller.allMitraSubmissions.length} mitra',
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  )),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Obx(() => TextField(
+                onChanged: (val) {
+                  controller.mitraSearchQuery.value = val;
+                  controller.applyMitraFilters();
+                },
+                decoration: InputDecoration(
+                  hintText: 'Cari nama, ID pengguna, atau NIK...',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+              )),
+          const SizedBox(height: 12),
+          Obx(() => Row(
+                children: [
+                  _buildMitraStatusChip('Semua', controller.mitraFilterStatus.value == 'Semua', () => controller.mitraFilterStatus.value = 'Semua'),
+                  const SizedBox(width: 8),
+                  _buildMitraStatusChip('Pending', controller.mitraFilterStatus.value == 'pending', () => controller.mitraFilterStatus.value = 'pending'),
+                  const SizedBox(width: 8),
+                  _buildMitraStatusChip('Approved', controller.mitraFilterStatus.value == 'approved', () => controller.mitraFilterStatus.value = 'approved'),
+                  const SizedBox(width: 8),
+                  _buildMitraStatusChip('Rejected', controller.mitraFilterStatus.value == 'rejected', () => controller.mitraFilterStatus.value = 'rejected'),
+                ],
+              )),
+          const SizedBox(height: 16),
+          Obx(() {
+            if (controller.isLoadingMitra.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (controller.filteredMitraSubmissions.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Text('Tidak ada data mitra.'),
+                ),
+              );
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.filteredMitraSubmissions.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final sub = controller.filteredMitraSubmissions[index];
+                return _buildMitraCard(context, sub, controller, currencyFormat, dateFormat);
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMitraStatusChip(String label, bool selected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? ColorDouce.douceBase : Colors.grey[200],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.grey[700],
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMitraCard(
+    BuildContext context,
+    dynamic sub,
+    AdminDashboardController controller,
+    NumberFormat currencyFormat,
+    DateFormat dateFormat,
+  ) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: ColorDouce.douceBase,
+                  child: const Icon(Icons.person, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sub.userName,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        sub.userEmail,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 28),
-
-                  // KPI Cards Grid (Responsive)
-                  Obx(() {
-                    final double screenWidth = MediaQuery.of(context).size.width;
-                    int crossAxisCount = 4;
-                    if (screenWidth < 600) {
-                      crossAxisCount = 1;
-                    } else if (screenWidth < 1100) {
-                      crossAxisCount = 2;
-                    }
-
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: screenWidth < 600 ? 4 : 2.2,
-                      children: [
-                        KpiCard(
-                          title: 'Total Pendapatan',
-                          value: currencyFormat.format(controller.totalRevenue.value),
-                          icon: Icons.monetization_on_outlined,
-                          color: Colors.teal,
-                        ),
-                        KpiCard(
-                          title: 'Bulan Ini',
-                          value: currencyFormat.format(controller.monthlyRevenue.value),
-                          icon: Icons.calendar_today_outlined,
-                          color: Colors.indigo,
-                        ),
-                        KpiCard(
-                          title: 'Pending Verifikasi',
-                          value: '${controller.pendingCount.value} Transaksi',
-                          icon: Icons.hourglass_empty_rounded,
-                          color: Colors.amber[700]!,
-                        ),
-                        KpiCard(
-                          title: 'Total Transaksi',
-                          value: '${controller.totalCount.value}',
-                          icon: Icons.shopping_bag_outlined,
-                          color: ColorDouce.douceBase,
-                        ),
-                      ],
-                    );
-                  }),
-                  const SizedBox(height: 28),
-
-                  // Section Charts (Responsive Row/Column)
-                  Obx(() {
-                    final double screenWidth = MediaQuery.of(context).size.width;
-                    final chartList = [
-                      Expanded(
-                        flex: screenWidth >= 1100 ? 1 : 0,
-                        child: SalesLineChart(transactions: controller.allTransactions),
-                      ),
-                      if (screenWidth < 1100) const SizedBox(height: 16),
-                      Expanded(
-                        flex: screenWidth >= 1100 ? 1 : 0,
-                        child: CategoryBarChart(transactions: controller.allTransactions),
-                      ),
-                    ];
-
-                    return screenWidth >= 1100
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              chartList[0],
-                              const SizedBox(width: 16),
-                              chartList[2],
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              SizedBox(width: double.infinity, child: chartList[0]),
-                              const SizedBox(height: 16),
-                              SizedBox(width: double.infinity, child: chartList[2]),
-                            ],
-                          );
-                  }),
-                  const SizedBox(height: 28),
-
-                  // Filter & Search Panel
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Filter & Pencarian',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'OpenSans',
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final double width = constraints.maxWidth;
-                              final isMobile = width < 700;
-
-                              final searchField = TextField(
-                                onChanged: (val) {
-                                  controller.searchQuery.value = val;
-                                  controller.applyFilters();
-                                },
-                                decoration: InputDecoration(
-                                  hintText: 'Cari ID, Nama, Deskripsi...',
-                                  prefixIcon: const Icon(Icons.search_rounded),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                                ),
-                              );
-
-                              final filterRow = [
-                                _buildDropdownFilter(
-                                  label: 'Status',
-                                  value: controller.selectedStatus,
-                                  items: ['Semua', 'Pending', 'Paid', 'Cancelled'],
-                                  onChanged: controller.applyFilters,
-                                ),
-                                const SizedBox(width: 12),
-                                _buildDropdownFilter(
-                                  label: 'Kategori',
-                                  value: controller.selectedCategory,
-                                  items: ['Semua', 'Doula', 'Obat', 'Tema', 'Diary'],
-                                  onChanged: controller.applyFilters,
-                                ),
-                                const SizedBox(width: 12),
-                                _buildDropdownFilter(
-                                  label: 'Waktu',
-                                  value: controller.selectedDateFilter,
-                                  items: ['Semua', 'Hari Ini', 'Minggu Ini', 'Bulan Ini'],
-                                  onChanged: controller.applyFilters,
-                                ),
-                              ];
-
-                              return isMobile
-                                  ? Column(
-                                      children: [
-                                        searchField,
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          children: [
-                                            Expanded(child: filterRow[0]),
-                                            const SizedBox(width: 8),
-                                            Expanded(child: filterRow[2]),
-                                            const SizedBox(width: 8),
-                                            Expanded(child: filterRow[4]),
-                                          ],
-                                        )
-                                      ],
-                                    )
-                                  : Row(
-                                      children: [
-                                        Expanded(flex: 3, child: searchField),
-                                        const SizedBox(width: 16),
-                                        Expanded(flex: 2, child: filterRow[0]),
-                                        const SizedBox(width: 12),
-                                        Expanded(flex: 2, child: filterRow[2]),
-                                        const SizedBox(width: 12),
-                                        Expanded(flex: 2, child: filterRow[4]),
-                                      ],
-                                    );
-                            },
-                          ),
-                        ],
-                      ),
+                ),
+                _buildMitraStatusChip(
+                  sub.status.toUpperCase(),
+                  true,
+                  () {},
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            _buildMitraInfoRow('NIK', sub.nik),
+            _buildMitraInfoRow('No HP', sub.nohp),
+            _buildMitraInfoRow('Kota/Provinsi', sub.kotaProvinsi),
+            _buildMitraInfoRow('Role', sub.role),
+            _buildMitraInfoRow('Submitted At', sub.submittedAt != null ? dateFormat.format(sub.submittedAt!) : '-'),
+            if (sub.rejectionReason != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Alasan Penolakan:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                    const SizedBox(height: 4),
+                    Text(sub.rejectionReason!, style: const TextStyle(fontSize: 13)),
+                  ],
+                ),
+              ),
+            ],
+            if (sub.ktpUrl != null || sub.sertifikatUrl != null) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: [
+                  if (sub.ktpUrl != null)
+                    ElevatedButton.icon(
+                      onPressed: () => _viewImage(context, sub.ktpUrl!),
+                      icon: const Icon(Icons.visibility, size: 16),
+                      label: const Text('Lihat KTP'),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                    ),
+                  if (sub.sertifikatUrl != null)
+                    ElevatedButton.icon(
+                      onPressed: () => _viewImage(context, sub.sertifikatUrl!),
+                      icon: const Icon(Icons.visibility, size: 16),
+                      label: const Text('Lihat Sertifikat'),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 16),
+            if (sub.status == 'pending')
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => controller.approveMitra(sub.id, sub.userId),
+                      icon: const Icon(Icons.check, size: 18),
+                      label: const Text('Approve'),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Data Table Transaksi
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Daftar Transaksi Masuk',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'OpenSans',
-                                ),
-                              ),
-                              Obx(() => Text(
-                                    'Menampilkan ${controller.filteredTransactions.length} item',
-                                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                                  )),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Obx(() {
-                            if (controller.filteredTransactions.isEmpty) {
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 40),
-                                  child: Text('Tidak ada data transaksi yang cocok.'),
-                                ),
-                              );
-                            }
-
-                            return Scrollbar(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: DataTable(
-                                  columnSpacing: 20,
-                                  columns: const [
-                                    DataColumn(label: Text('ID Transaksi', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Tanggal', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Pengguna', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Layanan', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Deskripsi', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Nominal', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Metode', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Bukti', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Status', style: TextStyle(fontWeight: FontWeight.bold))),
-                                    DataColumn(label: Text('Aksi', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  ],
-                                  rows: controller.filteredTransactions.map((tx) {
-                                    return DataRow(
-                                      cells: [
-                                        DataCell(Text(tx.id, style: const TextStyle(fontFamily: 'Courier', fontWeight: FontWeight.w600))),
-                                        DataCell(Text(dateFormat.format(tx.createdAt), style: const TextStyle(fontSize: 12))),
-                                        DataCell(Text(tx.namaUser)),
-                                        DataCell(Chip(
-                                          label: Text(_getLayananName(tx.jenisLayanan), style: const TextStyle(fontSize: 11, color: Colors.white)),
-                                          backgroundColor: _getLayananColor(tx.jenisLayanan),
-                                          padding: EdgeInsets.zero,
-                                          visualDensity: VisualDensity.compact,
-                                        )),
-                                        DataCell(Text(tx.deskripsi, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                        DataCell(Text(currencyFormat.format(tx.nominal), style: const TextStyle(fontWeight: FontWeight.w600))),
-                                        DataCell(Text(tx.metodePembayaran.replaceAll('_', ' ').toUpperCase(), style: const TextStyle(fontSize: 12))),
-                                        DataCell(_buildBuktiCell(context, tx)),
-                                        DataCell(_buildStatusChip(tx.status)),
-                                        DataCell(_buildActionCell(tx, controller)),
-                                      ],
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _showRejectDialog(context, sub.id, sub.userId, controller),
+                      icon: const Icon(Icons.close, size: 18),
+                      label: const Text('Tolak'),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     ),
                   ),
                 ],
               ),
-            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMitraInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          ),
+          const Text(':', style: TextStyle(fontSize: 13)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(value, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _viewImage(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CachedNetworkImage(imageUrl: url, fit: BoxFit.contain),
+              const SizedBox(height: 16),
+              ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup')),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRejectDialog(BuildContext context, String submissionId, String userId, AdminDashboardController controller) {
+    final TextEditingController reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Tolak Mitra'),
+        content: TextField(
+          controller: reasonController,
+          maxLines: 3,
+          decoration: const InputDecoration(hintText: 'Alasan penolakan...'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              if (reasonController.text.trim().isEmpty) {
+                Get.snackbar('Error', 'Alasan penolakan harus diisi');
+                return;
+              }
+              controller.rejectMitra(submissionId, reasonController.text.trim());
+              Navigator.pop(context);
+            },
+            child: const Text('Tolak'),
           ),
         ],
       ),
@@ -407,7 +707,7 @@ class AdminDashboardPage extends StatelessWidget {
                   children: [
                     Text('Momsie Admin',
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('Sales Panel', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text('Panel', style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ],
@@ -415,11 +715,16 @@ class AdminDashboardPage extends StatelessWidget {
           ),
           const Divider(color: Colors.white12, height: 1),
           const SizedBox(height: 20),
-          _buildSidebarItem(
-            icon: Icons.dashboard_outlined,
-            title: 'Monitoring',
-            selected: true,
-          ),
+          Obx(() => _buildSidebarItem(
+                icon: Icons.dashboard_outlined,
+                title: 'Monitoring',
+                selected: !controller.showMitraPanel.value,
+              )),
+          Obx(() => _buildSidebarItem(
+                icon: Icons.people_outline,
+                title: 'Mitra',
+                selected: controller.showMitraPanel.value,
+              )),
           const Spacer(),
           const Divider(color: Colors.white12, height: 1),
           ListTile(
@@ -450,6 +755,7 @@ class AdminDashboardPage extends StatelessWidget {
           ),
         ),
         selected: selected,
+        onTap: () => Get.back(),
       ),
     );
   }

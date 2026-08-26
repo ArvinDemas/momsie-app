@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/diary/diary_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
@@ -20,13 +21,13 @@ class DiaryListPage extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                // AppBar
+                // Custom App Bar Header
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
+                  padding: const EdgeInsets.fromLTRB(12, 12, 16, 0),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
                         onPressed: () => Get.back(),
                       ),
                       const Expanded(
@@ -38,25 +39,31 @@ class DiaryListPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'OpenSans',
+                                color: Color(0xFF0F172A),
                               ),
                             ),
                             Text(
-                              'Abadikan setiap momen berharga',
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.grey),
+                              'Abadikan kenangan momen indah kehamilan',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
                             ),
                           ],
                         ),
                       ),
-                      // PDF export
+                      // PDF Export Button
                       IconButton(
-                        tooltip: 'Ekspor PDF Album',
-                        icon: Icon(Icons.picture_as_pdf_outlined,
-                            color: ColorDouce.douceBase),
+                        tooltip: 'Ekspor PDF Album Kenangan',
+                        icon: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.picture_as_pdf_outlined, color: ColorDouce.douceBase, size: 20),
+                        ),
                         onPressed: () => Get.toNamed('/diary-pdf'),
                       ),
-                      // Add new
+                      const SizedBox(width: 4),
+                      // Add New Entry Button
                       GestureDetector(
                         onTap: () {
                           c.initForm();
@@ -67,9 +74,15 @@ class DiaryListPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: ColorDouce.douceBase,
                             borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorDouce.douceBase.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
                           ),
-                          child: const Icon(Icons.add_rounded,
-                              color: Colors.white, size: 22),
+                          child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
                         ),
                       ),
                     ],
@@ -78,22 +91,19 @@ class DiaryListPage extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // List
+                // Main Entries List
                 Expanded(
                   child: Obx(() {
                     if (c.isLoading.value) {
-                      return const Center(
-                          child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                     if (c.entries.isEmpty) {
                       return _buildEmpty(c);
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       itemCount: c.entries.length,
-                      itemBuilder: (_, i) =>
-                          _DiaryCard(entry: c.entries[i], controller: c),
+                      itemBuilder: (_, i) => _DiaryCard(entry: c.entries[i], controller: c),
                     );
                   }),
                 ),
@@ -107,42 +117,54 @@ class DiaryListPage extends StatelessWidget {
 
   Widget _buildEmpty(DiaryController c) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('📖', style: TextStyle(fontSize: 60)),
-          const SizedBox(height: 16),
-          const Text(
-            'Belum ada catatan diary',
-            style: TextStyle(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: ColorDouce.veryLightPink,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.book_rounded, size: 64, color: ColorDouce.douceBase),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Belum Ada Catatan Diary',
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black54),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Abadikan perasaan & momen kehamilan\nmu hari ini!',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              c.initForm();
-              Get.toNamed('/diary-form');
-            },
-            icon: const Icon(Icons.edit_rounded),
-            label: const Text('Tulis Diary Pertama'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ColorDouce.douceBase,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 12),
+                color: Color(0xFF0F172A),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Abadikan perasaan, foto USG, dan cerita indah perkembangan si buah hati.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: Colors.grey, height: 1.4),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                c.initForm();
+                Get.toNamed('/diary-form');
+              },
+              icon: const Icon(Icons.edit_note_rounded, size: 22),
+              label: const Text('Tulis Diary Pertama'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorDouce.douceBase,
+                foregroundColor: Colors.white,
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -152,6 +174,40 @@ class _DiaryCard extends StatelessWidget {
   final DiaryModel entry;
   final DiaryController controller;
   const _DiaryCard({required this.entry, required this.controller});
+
+  Widget _buildPhotoItem(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        height: 140,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _photoFallback(),
+      );
+    }
+    final file = File(url);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        height: 140,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _photoFallback(),
+      );
+    }
+    return _photoFallback();
+  }
+
+  Widget _photoFallback() {
+    return Container(
+      height: 140,
+      width: double.infinity,
+      color: ColorDouce.veryLightPink,
+      child: const Center(
+        child: Icon(Icons.photo_rounded, size: 36, color: Color(0xFFFF6972)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,179 +222,184 @@ class _DiaryCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 12,
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 14,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Photo strip (if any)
-            if (entry.photoUrls.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(18)),
-                child: SizedBox(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Photo Strip (If photos exist)
+              if (entry.photoUrls.isNotEmpty)
+                SizedBox(
                   height: 140,
                   child: entry.photoUrls.length == 1
-                      ? (entry.photoUrls.first.startsWith('http://') || entry.photoUrls.first.startsWith('https://')
-                          ? Image.network(
-                              entry.photoUrls.first,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox.shrink(),
-                            )
-                          : Image.file(
-                              File(entry.photoUrls.first),
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox.shrink(),
-                            ))
+                      ? _buildPhotoItem(entry.photoUrls.first)
                       : Row(
                           children: entry.photoUrls.take(2).map((url) {
                             return Expanded(
-                              child: (url.startsWith('http://') || url.startsWith('https://'))
-                                  ? Image.network(
-                                      url,
-                                      height: 140,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const SizedBox.shrink(),
-                                    )
-                                  : Image.file(
-                                      File(url),
-                                      height: 140,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const SizedBox.shrink(),
-                                    ),
+                              child: _buildPhotoItem(url),
                             );
                           }).toList(),
                         ),
                 ),
-              ),
 
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // Mood emoji
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: ColorDouce.kindaRed,
-                          borderRadius: BorderRadius.circular(20),
+              // Card Body Details
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        // Mood Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: ColorDouce.kindaRed,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(entry.moodEmoji, style: const TextStyle(fontSize: 12)),
+                              const SizedBox(width: 4),
+                              Text(
+                                entry.moodLabel,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Text(
-                          '${entry.moodEmoji} ${entry.moodLabel}',
-                          style: const TextStyle(fontSize: 11),
+                        const SizedBox(width: 8),
+                        // Pregnancy Week Pill
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: ColorDouce.veryLightPink,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            entry.ageLabel,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: ColorDouce.veryLightPink,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '🤱 Minggu ${entry.pregnancyWeek}',
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.black54),
-                        ),
-                      ),
-                      const Spacer(),
-                      // Options menu
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert_rounded,
-                            color: Colors.grey, size: 20),
-                        onSelected: (v) {
-                          if (v == 'edit') {
-                            controller.initForm(entry: entry);
-                            Get.toNamed('/diary-form',
-                                arguments: entry);
-                          } else if (v == 'delete') {
-                            Get.defaultDialog(
-                              title: 'Hapus Diary?',
-                              middleText:
-                                  'Entri ini akan dihapus permanen.',
-                              textConfirm: 'Hapus',
-                              textCancel: 'Batal',
-                              confirmTextColor: Colors.white,
-                              buttonColor: Colors.red,
-                              onConfirm: () {
-                                Get.back();
-                                controller.deleteEntry(entry);
-                              },
-                            );
-                          }
-                        },
-                        itemBuilder: (_) => const [
-                          PopupMenuItem(
+                        const Spacer(),
+                        // Popup Menu
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert_rounded, color: Colors.grey, size: 20),
+                          onSelected: (v) {
+                            if (v == 'edit') {
+                              controller.initForm(entry: entry);
+                              Get.toNamed('/diary-form', arguments: entry);
+                            } else if (v == 'delete') {
+                              Get.defaultDialog(
+                                title: 'Hapus Diary?',
+                                middleText: 'Entri ini akan dihapus secara permanen.',
+                                textConfirm: 'Hapus',
+                                textCancel: 'Batal',
+                                confirmTextColor: Colors.white,
+                                buttonColor: Colors.red,
+                                onConfirm: () {
+                                  Get.back();
+                                  controller.deleteEntry(entry);
+                                },
+                              );
+                            }
+                          },
+                          itemBuilder: (_) => const [
+                            PopupMenuItem(
                               value: 'edit',
-                              child: Row(children: [
-                                Icon(Icons.edit_outlined, size: 16),
-                                SizedBox(width: 8),
-                                Text('Edit')
-                              ])),
-                          PopupMenuItem(
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_outlined, size: 16),
+                                  SizedBox(width: 8),
+                                  Text('Edit'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
                               value: 'delete',
-                              child: Row(children: [
-                                Icon(Icons.delete_outline,
-                                    size: 16, color: Colors.red),
-                                SizedBox(width: 8),
-                                Text('Hapus',
-                                    style:
-                                        TextStyle(color: Colors.red))
-                              ])),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    entry.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'OpenSans',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Hapus', style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (entry.content.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 10),
                     Text(
-                      entry.content,
+                      entry.title,
                       style: const TextStyle(
-                          fontSize: 13, color: Colors.black54),
-                      maxLines: 2,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (entry.content.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        entry.content,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF475569),
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(
+                          dateStr,
+                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        ),
+                        if (entry.photoUrls.isNotEmpty) ...[
+                          const Spacer(),
+                          Row(
+                            children: [
+                              const Icon(Icons.photo_library_rounded, size: 12, color: Colors.grey),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${entry.photoUrls.length} Foto',
+                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
-                  const SizedBox(height: 8),
-                  Text(
-                    dateStr,
-                    style: const TextStyle(
-                        fontSize: 11, color: Colors.grey),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

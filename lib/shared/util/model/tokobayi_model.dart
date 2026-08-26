@@ -4,6 +4,7 @@ class TokoBayiModel {
   final String nama;
   final String rating;
   final String image;
+  final String mapUrl;
   final List<dynamic> product;
 
   TokoBayiModel({
@@ -12,6 +13,7 @@ class TokoBayiModel {
     required this.nama,
     required this.rating,
     required this.image,
+    this.mapUrl = '',
     required this.product,
   });
 
@@ -22,11 +24,11 @@ class TokoBayiModel {
       nama: map['nama'] ?? '',
       rating: map['rating']?.toString() ?? '0',
       image: map['image'] ?? '',
+      mapUrl: map['mapUrl'] ?? '',
       product: (map['product'] as List<dynamic>?) ?? [],
     );
   }
 
-  // Alias untuk kompatibilitas dengan kode lama
   static TokoBayiModel fromJson(Map<String, dynamic> json) =>
       TokoBayiModel.fromMap(json);
 
@@ -37,6 +39,7 @@ class TokoBayiModel {
       'nama': nama,
       'rating': rating,
       'image': image,
+      'mapUrl': mapUrl,
       'product': product,
     };
   }

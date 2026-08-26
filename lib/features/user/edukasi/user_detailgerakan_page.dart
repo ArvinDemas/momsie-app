@@ -1,7 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/edukasi/user_detailgerakan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
-import 'package:douce/shared/widget/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
@@ -21,7 +21,7 @@ class UserDetailGerakanPage extends StatelessWidget {
 
     gerakanController.timerSecond.value = move.time;
     gerakanController.onTimeEnd = () {
-      showCustomDialog(context, program, week, month, move);
+      showCustomDialog(context, program, week, month, move, gerakanController);
     };
 
     return Scaffold(
@@ -66,10 +66,14 @@ class UserDetailGerakanPage extends StatelessWidget {
             const SizedBox(height: 20),
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                move.image,
+              child: CachedNetworkImage(
+                imageUrl: move.image,
                 height: MediaQuery.of(context).size.height * 0.3,
                 fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  color: Colors.grey,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -176,7 +180,7 @@ class UserDetailGerakanPage extends StatelessWidget {
                               "Selesai",
                               () {
                                 showCustomDialog(
-                                    context, program, week, month, move);
+                                    context, program, week, month, move, gerakanController);
                               },
                             )
                           ],
@@ -215,18 +219,92 @@ class UserDetailGerakanPage extends StatelessWidget {
     );
   }
 
-  void showCustomDialog(BuildContext context, ProgramModel program, Week week,
-      Month month, Move move) {
+  Future<void> showCustomDialog(
+      BuildContext context,
+      ProgramModel program,
+      Week week,
+      Month month,
+      Move move,
+      UserDetailGerakanController controller) async {
+    final int newStreak = await controller.recordYogaCompletion();
+
+    if (!context.mounted) return;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomAlertDialog(
-          isSuccess: true,
-          descText: "Silahkan Kembali Besok Untuk Program Yoga Selanjutnya",
-          destination: '/user',
-          onTap: () {
-            Get.offAllNamed('/user');
-          },
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF6B8B).withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.local_fire_department_rounded,
+                    color: Color(0xFFFF6B8B),
+                    size: 54,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Yoga Selesai! 🎉',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Text(
+                    '🔥 $newStreak Hari Streak Yoga Berturut-turut!',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade800,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Luar biasa Bunda! Latihan pernapasan & kelenturan panggul hari ini telah berhasil diselesaikan.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Get.offAllNamed('/user'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorDouce.douceBase,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'Kembali ke Beranda',
+                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

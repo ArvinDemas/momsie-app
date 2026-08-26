@@ -15,10 +15,10 @@ class MitraDataDiriPage extends StatelessWidget {
     final MitraDataDiriController controller =
         Get.put(MitraDataDiriController());
 
-    controller.nameController.value.text = userController.doulaUsername.value;
-    controller.nikController.value.text = userController.doulaNIK.value;
-    controller.alamatController.value.text = userController.doulaAlamat.value;
-    controller.biografiController.value.text =
+    controller.nameController.text = userController.doulaUsername.value;
+    controller.nikController.text = userController.doulaNIK.value;
+    controller.alamatController.text = userController.doulaAlamat.value;
+    controller.biografiController.text =
         userController.doulaBiografi.value;
 
     return Scaffold(
@@ -40,57 +40,55 @@ class MitraDataDiriPage extends StatelessWidget {
           const SizedBox(height: 100),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Obx(
-              () => Column(
-                children: [
-                  editTextField(
-                    controller.nameController.value,
-                    "Nama Lengkap",
-                    true,
-                    1,
-                  ),
-                  const SizedBox(height: 30),
-                  editTextField(
-                    controller.nikController.value,
-                    "NIK",
-                    false,
-                    1,
-                  ),
-                  const SizedBox(height: 30),
-                  editTextField(
-                      controller.alamatController.value, "Alamat", true, 1),
-                  const SizedBox(height: 30),
-                  editTextField(
-                      controller.biografiController.value, "Biografi", true, 5),
-                  const SizedBox(height: 30),
-                  InkWell(
-                    onTap: () {
-                      controller.updateDoula();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: ColorDouce.douceBase,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "Confirm",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+            child: Column(
+              children: [
+                editTextField(
+                  controller.nameController,
+                  "Nama Lengkap",
+                  true,
+                  1,
+                ),
+                const SizedBox(height: 30),
+                editTextField(
+                  controller.nikController,
+                  "NIK",
+                  false,
+                  1,
+                ),
+                const SizedBox(height: 30),
+                editTextField(
+                    controller.alamatController, "Alamat", true, 1),
+                const SizedBox(height: 30),
+                editTextField(
+                    controller.biografiController, "Biografi", true, 5),
+                const SizedBox(height: 30),
+                InkWell(
+                  onTap: () {
+                    controller.updateDoula();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ColorDouce.douceBase,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "Confirm",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
         ],

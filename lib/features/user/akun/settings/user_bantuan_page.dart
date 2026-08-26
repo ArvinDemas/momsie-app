@@ -87,10 +87,10 @@ class UserBantuanPage extends StatelessWidget {
               const SizedBox(height: 20),
               Obx(
                 () => helpContainer(
-                  "Apakah aplikasi ini membutuhkan API Key untuk AI Chatbot?",
-                  "Ya, fitur Momsie AI menggunakan model Gemini-2.0-Flash dengan metode Bring Your Own Key (BYOK). Anda dapat membuat API Key gratis di Google AI Studio, lalu menyimpannya dengan aman di dalam menu AI Chatbot.",
-                  userBantuanController.geminiApiKey.value,
-                  userBantuanController.toggleGeminiApiKey,
+                  "Bagaimana cara kerja AI Chatbot Momsie?",
+                  "Momsie AI menggunakan model adaCODE-2.0-Pro yang dikhususkan untuk edukasi kesehatan kehamilan. API key sudah dikonfigurasi otomatis. Jika terjadi error, pastikan koneksi internet stabil dan coba kembali.",
+                  userBantuanController.adacodeApiKey.value,
+                  userBantuanController.toggleAdacodeApiKey,
                 ),
               ),
             ],

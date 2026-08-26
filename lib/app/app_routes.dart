@@ -4,13 +4,16 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String register = '/register';
   static const String registerSuccess = '/register-success';
+  static const String verifyEmail = '/verify-email';
   static const String forgotPassword = '/forgot-password';
   static const String verificationForgot = '/verification-forgot';
   static const String createPassword = '/create-password';
   static const String mitra = '/mitra';
   static const String user = '/user';
   static const String mitraDataDiri = '/mitra-data-diri';
+  static const String mitraAkun = '/mitra-akun';
   static const String mitraPendapatan = '/mitra-pendapatan';
+  static const String mitraAturJadwal = '/mitra-atur-jadwal';
   static const String detailToko = '/detail-toko';
   static const String detailObat = '/detail-obat';
   static const String userDataDiri = '/user-data-diri';
@@ -40,6 +43,7 @@ class AppRoutes {
   static const String userSearch = '/user-search';
   static const String mitraRegister = '/mitra-register';
   static const String userPesanan = '/user-pesanan';
+  static const String userAkun = '/user-akun';
   static const String confirmRegister = '/confirm-register';
   static const String adminLogin = '/admin-login';
   static const String adminDashboard = '/admin-dashboard';
@@ -52,4 +56,13 @@ class AppRoutes {
   static const String diaryDetail = '/diary-detail';
   static const String diaryPdf = '/diary-pdf';
   static const String aiChat = '/ai-chat';
+  static const String sizeGuide = '/size-guide';
+  static const String onboarding = '/onboarding';
+  static const String sopForm = '/sop-form';
+  static const String sopWaiting = '/sop-waiting';
+  static const String sopCsMessage = '/sop-cs-message';
+  static const String pinEntry = '/pin-entry';
+  static const String paymentSuccess = '/payment-success';
+  static const String bookingDetail = '/booking-detail';
+  static const String postpartumWellbeing = '/postpartum-wellbeing';
 }

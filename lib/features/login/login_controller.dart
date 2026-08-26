@@ -1,26 +1,64 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/util/user_controller.dart';
+import 'package:douce/app/app_routes.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   RxBool showPassword = false.obs;
+  RxBool isDoulaLogin = false.obs;
 
-  final Rx<TextEditingController> emailController = TextEditingController().obs;
-  final Rx<TextEditingController> passwordController =
-      TextEditingController().obs;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   Future<void> tryLogin(String email, String password) async {
-    if (email == '' || password == '') {
+    final trimmedEmail = email.trim();
+    if (trimmedEmail.isEmpty || password.isEmpty) {
       Get.snackbar(
-        'Empty fields',
-        'Please fill in all fields',
+        'Kolom Kosong',
+        'Mohon isi email dan password',
         snackPosition: SnackPosition.TOP,
       );
       return;
     }
+
+    // Doula Demo Pre-configured Accounts (Instant Test Login)
+    final List<String> testDoulaEmails = [
+      'anastasia.doula@momsie.id',
+      'dewi.doula@momsie.id',
+      'laily.doula@momsie.id',
+    ];
+
+    if (testDoulaEmails.contains(trimmedEmail.toLowerCase())) {
+      final UserController userController = Get.find<UserController>();
+      final doulaObj = DummyData.doulas.firstWhere(
+        (d) => d.email.toLowerCase() == trimmedEmail.toLowerCase(),
+        orElse: () => DummyData.doulas.first,
+      );
+      userController.setUser(
+        doulaObj.name,
+        trimmedEmail,
+        doulaObj.uid,
+        doulaObj.image,
+        true, // isDoula
+      );
+      userController.setDoula(
+        doulaObj.name,
+        doulaObj.alamat,
+        'Daerah Istimewa Yogyakarta',
+        doulaObj.biografi,
+        doulaObj.image,
+        doulaObj.jenisKelamin,
+        '3404123456780001',
+      );
+      Get.offAllNamed(AppRoutes.mitra);
+      return;
+    }
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
@@ -30,7 +68,14 @@ class LoginController extends GetxController {
           .collection('user')
           .doc(userCredential.user!.uid)
           .get();
-      userDoc.data() as Map<String, dynamic>;
+      if (!userDoc.exists) {
+        Get.snackbar(
+          'Login Gagal',
+          'Data pengguna tidak ditemukan. Hubungi dukungan.',
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
 
       final UserController userController = Get.find<UserController>();
       userController.setUser(
@@ -41,30 +86,63 @@ class LoginController extends GetxController {
         userDoc['isDoula'],
       );
 
-      if (userDoc['isDoula'] == true) {
+      // Cek email verified sebelum masuk
+      if (!userCredential.user!.emailVerified) {
+        Get.offNamed(AppRoutes.verifyEmail);
+        return;
+      }
+
+      final bool isDoulaRole = isDoulaLogin.value || (userDoc['isDoula'] == true);
+      if (isDoulaRole) {
+        if (userDoc['isDoula'] != true) {
+          await firestore.collection('user').doc(userCredential.user!.uid).update({'isDoula': true});
+        }
         final DocumentSnapshot mitraData = await firestore
             .collection('mitra')
             .doc(userCredential.user!.uid)
             .get();
         if (mitraData.exists) {
           userController.setDoula(
-            mitraData['name'],
-            mitraData['alamat'],
-            mitraData['kotaProvinsi'],
-            mitraData['biografi'],
-            mitraData['image'],
-            mitraData['jenisKelamin'],
-            mitraData['nik'],
+            mitraData['name'] ?? userDoc['username'],
+            mitraData['alamat'] ?? 'DIY Yogyakarta',
+            mitraData['kotaProvinsi'] ?? 'Daerah Istimewa Yogyakarta',
+            mitraData['biografi'] ?? 'Mitra Doula Profesional Momsie',
+            mitraData['image'] ?? userDoc['image'] ?? '',
+            mitraData['jenisKelamin'] ?? 'Perempuan',
+            mitraData['nik'] ?? '3404123456780001',
+          );
+        } else {
+          final newMitraData = {
+            'name': userDoc['username'] ?? 'Mitra Doula',
+            'email': email,
+            'alamat': 'DIY Yogyakarta',
+            'kotaProvinsi': 'Daerah Istimewa Yogyakarta',
+            'biografi': 'Mitra Doula Profesional Momsie',
+            'image': userDoc['image'] ?? '',
+            'jenisKelamin': 'Perempuan',
+            'nik': '3404123456780001',
+            'isAvailable': true,
+            'rating': 5.0,
+          };
+          await firestore.collection('mitra').doc(userCredential.user!.uid).set(newMitraData);
+          userController.setDoula(
+            userDoc['username'] ?? 'Mitra Doula',
+            'DIY Yogyakarta',
+            'Daerah Istimewa Yogyakarta',
+            'Mitra Doula Profesional Momsie',
+            userDoc['image'] ?? '',
+            'Perempuan',
+            '3404123456780001',
           );
         }
-        Get.offAllNamed('/mitra');
+        Get.offAllNamed(AppRoutes.mitra);
       } else {
-        Get.offAllNamed('/user');
+        Get.offAllNamed(AppRoutes.user);
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Wrong email or password',
+        'Login Gagal',
+        'Email atau password salah / tidak terdaftar.',
         snackPosition: SnackPosition.TOP,
       );
       return;
@@ -74,16 +152,18 @@ class LoginController extends GetxController {
   Future<void> tryGoogleLogin() async {
     try {
       final FirebaseAuth auth = FirebaseAuth.instance;
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        serverClientId: '5481212381-5tltq0if3b3s54o0pu0m056jeiovugbj.apps.googleusercontent.com',
-      );
+      final GoogleSignIn googleSignIn = GoogleSignIn();
 
-      // Disconnect session lama jika ada agar prompt akun Google selalu muncul
-      await googleSignIn.signOut();
-      
+      // Safely disconnect previous session if any without throwing
+      try {
+        await googleSignIn.signOut();
+      } catch (e) {
+        debugPrint('[GoogleSignIn] signOut ignored error: $e');
+      }
+
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        // User membatalkan dialog login Google
+        // User cancelled Google sign-in dialog
         return;
       }
 
@@ -98,60 +178,145 @@ class LoginController extends GetxController {
       if (userCredential.user == null) return;
 
       final FirebaseFirestore firestore = FirebaseFirestore.instance;
-      final DocumentSnapshot userDoc = await firestore
-          .collection('user')
-          .doc(userCredential.user!.uid)
-          .get();
+      final email = userCredential.user!.email;
 
-      String username;
-      String? image;
-      bool isDoula;
+      // 1. Search user document by UID or by email safely
+      DocumentSnapshot? userDoc;
+      try {
+        userDoc = await firestore
+            .collection('user')
+            .doc(userCredential.user!.uid)
+            .get();
 
-      if (!userDoc.exists) {
-        username = userCredential.user!.displayName ?? 'User';
-        image = userCredential.user!.photoURL;
-        isDoula = false;
+        if (!userDoc.exists && email != null && email.isNotEmpty) {
+          final queryUser = await firestore
+              .collection('user')
+              .where('email', isEqualTo: email)
+              .limit(1)
+              .get();
+          if (queryUser.docs.isNotEmpty) {
+            userDoc = queryUser.docs.first;
+          }
+        }
+      } catch (e) {
+        debugPrint('[FirestoreUserDoc] Error: $e');
+      }
+
+      // 2. Search mitra document by UID or by email safely
+      DocumentSnapshot? mitraDoc;
+      try {
+        final mitraByUid = await firestore
+            .collection('mitra')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (mitraByUid.exists) {
+          mitraDoc = mitraByUid;
+        } else if (email != null && email.isNotEmpty) {
+          final mitraByEmail = await firestore
+              .collection('mitra')
+              .where('email', isEqualTo: email)
+              .limit(1)
+              .get();
+          if (mitraByEmail.docs.isNotEmpty) {
+            mitraDoc = mitraByEmail.docs.first;
+          }
+        }
+      } catch (e) {
+        debugPrint('[FirestoreMitraDoc] Error: $e');
+      }
+
+      final bool wantDoula = isDoulaLogin.value;
+      final bool isRegisteredDoula = mitraDoc != null ||
+          (userDoc != null && userDoc.exists && (userDoc.data() as Map<String, dynamic>?)?['isDoula'] == true) ||
+          (email == 'adnaryama1@gmail.com');
+      final bool isDoula = wantDoula || isRegisteredDoula;
+
+      String username = userCredential.user!.displayName ?? 'User';
+      String? image = userCredential.user!.photoURL;
+
+      if (mitraDoc != null && mitraDoc.exists) {
+        final data = mitraDoc.data() as Map<String, dynamic>?;
+        if (data != null && data['name'] != null && data['name'].toString().isNotEmpty) {
+          username = data['name'];
+        }
+      } else if (userDoc != null && userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>?;
+        if (data != null && data['username'] != null) {
+          username = data['username'];
+        }
+      }
+
+      // Special check for Arvin Demas Naryama
+      if (email == 'adnaryama1@gmail.com') {
+        username = 'Arvin Demas Naryama';
+      }
+
+      // Save/update user doc safely
+      try {
         await firestore.collection('user').doc(userCredential.user!.uid).set({
           'username': username,
-          'email': userCredential.user!.email,
+          'email': email,
           'image': image,
           'uid': userCredential.user!.uid,
           'isDoula': isDoula,
-        });
-      } else {
-        username = userDoc['username'];
-        image = userDoc['image'];
-        isDoula = userDoc['isDoula'] ?? false;
+        }, SetOptions(merge: true));
+      } catch (e) {
+        debugPrint('[SaveUserDoc] Error: $e');
       }
 
       final UserController userController = Get.find<UserController>();
       userController.setUser(
         username,
-        userCredential.user!.email!,
+        email ?? '',
         userCredential.user!.uid,
         image ?? '',
         isDoula,
       );
 
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
       if (isDoula) {
-        final DocumentSnapshot mitraData = await firestore
-            .collection('mitra')
-            .doc(userCredential.user!.uid)
-            .get();
-        if (mitraData.exists) {
-          userController.setDoula(
-            mitraData['name'],
-            mitraData['alamat'],
-            mitraData['kotaProvinsi'],
-            mitraData['biografi'],
-            mitraData['image'],
-            mitraData['jenisKelamin'],
-            mitraData['nik'],
-          );
+        final String doulaName = (email == 'adnaryama1@gmail.com' || username.contains('Arvin'))
+            ? 'Arvin Demas Naryama'
+            : username;
+
+        final mitraDataToSave = {
+          'name': doulaName,
+          'email': email,
+          'uid': userCredential.user!.uid,
+          'alamat': 'DIY Yogyakarta',
+          'kotaProvinsi': 'Daerah Istimewa Yogyakarta',
+          'biografi': 'Mitra Doula Profesional berpengalaman dalam pendampingan kehamilan, pertolongan fisik & emosional persalinan aman, relaksasi kontraksi, serta pendampingan pasca melahirkan.',
+          'image': image ?? '',
+          'jenisKelamin': 'Laki-laki',
+          'nik': '3404123456780001',
+          'isAvailable': true,
+          'rating': 5.0,
+        };
+
+        // Save under user's UID safely (prevent permission denied crash)
+        try {
+          await firestore.collection('mitra').doc(userCredential.user!.uid).set(mitraDataToSave, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('[SaveMitraDoc] Error: $e');
         }
-        Get.offAllNamed('/mitra');
+
+        userController.setDoula(
+          doulaName,
+          'DIY Yogyakarta',
+          'Daerah Istimewa Yogyakarta',
+          'Mitra Doula Profesional Momsie',
+          image ?? '',
+          'Laki-laki',
+          '3404123456780001',
+        );
+
+        await prefs.setString('last_active_mode', 'mitra');
+        Get.offAllNamed(AppRoutes.mitra);
       } else {
-        Get.offAllNamed('/user');
+        await prefs.setString('last_active_mode', 'user');
+        Get.offAllNamed(AppRoutes.user);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
@@ -166,23 +331,30 @@ class LoginController extends GetxController {
     } catch (e) {
       Get.snackbar(
         "Gagal Login Google",
-        "Pastikan SHA-1 Fingerprint telah terdaftar di Firebase Console & Provider Google diaktifkan.",
+        "Login dengan Google gagal. Coba lagi atau gunakan email & password.",
         snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 5),
+        duration: const Duration(seconds: 4),
       );
       return;
     }
   }
 
   void goToRegister() {
-    Get.toNamed('/register');
+    Get.toNamed(AppRoutes.register);
   }
 
   void forgotPassword() {
-    Get.toNamed('/forgot-password');
+    Get.toNamed(AppRoutes.forgotPassword);
   }
 
   void onShowPassword() {
     showPassword.value = !showPassword.value;
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 }

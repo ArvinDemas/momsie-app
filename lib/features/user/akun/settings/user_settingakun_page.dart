@@ -19,8 +19,8 @@ class UserSettingAkunPage extends StatelessWidget {
     final UserSettingAkunController controller =
         Get.put(UserSettingAkunController());
 
-    controller.nameController.value.text = userController.username.value;
-    controller.emailController.value.text = userController.email.value;
+    controller.nameController.text = userController.username.value;
+    controller.emailController.text = userController.email.value;
 
     return Scaffold(
       body: Stack(
@@ -43,13 +43,13 @@ class UserSettingAkunPage extends StatelessWidget {
             child: Column(
               children: [
                 editTextField(
-                  controller.nameController.value,
+                  controller.nameController,
                   "Nama Lengkap",
                   true,
                 ),
                 const SizedBox(height: 30),
                 editTextField(
-                  controller.emailController.value,
+                  controller.emailController,
                   "Email",
                   false,
                 ),
@@ -138,8 +138,8 @@ class UserSettingAkunController extends GetxController {
   final RxString downloadUrl = ''.obs;
   final Rx<File?> currentImage = Rx<File?>(null);
 
-  final Rx<TextEditingController> nameController = TextEditingController().obs;
-  final Rx<TextEditingController> emailController = TextEditingController().obs;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
   Future<void> updateUser() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;

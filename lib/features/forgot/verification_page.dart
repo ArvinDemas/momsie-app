@@ -82,6 +82,12 @@ class VerificationPage extends StatelessWidget {
                 const SizedBox(height: 30),
                 InkWell(
                   onTap: () {
+                    final controller = Get.find<VerificationController>();
+                    if (!controller.isCodeComplete()) {
+                      Get.snackbar('Kode Belum Lengkap', 'Masukkan semua 4 digit kode verifikasi.');
+                      return;
+                    }
+                    controller.verifyCode();
                     Get.toNamed('/create-password');
                   },
                   child: Container(

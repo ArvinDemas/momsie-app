@@ -1,6 +1,7 @@
 import 'package:douce/features/user/search/user_search_service.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 class UserSearchController extends GetxController {
@@ -38,7 +39,7 @@ class UserSearchController extends GetxController {
         tokoBayiList.assignAll(listTokoBayi);
       }
     } catch (e) {
-      // print(e);
+      debugPrint('Search controller error: $e');
     }
   }
 }

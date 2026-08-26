@@ -4,6 +4,11 @@ class ArtikelModel {
   final String thumbnail;
   final String pubDate;
   final String link;
+  final String category;
+  final String author;
+  final String readTime;
+  final String sources;
+  final List<String> keyPoints;
 
   ArtikelModel({
     required this.title,
@@ -11,6 +16,11 @@ class ArtikelModel {
     required this.thumbnail,
     required this.pubDate,
     required this.link,
+    this.category = 'KESEHATAN IBU',
+    this.author = 'Tim Medis Momsie & POGI',
+    this.readTime = '5 min baca',
+    this.sources = 'Kemenkes RI, WHO, & POGI (Perkumpulan Obstetri dan Ginekologi Indonesia)',
+    this.keyPoints = const [],
   });
 
   factory ArtikelModel.fromMap(Map<String, dynamic> map) {
@@ -20,10 +30,14 @@ class ArtikelModel {
       thumbnail: map['thumbnail'] ?? '',
       pubDate: map['pubDate'] ?? '',
       link: map['link'] ?? '',
+      category: map['category'] ?? 'KESEHATAN IBU',
+      author: map['author'] ?? 'Tim Medis Momsie & POGI',
+      readTime: map['readTime'] ?? '5 min baca',
+      sources: map['sources'] ?? 'Kemenkes RI, WHO, & POGI',
+      keyPoints: map['keyPoints'] != null ? List<String>.from(map['keyPoints']) : [],
     );
   }
 
-  // Alias untuk kompatibilitas dengan kode lama yang pakai fromJson
   static ArtikelModel fromJson(Map<String, dynamic> json) =>
       ArtikelModel.fromMap(json);
 
@@ -34,6 +48,11 @@ class ArtikelModel {
       'thumbnail': thumbnail,
       'pubDate': pubDate,
       'link': link,
+      'category': category,
+      'author': author,
+      'readTime': readTime,
+      'sources': sources,
+      'keyPoints': keyPoints,
     };
   }
 }

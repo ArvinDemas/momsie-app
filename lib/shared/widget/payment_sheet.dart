@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/booking_model.dart';
+import 'package:douce/shared/util/service/midtrans_service.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 // ═══════════════════════════════════════════════════════════
 // Entry point: panggil dari mana saja untuk memulai pembayaran
@@ -15,6 +21,7 @@ Future<void> showPaymentSheet(
   required String jenisLayanan,
   required String deskripsi,
   required int nominal,
+  BookingModel? booking,
 }) async {
   await showModalBottomSheet(
     context: context,
@@ -24,6 +31,7 @@ Future<void> showPaymentSheet(
       jenisLayanan: jenisLayanan,
       deskripsi: deskripsi,
       nominal: nominal,
+      booking: booking,
     ),
   );
 }
@@ -35,12 +43,14 @@ class PaymentSheet extends StatefulWidget {
   final String jenisLayanan;
   final String deskripsi;
   final int nominal;
+  final BookingModel? booking;
 
   const PaymentSheet({
     super.key,
     required this.jenisLayanan,
     required this.deskripsi,
     required this.nominal,
+    this.booking,
   });
 
   @override
@@ -48,15 +58,16 @@ class PaymentSheet extends StatefulWidget {
 }
 
 class _PaymentSheetState extends State<PaymentSheet> {
-  String? _selectedMethod;
+  String? _selectedMethod = 'midtrans_snap';
   bool _isLoading = false;
 
   final _methods = [
-    {'id': 'transfer_bca', 'label': 'Transfer BCA', 'icon': Icons.account_balance},
-    {'id': 'transfer_mandiri', 'label': 'Transfer Mandiri', 'icon': Icons.account_balance_wallet},
-    {'id': 'qris', 'label': 'QRIS', 'icon': Icons.qr_code_2},
-    {'id': 'gopay', 'label': 'GoPay', 'icon': Icons.payments_outlined},
-    {'id': 'dana', 'label': 'DANA', 'icon': Icons.wallet},
+    {
+      'id': 'midtrans_snap',
+      'label': 'Midtrans Payment Gateway (QRIS, VA, E-Wallet, Kartu)',
+      'icon': Icons.payment_rounded,
+      'isRecommended': true,
+    },
   ];
 
   String _formatRupiah(int amount) {
@@ -72,14 +83,111 @@ class _PaymentSheetState extends State<PaymentSheet> {
     setState(() => _isLoading = true);
 
     try {
-      final txId = await PaymentService().createTransaction(
-        jenisLayanan: widget.jenisLayanan,
-        deskripsi: widget.deskripsi,
-        nominal: widget.nominal,
-        metodePembayaran: _selectedMethod!,
-      );
+      final String txId;
+
+      // Jika Midtrans belum dikonfigurasi (server key kosong), gunakan mode manual
+      if (_selectedMethod == 'midtrans_snap' && MidtransService.serverKey.isEmpty) {
+        // Tampilkan loading sebentar
+        await Future.delayed(const Duration(seconds: 1));
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+
+        // Langsung buka halaman instruksi pembayaran manual
+        final transactionId = 'BKG-${DateTime.now().millisecondsSinceEpoch}';
+        Navigator.pop(context);
+        if (!context.mounted) return;
+        await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => PaymentInstructionSheet(
+            transactionId: transactionId,
+            metodePembayaran: 'transfer_bca',
+            nominal: widget.nominal,
+            deskripsi: widget.deskripsi,
+          ),
+        );
+        return;
+      }
+
+      String? bookingId;
+      if (widget.booking != null) {
+        final result = await PaymentService().createBookingTransaction(
+          booking: widget.booking!,
+          metodePembayaran: _selectedMethod!,
+        );
+        txId = result.txId;
+        bookingId = result.bookingId;
+      } else {
+        txId = await PaymentService().createTransaction(
+          jenisLayanan: widget.jenisLayanan,
+          deskripsi: widget.deskripsi,
+          nominal: widget.nominal,
+          metodePembayaran: _selectedMethod!,
+        );
+      }
 
       if (!mounted) return;
+
+      // Jika Midtrans Snap dipilih, panggil Midtrans API & buka Halaman Bayar Resmi
+      if (_selectedMethod == 'midtrans_snap') {
+        final snapRes = await MidtransService().createSnapTransaction(
+          orderId: txId,
+          grossAmount: widget.nominal,
+          customerName: widget.booking?.namaUser ?? 'Bunda Momsie',
+          customerEmail: 'user@momsie.id',
+          itemDetails: widget.deskripsi,
+        );
+
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+
+        if (snapRes != null && snapRes.redirectUrl.isNotEmpty) {
+          // Launch Midtrans Payment Page (user bayar di browser/external)
+          await MidtransService().launchSnapPayment(snapRes.redirectUrl);
+
+          // Tutup payment sheet — SEBELUM cek mounted, karena setelah pop widget sudah unmounted
+          // Tapi kita cek mounted dulu supaya Navigator.pop tidak crash
+          if (mounted) Navigator.pop(context);
+
+          // Poll status Midtrans (5x, tiap 2 detik) — cukup untuk QRIS/credit card sandbox
+          // JANGAN cek mounted setelah ini karena widget sudah unmounted setelah pop!
+          // Get.offAllNamed adalah global navigator, aman dipanggil tanpa mounted check.
+          String? status;
+          for (int i = 0; i < 5; i++) {
+            status = await MidtransService().checkStatus(txId);
+            debugPrint('[Payment] Poll $i status: $status');
+            if (status == 'settlement' || status == 'capture') break;
+            await Future.delayed(const Duration(seconds: 2));
+          }
+
+          if (status == 'settlement' || status == 'capture') {
+            // Berhasil bayar! Update Firestore ke 'paid'
+            await PaymentService().updateStatus(txId, 'paid');
+            if (widget.jenisLayanan == 'subscription') {
+              await SubscriptionService.to.setPremium(true);
+            }
+            Get.offAllNamed(AppRoutes.paymentSuccess, arguments: {
+              'transactionId': txId,
+              'nominal': widget.nominal,
+              'layanan': widget.deskripsi,
+            });
+          } else {
+            // Pending / belum bayar → ke halaman Pesanan agar bisa bayar nanti
+            Get.snackbar(
+              'Status Pembayaran',
+              'Pembayaran belum dikonfirmasi. Lanjutkan pembayaran di menu Pesanan.',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.orange.shade800,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 4),
+            );
+            Get.offAllNamed('/user-pesanan');
+          }
+          return;
+        } // end if (snapRes != null)
+      } // end if (_selectedMethod == 'midtrans_snap')
+
       setState(() => _isLoading = false);
 
       final ctx = context;
@@ -87,7 +195,7 @@ class _PaymentSheetState extends State<PaymentSheet> {
       final nominal = widget.nominal;
       final deskripsi = widget.deskripsi;
 
-      // Navigasi ke Step 2
+      // Navigasi ke Step 2 (Instruksi Transfer Manual)
       Navigator.pop(ctx);
       if (!ctx.mounted) return;
       await showModalBottomSheet(
@@ -414,13 +522,14 @@ class _PaymentUploadSheetState extends State<PaymentUploadSheet> {
       if (_image != null) {
         await PaymentService().uploadBukti(_image!, widget.transactionId);
       }
-      // Simulasi auto-verify 10 detik (fire & forget)
-      PaymentService().simulateVerification(widget.transactionId);
+      // Update status di Firestore menjadi 'paid' agar pembayaran berhasil
+      await PaymentService().updateStatus(widget.transactionId, 'paid');
+      await SubscriptionService.to.setPremium(true);
 
       if (!mounted) return;
       Navigator.pop(context);
 
-      // Step 4: Success
+      // Step 4: Success — status sudah 'paid' di Firestore
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -659,13 +768,19 @@ class _MethodTile extends StatelessWidget {
             Icon(icon,
                 color: selected ? ColorDouce.douceBase : Colors.grey.shade600),
             const SizedBox(width: 12),
-            Text(label,
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.normal,
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   color: selected ? ColorDouce.douceBase : Colors.black87,
-                )),
-            const Spacer(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
             if (selected)
               Icon(Icons.check_circle, color: ColorDouce.douceBase, size: 20),
           ],

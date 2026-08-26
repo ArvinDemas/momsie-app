@@ -16,13 +16,11 @@ class MitraRegisterController extends GetxController {
 
   final Rx<File?> currentImage = Rx<File?>(null);
 
-  final Rx<TextEditingController> nameController = TextEditingController().obs;
-  final Rx<TextEditingController> nikController = TextEditingController().obs;
-  final Rx<TextEditingController> nohpController = TextEditingController().obs;
-  final Rx<TextEditingController> kotaProvinsiController =
-      TextEditingController().obs;
-  final Rx<TextEditingController> biografiController =
-      TextEditingController().obs;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController nikController = TextEditingController();
+  final TextEditingController nohpController = TextEditingController();
+  final TextEditingController kotaProvinsiController = TextEditingController();
+  final TextEditingController biografiController = TextEditingController();
 
   void changePage(int page) {
     currentPage.value = page;
@@ -43,10 +41,10 @@ class MitraRegisterController extends GetxController {
 
   Future<void> submitRegister() async {
     try {
-      if (nameController.value.text.isEmpty ||
-          nikController.value.text.isEmpty ||
-          nohpController.value.text.isEmpty ||
-          kotaProvinsiController.value.text.isEmpty) {
+      if (nameController.text.isEmpty ||
+          nikController.text.isEmpty ||
+          nohpController.text.isEmpty ||
+          kotaProvinsiController.text.isEmpty) {
         Get.snackbar('Error', 'Lengkapi data diri di halaman pertama',
             snackPosition: SnackPosition.TOP);
         return;
@@ -59,7 +57,7 @@ class MitraRegisterController extends GetxController {
             snackPosition: SnackPosition.TOP);
         return;
       }
-      if (biografiController.value.text.isEmpty) {
+      if (biografiController.text.isEmpty) {
         Get.snackbar('Error', 'Biografi tidak boleh kosong',
             snackPosition: SnackPosition.TOP);
         return;
@@ -91,19 +89,34 @@ class MitraRegisterController extends GetxController {
 
       Get.back(); // close loading
 
+      // Buat/Update dokumen mitra
       await firestore.collection('mitra').doc(userController.uid.value).set({
-        'name': nameController.value.text,
-        'nik': nikController.value.text,
-        'nohp': nohpController.value.text,
-        'biografi': biografiController.value.text,
+        'name': nameController.text,
+        'nik': nikController.text,
+        'nohp': nohpController.text,
+        'biografi': biografiController.text,
         'pekerjaan': jobSelect.value,
         'pendidikan': educationSelect.value,
         'agama': religionSelect.value,
         'jenisKelamin': genderSelect.value,
-        'kotaProvinsi': kotaProvinsiController.value.text,
+        'kotaProvinsi': kotaProvinsiController.text,
+        'alamat': kotaProvinsiController.text,  // Simpan juga sebagai 'alamat' agar kompatibel dengan DoulaModel
         'image': localPath,
         'rating': 5.0,
         'saldo': 0,
+        'saldo_tersedia': 0,
+        'saldo_escrow': 0,
+        'totalPendapatan': 0,
+      }, SetOptions(merge: true));
+
+      // PENTING: Update field isDoula di collection 'user' agar login mendeteksi role mitra
+      await firestore.collection('user').doc(userController.uid.value).update({
+        'isDoula': true,
+      }).catchError((_) async {
+        // Jika document belum ada, buat baru dengan isDoula: true
+        await firestore.collection('user').doc(userController.uid.value).set({
+          'isDoula': true,
+        }, SetOptions(merge: true));
       });
 
       final int randomNumber = getRandomNumber();
@@ -112,36 +125,25 @@ class MitraRegisterController extends GetxController {
       // jangan buat dokumen register dan jangan arahkan ke halaman OVO
       final AppConfigService configService = Get.find<AppConfigService>();
 
-      if (configService.showPaymentFlow.value) {
-        // Mode normal: buat dokumen register untuk alur pembayaran OVO
-        await firestore
-            .collection('register')
-            .doc(userController.uid.value)
-            .set({
-          'registerConfirmed': false,
-          'payment': randomNumber,
-        });
-
-        Get.offAllNamed('/user');
-        Get.toNamed('/confirm-register', arguments: {
-          'payment': randomNumber,
-        });
-      } else {
-        // Mode review Google Play: lewati halaman OVO
-        Get.offAllNamed('/user');
-        Get.snackbar(
-          'Pendaftaran Berhasil',
-          'Data pendaftaran mitra Anda telah dikirim. Tim kami akan meninjau dalam 1x24 jam.',
-          snackPosition: SnackPosition.TOP,
-          duration: const Duration(seconds: 4),
-        );
-      }
+      // Setelah selesai registrasi, arahkan ke halaman SOP untuk approval
+      // Doula akan masuk ke flow mitra setelah SOP disetujui
+      Get.offAllNamed('/sop-waiting');
     } catch (e) {
       // Make sure loading dialog is closed if Firestore write fails
       if (Get.isDialogOpen ?? false) Get.back();
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
           snackPosition: SnackPosition.TOP);
     }
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    nikController.dispose();
+    nohpController.dispose();
+    kotaProvinsiController.dispose();
+    biografiController.dispose();
+    super.onClose();
   }
 
   int getRandomNumber() {

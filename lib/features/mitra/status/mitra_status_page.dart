@@ -1,7 +1,7 @@
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/features/mitra/status/mitra_status_controller.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/util/model/pesanan_model.dart';
+import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +114,7 @@ class MitraStatusPage extends StatelessWidget {
     return Wrap(
       runSpacing: 20,
       children: Get.find<MitraPekerjaanController>()
-          .active
+          .activeBookings
           .map(
             (active) => jobContainer(context, active),
           )
@@ -126,7 +126,7 @@ class MitraStatusPage extends StatelessWidget {
     return Wrap(
       runSpacing: 20,
       children: Get.find<MitraPekerjaanController>()
-          .riwayat
+          .completedBookings
           .map(
             (riwayat) => terkonfirmasiJobContainer(riwayat),
           )
@@ -134,7 +134,7 @@ class MitraStatusPage extends StatelessWidget {
     );
   }
 
-  Widget jobContainer(context, ActiveModel active) {
+  Widget jobContainer(context, BookingModel active) {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
@@ -208,7 +208,7 @@ class MitraStatusPage extends StatelessWidget {
                     children: [
                       const Icon(Icons.wallet),
                       const SizedBox(width: 15),
-                      Text(active.harga.toString()),
+                      Text(active.hargaLayanan.toString()),
                     ],
                   )
                 ],
@@ -241,8 +241,8 @@ class MitraStatusPage extends StatelessWidget {
               InkWell(
                 onTap: () {
                   Get.toNamed('/chat-page', arguments: {
-                    "user": active.pemesan,
-                    "doula": active.doula,
+                    "user": active.userId,
+                    "doula": active.doulaUid,
                     "isDoula": true,
                   });
                 },
@@ -325,7 +325,7 @@ class MitraStatusPage extends StatelessWidget {
     );
   }
 
-  Widget terkonfirmasiJobContainer(ActiveModel riwayat) {
+  Widget terkonfirmasiJobContainer(BookingModel riwayat) {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
@@ -391,7 +391,7 @@ class MitraStatusPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Harga:"),
-              Text(riwayat.harga.toString()),
+              Text(riwayat.hargaLayanan.toString()),
             ],
           ),
           const SizedBox(height: 5),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/diary/diary_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
@@ -19,7 +20,7 @@ class DiaryDetailPage extends StatelessWidget {
         '${entry.createdAt.month.toString().padLeft(2, '0')}/'
         '${entry.createdAt.year} '
         '${entry.createdAt.hour.toString().padLeft(2, '0')}:'
-        '${entry.createdAt.minute.toString().padLeft(2, '0')}';
+        '${entry.createdAt.minute.toString().padLeft(2, '0')} WIB';
 
     return Scaffold(
       body: Stack(
@@ -28,25 +29,39 @@ class DiaryDetailPage extends StatelessWidget {
           SafeArea(
             child: CustomScrollView(
               slivers: [
-                // SliverAppBar with photo as header
+                // SliverAppBar with photo carousel as header
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
-                  expandedHeight: entry.photoUrls.isNotEmpty ? 260 : 0,
+                  expandedHeight: entry.photoUrls.isNotEmpty ? 280 : 0,
                   pinned: true,
                   leading: IconButton(
-                    icon: const CircleAvatar(
-                      backgroundColor: Colors.black38,
-                      child: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white, size: 18),
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.black45,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                     onPressed: () => Get.back(),
                   ),
                   actions: [
                     IconButton(
-                      icon: const CircleAvatar(
-                        backgroundColor: Colors.black38,
-                        child: Icon(Icons.edit_rounded,
-                            color: Colors.white, size: 18),
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.black45,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.edit_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
                       onPressed: () {
                         c.initForm(entry: entry);
@@ -56,52 +71,68 @@ class DiaryDetailPage extends StatelessWidget {
                   ],
                   flexibleSpace: entry.photoUrls.isNotEmpty
                       ? FlexibleSpaceBar(
-                          background: _PhotoCarousel(
-                              urls: entry.photoUrls),
+                          background: _PhotoCarousel(urls: entry.photoUrls),
                         )
                       : null,
                 ),
 
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Badges row
+                        // Badges Row
                         Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: ColorDouce.kindaRed,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                '${entry.moodEmoji} ${entry.moodLabel}',
-                                style: const TextStyle(fontSize: 12),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(entry.moodEmoji, style: const TextStyle(fontSize: 14)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    entry.moodLabel,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: ColorDouce.veryLightPink,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                '🤱 Minggu ${entry.pregnancyWeek}',
+                                entry.isBabyBorn ? '👶 ${entry.ageLabel}' : '🤱 Usia Kehamilan: ${entry.ageLabel}',
                                 style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black54),
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
 
                         // Title
                         Text(
@@ -109,33 +140,53 @@ class DiaryDetailPage extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
-                            height: 1.2,
+                            color: Color(0xFF0F172A),
+                            height: 1.25,
                           ),
                         ),
 
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
 
-                        // Date
-                        Text(
-                          dateStr,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey),
+                        // Date Tag
+                        Row(
+                          children: [
+                            const Icon(Icons.access_time_rounded, size: 14, color: Colors.grey),
+                            const SizedBox(width: 6),
+                            Text(
+                              dateStr,
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
                         ),
 
                         if (entry.content.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          const Divider(),
+                          const Divider(color: Colors.black12),
                           const SizedBox(height: 16),
-                          Text(
-                            entry.content,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              height: 1.7,
-                              color: Colors.black87,
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              entry.content,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                height: 1.7,
+                                color: Color(0xFF334155),
+                              ),
                             ),
                           ),
                         ],
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -167,6 +218,37 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
     super.dispose();
   }
 
+  Widget _buildPhotoItem(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorWidget: (_, __, ___) => _photoFallback(),
+      );
+    }
+    final file = File(url);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (_, __, ___) => _photoFallback(),
+      );
+    }
+    return _photoFallback();
+  }
+
+  Widget _photoFallback() {
+    return Container(
+      color: ColorDouce.veryLightPink,
+      width: double.infinity,
+      child: const Center(
+        child: Icon(Icons.photo_rounded, size: 48, color: Color(0xFFFF6972)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -175,45 +257,24 @@ class _PhotoCarouselState extends State<_PhotoCarousel> {
           controller: _pc,
           onPageChanged: (i) => setState(() => _current = i),
           itemCount: widget.urls.length,
-          itemBuilder: (_, i) {
-            final url = widget.urls[i];
-            return (url.startsWith('http://') || url.startsWith('https://'))
-                ? Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (_, __, ___) => const ColoredBox(
-                      color: Color(0xFFEEEEEE),
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  )
-                : Image.file(
-                    File(url),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (_, __, ___) => const ColoredBox(
-                      color: Color(0xFFEEEEEE),
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  );
-          },
+          itemBuilder: (_, i) => _buildPhotoItem(widget.urls[i]),
         ),
         if (widget.urls.length > 1)
           Positioned(
-            bottom: 12,
+            bottom: 14,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: widget.urls.asMap().entries.map((e) {
                 return Container(
-                  width: _current == e.key ? 16 : 6,
+                  width: _current == e.key ? 18 : 6,
                   height: 6,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
                     color: _current == e.key
                         ? Colors.white
-                        : Colors.white54,
+                        : Colors.white60,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Izinkan baca publik untuk gambar avatar, sertifikat, & foto obat/toko
+      allow read: if true;
+      // Izinkan unggah/edit untuk pengguna yang sudah login
+      allow write: if request.auth != null;
+    }
+  }
+}

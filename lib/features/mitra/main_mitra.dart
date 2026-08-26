@@ -1,8 +1,8 @@
-import 'package:douce/features/mitra/akun/mitra_akun_page.dart';
 import 'package:douce/features/mitra/beranda/mitra_beranda_page.dart';
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_page.dart';
-import 'package:douce/features/mitra/status/mitra_status_page.dart';
+import 'package:douce/features/mitra/pendapatan/mitra_pendapatan_page.dart';
+import 'package:douce/features/mitra/profil/mitra_aturjadwal_page.dart';
 import 'package:douce/shared/widget/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,11 +23,12 @@ class MainMitraPage extends StatelessWidget {
         ),
         bottomNavigationBar: Obx(
           () => NavBar(
+            isMitra: true,
             listItems: const [
               {'label': 'Beranda', 'count': 0},
               {'label': 'Pekerjaan', 'count': 1},
-              {'label': 'Status', 'count': 2},
-              {'label': 'Akun', 'count': 3},
+              {'label': 'Jadwal', 'count': 2},
+              {'label': 'Pendapatan', 'count': 3},
             ],
             onChangeIndex: mitraController.onItemTapped,
             selectedIndex: mitraController.selectedIndex.value,
@@ -39,7 +40,7 @@ class MainMitraPage extends StatelessWidget {
 }
 
 class MainMitraController extends GetxController {
-  RxInt selectedIndex = 3.obs;
+  RxInt selectedIndex = 0.obs;
 
   void onItemTapped(int index) {
     selectedIndex.value = index;
@@ -48,7 +49,7 @@ class MainMitraController extends GetxController {
   final List<Widget> pageList = const [
     MitraBerandaPage(),
     MitraPekerjaanPage(),
-    MitraStatusPage(),
-    MitraAkunPage(),
+    MitraAturJadwalPage(),
+    MitraPendapatanPage(),
   ];
 }

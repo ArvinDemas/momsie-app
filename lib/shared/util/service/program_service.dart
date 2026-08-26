@@ -5,14 +5,25 @@ import 'package:douce/shared/util/model/program_model.dart';
 
 class ProgramService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<ProgramModel>? _cache;
+  DateTime? _cachedAt;
+  static const _cacheTtl = Duration(minutes: 5);
 
   Future<List<ProgramModel>> getProgram() async {
+    // Return cached data if still fresh
+    if (_cache != null &&
+        _cachedAt != null &&
+        DateTime.now().difference(_cachedAt!) < _cacheTtl) {
+      return _cache!;
+    }
+
     try {
       QuerySnapshot programSnapshot =
-          await _firestore.collection('program').get();
+          await _firestore.collection('program').limit(50).get();
 
-      List<ProgramModel> programs = [];
-      for (var doc in programSnapshot.docs) {
+      // Batch-fetch all sub-collections per program in parallel to avoid N+1
+      final List<Future<ProgramModel>> programFutures =
+          programSnapshot.docs.map((doc) async {
         var programData = doc.data() as Map<String, dynamic>;
         List<Month> months = [];
 
@@ -22,7 +33,10 @@ class ProgramService {
             .collection('bulan')
             .get();
 
-        for (var monthDoc in monthSnapshot.docs) {
+        // Parallelize week/move fetches per month
+        final List<Future<Month>> monthFutures = monthSnapshot.docs.map((
+          monthDoc,
+        ) async {
           var monthData = monthDoc.data() as Map<String, dynamic>;
           List<Week> weeks = [];
 
@@ -33,47 +47,61 @@ class ProgramService {
               .doc(monthDoc.id)
               .collection('minggu')
               .get();
-          for (var weekDoc in weekSnapshot.docs) {
-            var weekData = weekDoc.data() as Map<String, dynamic>;
-            List<Move> moves = [];
 
-            QuerySnapshot moveSnapshot = await _firestore
-                .collection('program')
-                .doc(doc.id)
-                .collection('bulan')
-                .doc(monthDoc.id)
-                .collection('minggu')
-                .doc(weekDoc.id)
-                .collection('gerakan')
-                .get();
+          // Parallelize move fetches per week
+          final List<Future<Week>> weekFutures = weekSnapshot.docs.map(
+            (weekDoc) async {
+              var weekData = weekDoc.data() as Map<String, dynamic>;
+              List<Move> moves = [];
 
-            for (var moveDoc in moveSnapshot.docs) {
-              var moveData = moveDoc.data() as Map<String, dynamic>;
-              moves.add(Move(
-                image: moveData['image'],
-                name: moveData['judul'],
-                petunjuk: moveData['petunjuk'],
-                time: int.parse(moveData['waktu']),
-              ));
-            }
-            weeks.add(Week(
-              week: weekData['minggu'],
-              image: weekData['image'],
-              moves: moves,
-            ));
-          }
-          months.add(Month(
+              QuerySnapshot moveSnapshot = await _firestore
+                  .collection('program')
+                  .doc(doc.id)
+                  .collection('bulan')
+                  .doc(monthDoc.id)
+                  .collection('minggu')
+                  .doc(weekDoc.id)
+                  .collection('gerakan')
+                  .get();
+
+              for (var moveDoc in moveSnapshot.docs) {
+                var moveData = moveDoc.data() as Map<String, dynamic>;
+                moves.add(Move(
+                  image: moveData['image'],
+                  name: moveData['judul'],
+                  petunjuk: moveData['petunjuk'],
+                  time: int.parse(moveData['waktu']),
+                ));
+              }
+              return Week(
+                week: weekData['minggu'],
+                image: weekData['image'],
+                moves: moves,
+              );
+            },
+          ).toList();
+          weeks = await Future.wait(weekFutures);
+
+          return Month(
             month: monthData['bulan'],
             weeks: weeks,
-          ));
-        }
-        programs.add(ProgramModel(
+          );
+        }).toList();
+        months = await Future.wait(monthFutures);
+
+        return ProgramModel(
           image: programData['image'],
           name: programData['nama'],
           desc: programData['desc'],
           months: months,
-        ));
-      }
+        );
+      }).toList();
+
+      List<ProgramModel> programs = await Future.wait(programFutures);
+
+      // Cache the result
+      _cache = programs;
+      _cachedAt = DateTime.now();
 
       if (programs.isEmpty) {
         return _getMockPrograms();
@@ -85,9 +113,17 @@ class ProgramService {
   }
 
   List<ProgramModel> _getMockPrograms() {
+    const yogaMainImage = 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format&fit=crop&q=80';
+    const weekYogaImages = [
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1599447421416-3414500d18a5?w=500&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?w=500&auto=format&fit=crop&q=80',
+    ];
+
     return [
       ProgramModel(
-        image: 'https://picsum.photos/seed/yoga1/300/300',
+        image: yogaMainImage,
         name: 'Yoga Hamil & Meditasi',
         desc: 'Program latihan yoga prenatal untuk melatih pernapasan, kelenturan otot panggul, dan ketenangan pikiran menghadapi persalinan.',
         months: List.generate(9, (mIndex) {
@@ -98,28 +134,28 @@ class ProgramService {
               final weekNum = (wIndex + 1).toString();
               return Week(
                 week: weekNum,
-                image: 'https://picsum.photos/seed/yogaweek${monthNum}_${weekNum}/400/250',
+                image: weekYogaImages[wIndex % weekYogaImages.length],
                 moves: [
                   Move(
-                    image: 'https://picsum.photos/seed/yogam1/300/300',
+                    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format&fit=crop&q=80',
                     name: 'Pernapasan Diafragma (Deep Breathing)',
                     time: 60,
                     petunjuk: '1. Duduk dengan posisi tegak dan nyaman.\n2. Letakkan satu tangan di dada dan tangan lainnya di perut.\n3. Tarik napas perlahan melalui hidung hingga perut mengembang.\n4. Hembuskan napas perlahan melalui mulut.\n5. Lakukan berulang selama 1 menit.',
                   ),
                   Move(
-                    image: 'https://picsum.photos/seed/yogam2/300/300',
+                    image: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&auto=format&fit=crop&q=80',
                     name: 'Pose Kucing-Sapi (Cat-Cow Pose)',
                     time: 120,
                     petunjuk: '1. Mulai dengan posisi merangkak di matras.\n2. Sejajarkan pergelangan tangan dengan bahu, dan lutut dengan pinggul.\n3. Tarik napas, lengkungkan punggung ke bawah (pose sapi).\n4. Hembuskan napas, bulatkan punggung ke atas (pose kucing).\n5. Lakukan bergantian selama 2 menit.',
                   ),
                   Move(
-                    image: 'https://picsum.photos/seed/yogam3/300/300',
+                    image: 'https://images.unsplash.com/photo-1599447421416-3414500d18a5?w=500&auto=format&fit=crop&q=80',
                     name: 'Pose Kupu-Kupu (Butterfly Pose)',
                     time: 90,
                     petunjuk: '1. Duduk tegak dan pertemukan kedua telapak kaki di depan.\n2. Pegang pergelangan kaki, rapatkan tumit sedekat mungkin ke arah panggul.\n3. Ayunkan lutut ke atas dan bawah dengan lembut.\n4. Lakukan selama 1,5 menit.',
                   ),
                   Move(
-                    image: 'https://picsum.photos/seed/yogam4/300/300',
+                    image: 'https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?w=500&auto=format&fit=crop&q=80',
                     name: 'Peregangan Pinggul Lambat (Gentle Bridge Pose)',
                     time: 60,
                     petunjuk: '1. Berbaring telentang dengan lutut ditekuk dan kaki rata di matras.\n2. Angkat pinggul Anda perlahan ke atas.\n3. Tahan beberapa detik lalu turunkan kembali secara perlahan.\n4. Lakukan berulang selama 1 menit.',

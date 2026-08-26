@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:douce/features/user/beranda/user_beranda_controller.dart';
+import 'package:douce/features/user/main_user.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/features/user/sizeguide/sizeguide_card.dart';
 import 'package:douce/shared/theme/color.dart';
-import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
+import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/widget/feedback_dialog.dart';
 import 'package:douce/shared/widget/onboarding_modal.dart';
+import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,33 +27,57 @@ class UserBerandaPage extends StatefulWidget {
 
 class _UserBerandaPageState extends State<UserBerandaPage> {
   final PageController _carouselController = PageController();
+  Timer? _carouselTimer;
   int _activeSlideIndex = 0;
+  late UserBerandaController controller;
 
   @override
   void initState() {
     super.initState();
+    // Controller sudah di-register permanent di main_user.dart, cukup Get.find()
+    controller = Get.find<UserBerandaController>();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       OnboardingModal.checkAndShow(context);
+    });
+
+    // Auto-Play Carousel Banner (Pergeseran Otomatis setiap 6 detik agar lebih tenang & nyaman)
+    _carouselTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
+      if (_carouselController.hasClients) {
+        final nextPage = (_activeSlideIndex + 1) % 4;
+        _carouselController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
   @override
   void dispose() {
+    // Memory Leak Guardrail: Pembatalan Timer.periodic secara eksplisit saat dispose
+    _carouselTimer?.cancel();
     _carouselController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final UserBerandaController controller = Get.put(UserBerandaController());
 
     return BasePage(
+      onAvatarTap: () {
+        if (!Get.isRegistered<UserController>()) {
+          Get.put(UserController());
+        }
+        Get.toNamed(AppRoutes.userAkun);
+      },
       childWidget: ListView(
         padding: const EdgeInsets.only(bottom: 100),
         children: [
           const SizedBox(height: 16),
 
-          // ── 1. Top 3D Carousel Banner (Apple Aesthetic) ─────────────
+          // ── 1. Top 3D Carousel Banner (Apple Aesthetic + Auto-Play) ──
           _buildBannerCarousel(),
 
           const SizedBox(height: 20),
@@ -107,7 +135,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 // ── 3. Apple Bento Grid Layout (Bebas Emoji) ──────────
                 _buildBentoGrid(),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 36),
 
                 // ── 4. Toko Perlengkapan Bayi Jogja ───────────────────
                 Row(
@@ -147,29 +175,33 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                Obx(
-                  () => controller.isTokoBayiLoading.value
-                      ? const Center(child: CircularProgressIndicator())
-                      : SingleChildScrollView(
-                          clipBehavior: Clip.none,
-                          scrollDirection: Axis.horizontal,
-                          child: Wrap(
-                            spacing: 16,
-                            children: controller
-                                .getRandomTokoBayi()
-                                .map(
-                                  (tokoBayi) => TokoBayiContainer(
-                                    tokoBayi: tokoBayi,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-                ),
+                // Horizontal scroll toko bayi — width card bounded 300px
+                Obx(() {
+                  if (controller.isTokoBayiLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final tokos = controller.getRandomTokoBayi();
+                  if (tokos.isEmpty) return const SizedBox();
+                  return SizedBox(
+                    height: 270,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      itemCount: tokos.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 14),
+                      itemBuilder: (context, index) {
+                        return SizedBox(
+                          width: 300,
+                          child: TokoBayiContainer(tokoBayi: tokos[index]),
+                        );
+                      },
+                    ),
+                  );
+                }),
 
                 const SizedBox(height: 28),
 
-                // ── 5. Artikel Terkini ─────────────────────────────────
+                // ── 5. Artikel Terkini ──────────────────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -207,20 +239,33 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                Obx(
-                  () => controller.isArtikelLoading.value
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: controller.getRandomArtikel().length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final artikel = controller.getRandomArtikel()[index];
-                            return _buildArtikelTile(artikel);
-                          },
-                        ),
-                ),
+                // Cache list artikel SEKALI agar tidak di-shuffle 2x oleh itemCount + itemBuilder
+                Obx(() {
+                  if (controller.isArtikelLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final artikels = controller.getRandomArtikel();
+                  if (artikels.isEmpty) return const SizedBox();
+                  // Bangun grid secara manual dengan Row berpasangan
+                  // (menghindari GridView shrinkWrap di dalam ListView yang menyebabkan lag)
+                  final rows = <Widget>[];
+                  for (int i = 0; i < artikels.length; i += 2) {
+                    final hasSecond = i + 1 < artikels.length;
+                    rows.add(
+                      Row(
+                        children: [
+                          Expanded(child: ArtikelContainer(artikel: artikels[i])),
+                          const SizedBox(width: 14),
+                          hasSecond
+                              ? Expanded(child: ArtikelContainer(artikel: artikels[i + 1]))
+                              : const Expanded(child: SizedBox()),
+                        ],
+                      ),
+                    );
+                    if (i + 2 < artikels.length) rows.add(const SizedBox(height: 16));
+                  }
+                  return Column(children: rows);
+                }),
               ],
             ),
           )
@@ -235,34 +280,43 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
       {
         'title': 'Pendamping Persalinan Professional',
         'subtitle': 'Pesan Doula Bersertifikat Door-to-Door langsung ke lokasi Bunda',
-        'cta': 'Pesan Doula Now',
+        'cta': 'Momsie Ecosystem',
+        'image': 'assets/images/banner_doula.jpg',
         'gradient': const [Color(0xFFF43F5E), Color(0xFFFB7185)],
         'icon': Icons.medical_services_rounded,
-        'action': () => Get.toNamed('/booking-doula'),
+        'action': () {
+          if (!Get.isRegistered<MainUserController>()) {
+            Get.put(MainUserController());
+          }
+          Get.find<MainUserController>().switchTab(1);
+        },
       },
       {
         'title': 'Momsie AI Assistant 24/7',
         'subtitle': 'Konsultasikan keluhan kehamilan & nutrisi kapan saja bersama AI',
-        'cta': 'Tanya AI Sekarang',
-        'gradient': const [Color(0xFF0284C7), Color(0xFF38BDF8)],
+        'cta': 'Tanya AI',
+        'image': 'assets/images/banner_ai.jpg',
+        'gradient': const [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
         'icon': Icons.smart_toy_rounded,
-        'action': () => Get.toNamed('/ai-chat'),
+        'action': () => Get.toNamed(AppRoutes.aiChat),
       },
       {
-        'title': 'Hospital Bag & Birth Plan',
-        'subtitle': 'Checklist perlengkapan bersalin lengkap untuk Ibu, Bayi, & Pendamping',
-        'cta': 'Cek Checklist',
+        'title': 'Hospital Bag Checklist',
+        'subtitle': 'Checklist perlengkapan bersalin lengkap untuk Ibu & Si Kecil',
+        'cta': 'Cek Tas Bersalin',
+        'image': 'assets/images/banner_hospital_bag.jpg',
         'gradient': const [Color(0xFF7C3AED), Color(0xFFC084FC)],
         'icon': Icons.backpack_rounded,
-        'action': () => Get.toNamed('/checklist'),
+        'action': () => Get.toNamed(AppRoutes.checklist),
       },
       {
-        'title': 'Toko Bayi & Faskes Terdekat',
-        'subtitle': 'Temukan lokasi toko perlengkapan bayi & RSIA terpercaya di Jogja',
-        'cta': 'Cari Lokasi',
-        'gradient': const [Color(0xFFE11D48), Color(0xFFFDA4AF)],
-        'icon': Icons.storefront_rounded,
-        'action': () => Get.toNamed('/user-search'),
+        'title': 'Birth Plan Rencana Persalinan',
+        'subtitle': 'Susun keinginan persalinan nyaman & aman bersama Bidan/Dokter',
+        'cta': 'Buat Birth Plan',
+        'image': 'assets/images/banner_birth_plan.jpg',
+        'gradient': const [Color(0xFF0D9488), Color(0xFF2DD4BF)],
+        'icon': Icons.assignment_rounded,
+        'action': () => Get.toNamed(AppRoutes.checklist),
       },
     ];
 
@@ -278,105 +332,67 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
               final slide = slides[index];
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: slide['gradient'] as List<Color>,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: (slide['gradient'][0] as Color).withOpacity(0.35),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
+                      color: (slide['gradient'][0] as Color).withValues(alpha: 0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            slide['title'] as String,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: InkWell(
+                    onTap: slide['action'] as VoidCallback,
+                    child: Image.asset(
+                      slide['image'] as String,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 160,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: slide['gradient'] as List<Color>,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            slide['subtitle'] as String,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 11,
-                              height: 1.3,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          // WCAG AAA Pristine White Pill Button (17.85:1 Contrast)
-                          InkWell(
-                            onTap: slide['action'] as VoidCallback,
-                            borderRadius: BorderRadius.circular(20),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.15),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    slide['cta'] as String,
-                                    style: const TextStyle(
-                                      color: Color(0xFF0F172A),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      slide['title'] as String,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Icon(
-                                    Icons.arrow_forward_rounded,
-                                    size: 14,
-                                    color: Color(0xFF0F172A),
-                                  ),
-                                ],
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      slide['subtitle'] as String,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        slide['icon'] as IconData,
-                        color: Colors.white,
-                        size: 36,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               );
             },
@@ -417,7 +433,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 subtitle: 'Checklist Bersalin',
                 icon: Icons.backpack_rounded,
                 color: const Color(0xFFF43F5E),
-                onTap: () => Get.toNamed('/checklist'),
+                onTap: () => Get.toNamed(AppRoutes.checklist),
               ),
             ),
             const SizedBox(width: 12),
@@ -427,13 +443,13 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 subtitle: 'Rencana Persalinan',
                 icon: Icons.description_rounded,
                 color: const Color(0xFF8B5CF6),
-                onTap: () => Get.toNamed('/birth-plan'),
+                onTap: () => Get.toNamed(AppRoutes.birthPlan),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        // Row 2: Diary & Nama Bayi
+        // Row 2: Diary & Postpartum Wellbeing
         Row(
           children: [
             Expanded(
@@ -442,29 +458,44 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 subtitle: 'Jurnal Kehamilan',
                 icon: Icons.menu_book_rounded,
                 color: const Color(0xFFF97316),
-                onTap: () => Get.toNamed('/diary'),
+                onTap: () => Get.toNamed(AppRoutes.diary),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _bentoCard(
-                title: 'Nama Bayi',
-                subtitle: 'Inspirasi Nama',
-                icon: Icons.auto_awesome_rounded,
-                color: const Color(0xFF06B6D4),
-                onTap: () => Get.toNamed('/baby-names'),
+                title: 'Postpartum',
+                subtitle: 'Pemulihan Nifas',
+                icon: Icons.favorite_rounded,
+                color: const Color(0xFFEC4899),
+                onTap: () => Get.toNamed(AppRoutes.postpartumWellbeing),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        // Row 3: Full Width AI Chatbot
+        // Row 3: Nama Bayi
+        Row(
+          children: [
+            Expanded(
+              child: _bentoCard(
+                title: 'Nama Bayi',
+                subtitle: 'Inspirasi Nama Islami & Modern',
+                icon: Icons.auto_awesome_rounded,
+                color: const Color(0xFF06B6D4),
+                onTap: () => Get.toNamed(AppRoutes.babyNames),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Row 4: Full Width AI Chatbot (Gemini Dynamic Gradient)
         _bentoCardWide(
           title: 'Momsie AI Chatbot Assistant 24/7',
           subtitle: 'Tanya keluhan kehamilan & rekomendasi medis instan',
           icon: Icons.smart_toy_rounded,
-          color: const Color(0xFF0284C7),
-          onTap: () => Get.toNamed('/ai-chat'),
+          colorsList: const [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
+          onTap: () => Get.toNamed(AppRoutes.aiChat),
         ),
       ],
     );
@@ -532,7 +563,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color color,
+    required List<Color> colorsList,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -542,15 +573,15 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color, color.withOpacity(0.85)],
+            colors: colorsList,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 10,
+              color: colorsList.first.withValues(alpha: 0.35),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -560,7 +591,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.white, size: 26),
@@ -600,75 +631,5 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
     );
   }
 
-  Widget _buildArtikelTile(ArtikelModel artikel) {
-    return InkWell(
-      onTap: () => Get.toNamed("/user-artikel", arguments: artikel),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.network(
-                artikel.thumbnail,
-                width: 90,
-                height: 75,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 90,
-                  height: 75,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.article_rounded, color: Colors.grey),
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    artikel.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        artikel.pubDate,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
+

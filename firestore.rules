@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ─── BERITA (Publik bisa baca, Admin/User terotentikasi bisa tulis) ─
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    // ─── USERS (Akses Resmi Pengguna) ────────────────
+    match /users/{userId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── USER ───────────────────────────────────────
+    match /user/{userId} {
+      allow read, write: if isAuth();
+
+      match /diary/{diaryId} {
+        allow read, write: if isAuth();
+      }
+    }
+
+    // ─── MITRA ──────────────────────────────────────
+    match /mitra/{mitraId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── BOOKING (singular legacy & plural) ─────────
+    match /booking/{bookingId} {
+      allow read, write: if isAuth();
+    }
+
+    match /bookings/{bookingId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── PEKERJAAN ──────────────────────────────────
+    match /pekerjaan/{pekerjaanId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── ACTIVE ─────────────────────────────────────
+    match /active/{activeId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── RIWAYAT ────────────────────────────────────
+    match /riwayat/{riwayatId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── CHAT ───────────────────────────────────────
+    match /chat/{chatId} {
+      allow read, write: if isAuth();
+
+      match /messages/{messageId} {
+        allow read, write: if isAuth();
+      }
+    }
+
+    // ─── REGISTER ───────────────────────────────────
+    match /register/{userId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── WITHDRAWALS (Tarik Dana Doula & Admin) ─────
+    match /withdrawals/{withdrawalId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── TRANSACTIONS (Transaksi Midtrans & Admin) ──
+    match /transactions/{txId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── SOP SUBMISSIONS (Pendaftaran Mitra Doula) ──
+    match /sop_submissions/{submissionId} {
+      allow read, write: if isAuth();
+    }
+
+    // ─── REFERENCE DATA (read-only client, read-write auth) ──
+    match /obat/{docId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    match /tokobayi/{docId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    match /rumahsakit/{docId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    // ─── BOOKING SLOTS (Jadwal Ketersediaan Doula) ─
+    match /booking_slots/{slotId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+
+    // ─── PROGRAM (nested subcollections) ────────────
+    match /program/{programId} {
+      allow read: if true;
+      allow write: if isAuth();
+
+      match /bulan/{bulanId} {
+        allow read: if true;
+        allow write: if isAuth();
+
+        match /minggu/{mingguId} {
+          allow read: if true;
+          allow write: if isAuth();
+
+          match /gerakan/{gerakanId} {
+            allow read: if true;
+            allow write: if isAuth();
+          }
+        }
+      }
+    }
+
+    // ─── APP CONFIG (read-only untuk client) ────────
+    match /app/{docId} {
+      allow read: if true;
+      allow write: if isAuth();
+    }
+  }
+}

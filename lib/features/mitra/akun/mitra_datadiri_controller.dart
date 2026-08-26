@@ -8,12 +8,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MitraDataDiriController extends GetxController {
-  final Rx<TextEditingController> nameController = TextEditingController().obs;
-  final Rx<TextEditingController> nikController = TextEditingController().obs;
-  final Rx<TextEditingController> alamatController =
-      TextEditingController().obs;
-  final Rx<TextEditingController> biografiController =
-      TextEditingController().obs;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController nikController = TextEditingController();
+  final TextEditingController alamatController = TextEditingController();
+  final TextEditingController biografiController = TextEditingController();
   final RxString downloadUrl = ''.obs;
   final Rx<File?> currentImage = Rx<File?>(null);
 
@@ -49,6 +47,15 @@ class MitraDataDiriController extends GetxController {
     );
 
     Get.back();
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    nikController.dispose();
+    alamatController.dispose();
+    biografiController.dispose();
+    super.onClose();
   }
 
   Future<void> pickImage() async {

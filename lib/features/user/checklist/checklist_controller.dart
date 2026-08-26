@@ -1,4 +1,5 @@
 import 'package:douce/shared/database/local_db_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,7 +69,8 @@ class ChecklistController extends GetxController {
         final List<ChecklistItem> fallback = _getFallbackItems(prefs);
         items.assignAll(fallback);
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Checklist load error: $e');
       final prefs = await SharedPreferences.getInstance();
       items.assignAll(_getFallbackItems(prefs));
     } finally {

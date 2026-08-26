@@ -3,23 +3,41 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class ForgotController extends GetxController {
-  final Rx<TextEditingController> emailController = TextEditingController().obs;
+  final TextEditingController emailController = TextEditingController();
   final RxBool isSent = false.obs;
+  final RxString resetEmail = ''.obs;
 
   void resetPassword() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      Get.snackbar("Error", "Masukkan email terlebih dahulu.");
+      return;
+    }
     try {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: emailController.value.text.trim());
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      resetEmail.value = email;
+      isSent.value = true;
       Get.snackbar(
         "Reset Password",
-        "Email sent to ${emailController.value.text}",
+        "Email reset password telah dikirim ke $email",
+        snackPosition: SnackPosition.BOTTOM,
       );
-      isSent.value = true;
     } catch (e) {
       Get.snackbar(
-        "Failed",
-        "Email for ${emailController.value.text} is not found",
+        "Gagal",
+        "Email tidak ditemukan: $e",
+        snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  void navigateToVerification() {
+    Get.toNamed('/verification-forgot');
+  }
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    super.onClose();
   }
 }

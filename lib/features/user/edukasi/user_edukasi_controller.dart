@@ -5,7 +5,7 @@ import 'package:douce/shared/util/service/program_service.dart';
 import 'package:get/get.dart';
 
 class UserEdukasiController extends GetxController {
-  final RxString edukasi = "Artikel".obs;
+  final RxString edukasi = "Program Kehamilan".obs;
 
   final RxBool isLoadingArtikel = true.obs;
   RxList<ArtikelModel> artikelList = <ArtikelModel>[].obs;

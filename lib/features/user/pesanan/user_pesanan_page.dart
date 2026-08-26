@@ -1,6 +1,9 @@
 import 'package:douce/features/user/pesanan/user_pesanan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/util/model/pesanan_model.dart';
+import 'package:douce/shared/util/service/payment_service.dart';
+import 'package:douce/shared/widget/payment_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
@@ -117,8 +120,8 @@ class UserPesananPage extends StatelessWidget {
             const SizedBox(height: 25),
             Obx(
               () => controller.selectedPesanan.value == "Aktif"
-                  ? aktifColumn(controller)
-                  : riwayatColumn(controller),
+                  ? aktifColumn(controller, context)
+                  : riwayatColumn(controller, context),
             ),
           ],
         ),
@@ -128,43 +131,342 @@ class UserPesananPage extends StatelessWidget {
     );
   }
 
-  Widget aktifColumn(UserPesananController controller) {
-    return Wrap(
-      spacing: 20,
-      runSpacing: 20,
-      children: [
-        Obx(
-          () => controller.pesanan.isEmpty &&
-                  controller.pekerjaan.isEmpty &&
-                  controller.active.isEmpty
-              ? const Center(child: Text("Tidak ada pesanan"))
-              : Column(
-                  children: [
-                    ...controller.active
-                        .map((active) => activeContainer(active)),
-                    ...controller.pekerjaan
-                        .map((pesanan) => pekerjaanContainer(pesanan)),
-                    ...controller.pesanan
-                        .map((pesanan) => bookingContainer(pesanan)),
-                  ],
-                ),
-        ),
-      ],
-    );
+  Widget aktifColumn(UserPesananController controller, BuildContext context) {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(40),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+      final list = controller.activeBookings;
+      if (list.isEmpty) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(40),
+            child: Text(
+              "Belum ada pesanan aktif",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ),
+        );
+      }
+      return Column(
+        children: list.map((b) => _buildBookingCard(b, context)).toList(),
+      );
+    });
   }
 
-  Widget riwayatColumn(UserPesananController controller) {
-    return Wrap(
-      children: [
-        Obx(
-          () => controller.riwayat.isEmpty
-              ? const Center(child: Text("Tidak ada riwayat pesanan"))
-              : Column(
-                  children: controller.riwayat
-                      .map((pesanan) => riwayatContainer(pesanan))
-                      .toList()),
-        ),
-      ],
+  Widget riwayatColumn(UserPesananController controller, BuildContext context) {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(40),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+      final list = controller.riwayatBookings;
+      if (list.isEmpty) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(40),
+            child: Text(
+              "Belum ada riwayat pesanan",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ),
+        );
+      }
+      return Column(
+        children: list.map((b) => _buildBookingCard(b, context)).toList(),
+      );
+    });
+  }
+
+  Widget _buildBookingCard(BookingModel booking, BuildContext context) {
+    Color badgeColor;
+    String statusText;
+
+    switch (booking.status) {
+      case 'pending':
+        badgeColor = Colors.orange;
+        statusText = 'Belum Bayar';
+        break;
+      case 'paid':
+        badgeColor = Colors.blue;
+        statusText = 'Sudah Bayar';
+        break;
+      case 'confirmed':
+        badgeColor = Colors.teal;
+        statusText = 'Dikonfirmasi Doula';
+        break;
+      case 'ongoing':
+        badgeColor = Colors.green;
+        statusText = 'Sedang Berjalan';
+        break;
+      case 'completed':
+        badgeColor = Colors.grey;
+        statusText = 'Selesai';
+        break;
+      case 'cancelled':
+        badgeColor = Colors.red;
+        statusText = 'Dibatalkan';
+        break;
+      default:
+        badgeColor = Colors.grey;
+        statusText = booking.status;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.medical_information_outlined,
+                size: 48,
+                color: ColorDouce.douceBase,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.layanan,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      booking.doulaName.isNotEmpty ? booking.doulaName : 'Mitra Doula',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: badgeColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  statusText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: badgeColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24, thickness: 0.5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.date_range, size: 16, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${booking.tanggal} (${booking.day})',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.wallet, size: 16, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Rp ${booking.totalBayar.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text(
+                        booking.jam,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (booking.status == 'pending') ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      showPaymentSheet(
+                        context,
+                        jenisLayanan: 'doula',
+                        deskripsi: 'Booking Doula – ${booking.layanan}',
+                        nominal: booking.totalBayar,
+                        booking: booking,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: ColorDouce.douceBase,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Bayar Sekarang",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: () async {
+                    await PaymentService().updateStatus(booking.id, 'cancelled');
+                    Get.snackbar('Pesanan Dibatalkan', 'Status pesanan berhasil diperbarui');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Text(
+                      "Batal",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (['paid', 'confirmed', 'ongoing', 'completed'].contains(booking.status)) ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed('/chat-page', arguments: {
+                        "doula": booking.doulaUid,
+                        "user": booking.userId,
+                        "isDoula": false,
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: ColorDouce.douceBase,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Hubungi Doula",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed('/payment-success', arguments: {
+                      'transactionId': booking.transactionId.isNotEmpty ? booking.transactionId : booking.id,
+                      'bookingId': booking.id,
+                      'nominal': booking.totalBayar,
+                      'layanan': 'Booking ${booking.doulaName.isNotEmpty ? booking.doulaName : "Doula"} – ${booking.layanan}',
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.receipt_long_rounded, size: 16, color: Colors.green.shade700),
+                        const SizedBox(width: 6),
+                        Text(
+                          "Bukti Bayar",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.green.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
     );
   }
 

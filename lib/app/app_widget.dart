@@ -1,10 +1,16 @@
 import 'package:douce/app/app_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:douce/features/forgot/forgot_page.dart';
 import 'package:douce/features/forgot/password_page.dart';
 import 'package:douce/features/forgot/verification_page.dart';
 import 'package:douce/features/login/login_page.dart';
+import 'package:douce/features/mitra/akun/mitra_akun_page.dart';
 import 'package:douce/features/mitra/akun/mitra_datadiri_page.dart';
-import 'package:douce/features/mitra/akun/mitra_pendapatan_page.dart';
+import 'package:douce/features/mitra/pendapatan/mitra_pendapatan_page.dart';
+import 'package:douce/features/mitra/profil/mitra_aturjadwal_page.dart';
+import 'package:douce/features/verify_email/verify_email_page.dart';
+import 'package:douce/shared/util/service/pin_auth_service.dart';
 import 'package:douce/features/mitra/main_mitra.dart';
 import 'package:douce/features/mitra_register/confirmation_register_page.dart';
 import 'package:douce/features/mitra_register/mitra_register_page.dart';
@@ -26,6 +32,7 @@ import 'package:douce/features/user/akun/settings/user_settings_page.dart';
 import 'package:douce/features/user/beranda/detail_toko_page.dart';
 import 'package:douce/features/user/beranda/see_more_page.dart';
 import 'package:douce/features/user/beranda/user_notifikasi_page.dart';
+import 'package:douce/features/user/akun/user_akun_page.dart';
 import 'package:douce/features/user/pesanan/user_pesanan_page.dart';
 import 'package:douce/features/user/search/user_search_page.dart';
 import 'package:douce/features/user/edukasi/user_artikel_page.dart';
@@ -45,18 +52,27 @@ import 'package:douce/features/admin/dashboard/admin_dashboard_page.dart';
 import 'package:douce/features/user/checklist/checklist_page.dart';
 import 'package:douce/features/user/babynames/baby_names_page.dart';
 import 'package:douce/features/user/birthplan/birth_plan_page.dart';
+import 'package:douce/features/user/postpartum/postpartum_wellbeing_page.dart';
 import 'package:douce/features/user/theme/theme_picker_page.dart';
 import 'package:douce/features/user/diary/diary_list_page.dart';
 import 'package:douce/features/user/diary/diary_form_page.dart';
 import 'package:douce/features/user/diary/diary_detail_page.dart';
 import 'package:douce/features/user/diary/diary_pdf_page.dart';
+import 'package:douce/features/sop/sop_form_page.dart';
+import 'package:douce/features/sop/sop_waiting_page.dart';
+import 'package:douce/features/sop/sop_cs_message_page.dart';
+import 'package:douce/features/user/sizeguide/sizeguide_page.dart';
 import 'package:douce/features/user/ai_chat/ai_chat_page.dart';
+import 'package:douce/features/onboarding/onboarding_page.dart';
+import 'package:douce/features/pin/pin_entry_page.dart';
+import 'package:douce/features/user/kesehatan/payment_success_page.dart';
+import 'package:douce/features/user/pesanan/booking_detail_page.dart';
 import 'package:douce/shared/theme/theme_service.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class AppWidget extends StatelessWidget {
-  const AppWidget({super.key});
+  final Bindings? initialBinding;
+
+  const AppWidget({super.key, this.initialBinding});
 
   @override
   Widget build(BuildContext context) {  
@@ -68,7 +84,9 @@ class AppWidget extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Momsie',
       initialBinding: BindingsBuilder(() {
+        initialBinding?.dependencies();
         Get.put<ThemeService>(ThemeService(), permanent: true);
+        Get.put<PinAuthService>(PinAuthService(), permanent: true);
       }),
       getPages: [
         GetPage(
@@ -86,6 +104,10 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.registerSuccess,
           page: () => const SuccessRegisterPage(),
+        ),
+        GetPage(
+          name: AppRoutes.verifyEmail,
+          page: () => const VerifyEmailPage(),
         ),
         GetPage(
           name: AppRoutes.forgotPassword,
@@ -108,8 +130,16 @@ class AppWidget extends StatelessWidget {
           page: () => const MitraDataDiriPage(),
         ),
         GetPage(
+          name: AppRoutes.mitraAkun,
+          page: () => const MitraAkunPage(),
+        ),
+        GetPage(
           name: AppRoutes.mitraPendapatan,
           page: () => const MitraPendapatanPage(),
+        ),
+        GetPage(
+          name: AppRoutes.mitraAturJadwal,
+          page: () => const MitraAturJadwalPage(),
         ),
         GetPage(
           name: AppRoutes.user,
@@ -146,6 +176,10 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.userSettings,
           page: () => const UserSettingsPage(),
+        ),
+        GetPage(
+          name: AppRoutes.userAkun,
+          page: () => const UserAkunPage(),
         ),
         GetPage(
           name: AppRoutes.userKebijakanPrivasi,
@@ -256,6 +290,10 @@ class AppWidget extends StatelessWidget {
           page: () => const BirthPlanPage(),
         ),
         GetPage(
+          name: AppRoutes.postpartumWellbeing,
+          page: () => const PostpartumWellbeingPage(),
+        ),
+        GetPage(
           name: AppRoutes.themePicker,
           page: () => const ThemePickerPage(),
         ),
@@ -278,6 +316,51 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.aiChat,
           page: () => const AiChatPage(),
+        ),
+        GetPage(
+          name: AppRoutes.sizeGuide,
+          page: () => const SizeGuidePage(),
+        ),
+        GetPage(
+          name: AppRoutes.onboarding,
+          page: () => const OnboardingPage(),
+        ),
+        GetPage(
+          name: AppRoutes.sopForm,
+          page: () => const SopFormPage(),
+        ),
+        GetPage(
+          name: AppRoutes.sopWaiting,
+          page: () => const SopWaitingPage(),
+        ),
+        GetPage(
+          name: AppRoutes.sopCsMessage,
+          page: () => const SopCsMessagePage(),
+        ),
+        GetPage(
+          name: AppRoutes.pinEntry,
+          page: () => const PinEntryPage(),
+        ),
+        GetPage(
+          name: AppRoutes.paymentSuccess,
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            return PaymentSuccessPage(
+              transactionId: args?['transactionId'] ?? '',
+              bookingId: args?['bookingId'],
+              nominal: args?['nominal'],
+              layanan: args?['layanan'],
+            );
+          },
+        ),
+        GetPage(
+          name: AppRoutes.bookingDetail,
+          page: () {
+            final args = Get.arguments as Map<String, dynamic>?;
+            return BookingDetailPage(
+              bookingId: args?['bookingId'] ?? '',
+            );
+          },
         ),
       ],
       initialRoute: AppRoutes.splash,

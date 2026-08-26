@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/chat/chat_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
@@ -75,11 +76,16 @@ class ChatPage extends StatelessWidget {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(50),
                                         child: message.sender == doula
-                                            ? Image.network(
-                                                chatController.imageDoula.value,
+                                            ? CachedNetworkImage(
+                                                imageUrl: chatController.imageDoula.value,
                                                 width: 35,
                                                 height: 35,
                                                 fit: BoxFit.cover,
+                                                errorWidget: (_, __, ___) => Container(
+                                                  width: 35,
+                                                  height: 35,
+                                                  color: Colors.grey,
+                                                ),
                                               )
                                             : chatController
                                                     .imageUser.value.isEmpty
@@ -89,12 +95,17 @@ class ChatPage extends StatelessWidget {
                                                     height: 35,
                                                     fit: BoxFit.cover,
                                                   )
-                                                : Image.network(
-                                                    chatController
+                                                : CachedNetworkImage(
+                                                    imageUrl: chatController
                                                         .imageUser.value,
                                                     width: 35,
                                                     height: 35,
                                                     fit: BoxFit.cover,
+                                                    errorWidget: (_, __, ___) => Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      color: Colors.grey,
+                                                    ),
                                                   ),
                                       ),
                                       const SizedBox(width: 15),
@@ -187,12 +198,17 @@ class ChatPage extends StatelessWidget {
                                                     height: 35,
                                                     fit: BoxFit.cover,
                                                   )
-                                                : Image.network(
-                                                    chatController
+                                                : CachedNetworkImage(
+                                                    imageUrl: chatController
                                                         .imageUser.value,
                                                     width: 35,
                                                     height: 35,
                                                     fit: BoxFit.cover,
+                                                    errorWidget: (_, __, ___) => Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      color: Colors.grey,
+                                                    ),
                                                   ),
                                       ),
                                     ],
@@ -221,7 +237,7 @@ class ChatPage extends StatelessWidget {
                         ],
                       ),
                       child: TextField(
-                        controller: chatController.messageController.value,
+                        controller: chatController.messageController,
                         decoration: InputDecoration(
                           hintText: 'Tulis Pesan',
                           hintStyle: const TextStyle(
