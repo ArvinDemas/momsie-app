@@ -1,4 +1,5 @@
 import 'package:douce/app/app_routes.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:douce/features/forgot/forgot_page.dart';
@@ -83,6 +84,9 @@ class AppWidget extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Momsie',
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       initialBinding: BindingsBuilder(() {
         initialBinding?.dependencies();
         Get.put<ThemeService>(ThemeService(), permanent: true);
