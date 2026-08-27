@@ -80,14 +80,12 @@ class _UserKesehatanPageState extends State<UserKesehatanPage> {
       },
       searchHint: "Cari Doula...",
       onSearchChanged: controller.onSearch,
-      childWidget: Expanded(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return _doulaColumn(context);
-        }),
-      ),
+      childWidget: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return _doulaColumn(context);
+      }),
     );
   }
 

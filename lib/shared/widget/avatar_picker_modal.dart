@@ -41,10 +41,12 @@ class AvatarPickerModal extends StatelessWidget {
   Future<void> _selectAvatar(String path) async {
     final UserController userController = Get.find<UserController>();
     userController.image.value = path;
+    userController.doulaImage.value = path;
 
     // Simpan ke SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_image', path);
+    await prefs.setString('doula_image', path);
 
     // Simpan ke Firestore
     final uid = userController.uid.value;
@@ -52,6 +54,10 @@ class AvatarPickerModal extends StatelessWidget {
       try {
         await FirebaseFirestore.instance
             .collection('user')
+            .doc(uid)
+            .set({'image': path}, SetOptions(merge: true));
+        await FirebaseFirestore.instance
+            .collection('mitra')
             .doc(uid)
             .set({'image': path}, SetOptions(merge: true));
       } catch (e) {
@@ -70,10 +76,26 @@ class AvatarPickerModal extends StatelessWidget {
   }
 
   Future<void> _pickFromGallery() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      await _selectAvatar(image.path);
+    try {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        await _selectAvatar(image.path);
+      }
+    } catch (e) {
+      debugPrint('Error pickFromGallery: $e');
+      Get.snackbar(
+        'Akses Galeri',
+        'Gagal mengambil foto. Mohon izinkan akses media/galeri di HP Anda.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+      );
     }
   }
 

@@ -427,7 +427,7 @@ class _DiaryPdfPageState extends State<DiaryPdfPage> {
       SubscriptionService.to.showPaywall(
         context: context,
         featureName: 'Eksport Diary ke PDF',
-        canDismissToAccess: false,
+        canDismissToAccess: true,
         onUnlocked: () => _generatePdf(c),
       );
       return;

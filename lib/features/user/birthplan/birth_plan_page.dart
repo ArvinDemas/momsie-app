@@ -26,7 +26,7 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
         SubscriptionService.to.showPaywall(
           context: context,
           featureName: 'Birth Plan Persalinan',
-          canDismissToAccess: false,
+          canDismissToAccess: true,
         );
       }
     });

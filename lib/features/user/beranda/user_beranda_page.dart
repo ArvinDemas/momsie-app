@@ -316,7 +316,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         'image': 'assets/images/banner_birth_plan.jpg',
         'gradient': const [Color(0xFF0D9488), Color(0xFF2DD4BF)],
         'icon': Icons.assignment_rounded,
-        'action': () => Get.toNamed(AppRoutes.checklist),
+        'action': () => Get.toNamed(AppRoutes.birthPlan),
       },
     ];
 

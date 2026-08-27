@@ -20,7 +20,7 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
         SubscriptionService.to.showPaywall(
           context: context,
           featureName: 'Postpartum Wellbeing',
-          canDismissToAccess: false,
+          canDismissToAccess: true,
         );
       }
     });
