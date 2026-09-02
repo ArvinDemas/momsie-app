@@ -221,15 +221,19 @@ class AdminDashboardController extends GetxController {
       await FirebaseFirestore.instance
           .collection('sop_submissions')
           .doc(submissionId)
-          .update({'status': 'approved'});
+          .update({
+            'status': 'approved',
+            'approvedAt': FieldValue.serverTimestamp(),
+          });
+      // CRITICAL: Unlock user account — set isDoula true dan hapus pending flag
       await FirebaseFirestore.instance.collection('user').doc(userId).update({
-        'role': 'mitra',
-        'hasSubmittedSOP': true,
+        'isDoula': true,
+        'mitraPendingApproval': false,
         'sopStatus': 'approved',
       });
       Get.snackbar(
         'Berhasil',
-        'Mitra berhasil disetujui',
+        'Mitra berhasil disetujui dan akun telah diaktifkan.',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.green,
         colorText: Colors.white,

@@ -1006,6 +1006,46 @@ class UserAkunPage extends StatelessWidget {
                 data?['nik'] ?? '',
               );
 
+              // ═══ Cek status SOP sebelum izinkan masuk dashboard ═══
+              final hasPending = userData?['mitraPendingApproval'] == true;
+              if (hasPending) {
+                final sopQuery = await firestore
+                    .collection('sop_submissions')
+                    .where('userId', isEqualTo: userController.uid.value)
+                    .limit(1)
+                    .get();
+
+                if (sopQuery.docs.isEmpty) {
+                  Get.offAllNamed('/sop-form');
+                  return;
+                }
+
+                final sopDoc = sopQuery.docs.first;
+                final sopData = sopDoc.data() as Map<String, dynamic>? ?? {};
+                final sopStatus = sopData['status'] ?? 'pending';
+
+                if (sopStatus == 'pending') {
+                  Get.snackbar(
+                    'Menunggu Verifikasi',
+                    'Pendaftaran Anda sedang diverifikasi admin.',
+                    snackPosition: SnackPosition.TOP,
+                  );
+                  Get.offAllNamed('/sop-waiting');
+                  return;
+                } else if (sopStatus == 'rejected') {
+                  final reason = sopData['rejectionReason'] ?? 'Ditolak oleh admin.';
+                  Get.snackbar(
+                    'Pendaftaran Ditolak',
+                    reason,
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.red.shade700,
+                    colorText: Colors.white,
+                  );
+                  Get.offAllNamed(AppRoutes.login);
+                  return;
+                }
+              }
+
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString('last_active_mode', 'mitra');
               Get.offAllNamed('/mitra');
@@ -1040,8 +1080,12 @@ class UserAkunPage extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Get.back();
-                await GoogleSignIn().signOut();
-                await GoogleSignIn().signIn();
+                try {
+                  await GoogleSignIn().signOut();
+                  await GoogleSignIn().signIn();
+                } catch (e) {
+                  debugPrint('[SwitchAccount Error]: $e');
+                }
                 Get.offAllNamed('/login');
               },
               child: Text(
@@ -1052,8 +1096,12 @@ class UserAkunPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 Get.back();
-                await FirebaseAuth.instance.signOut();
-                await GoogleSignIn().signOut();
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  await GoogleSignIn().signOut();
+                } catch (e) {
+                  debugPrint('[Logout Error]: $e');
+                }
                 Get.offAllNamed('/login');
               },
               style: ElevatedButton.styleFrom(
