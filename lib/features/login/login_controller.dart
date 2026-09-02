@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/app/app_routes.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,7 +27,22 @@ class LoginController extends GetxController {
       return;
     }
 
-    // Doula Demo Pre-configured Accounts (Instant Test Login)
+    // Doula & User Demo Pre-configured Accounts (Instant Test Login)
+    if (trimmedEmail.toLowerCase() == 'test@momsie.id' || trimmedEmail.toLowerCase() == 'ibu.hamil@momsie.id') {
+      final UserController userController = Get.isRegistered<UserController>()
+          ? Get.find<UserController>()
+          : Get.put(UserController(), permanent: true);
+      userController.setUser(
+        'Bunda Test',
+        trimmedEmail,
+        'test-uid-123',
+        'assets/images/blank-profile.png',
+        false, // isDoula
+      );
+      Get.offAllNamed(AppRoutes.user);
+      return;
+    }
+
     final List<String> testDoulaEmails = [
       'anastasia.doula@momsie.id',
       'dewi.doula@momsie.id',
@@ -135,6 +151,58 @@ class LoginController extends GetxController {
             '3404123456780001',
           );
         }
+
+        // ═══ CRITICAL: Cek status SOP sebelum izinkan masuk dashboard ═══
+        final hasPending = userDoc.get('mitraPendingApproval') == true;
+        if (hasPending) {
+          // Cari SOP submission untuk user ini
+          final sopQuery = await firestore
+              .collection('sop_submissions')
+              .where('userId', isEqualTo: userCredential.user!.uid)
+              .limit(1)
+              .get();
+
+          if (sopQuery.docs.isEmpty) {
+            // Belum submit SOP — arahkan ke form SOP
+            Get.snackbar(
+              'SOP Belum Diisi',
+              'Silakan lengkapi dokumen SOP terlebih dahulu.',
+              snackPosition: SnackPosition.TOP,
+            );
+            Get.offAllNamed('/sop-form');
+            return;
+          }
+
+          final sopDoc = sopQuery.docs.first;
+          final sopStatus = sopDoc.data()['status'] ?? 'pending';
+
+          if (sopStatus == 'pending') {
+            // Menunggu approval admin
+            Get.snackbar(
+              'Menunggu Verifikasi',
+              'Pendaftaran Anda sedang diverifikasi admin. Tunggu hingga 1x24 jam.',
+              snackPosition: SnackPosition.TOP,
+            );
+            Get.offAllNamed('/sop-waiting');
+            return;
+          } else if (sopStatus == 'rejected') {
+            // Ditolak — tampilkan alasan
+            final reason = sopDoc.data()['rejectionReason'] ?? 'Ditolak oleh admin.';
+            Get.snackbar(
+              'Pendaftaran Ditolak',
+              reason,
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.red.shade700,
+              colorText: Colors.white,
+            );
+            // Kembalikan ke login, user harus daftar ulang
+            await FirebaseAuth.instance.signOut();
+            Get.offAllNamed(AppRoutes.login);
+            return;
+          }
+          // approved → lanjut ke dashboard mitra
+        }
+
         Get.offAllNamed(AppRoutes.mitra);
       } else {
         Get.offAllNamed(AppRoutes.user);
@@ -152,22 +220,29 @@ class LoginController extends GetxController {
   Future<void> tryGoogleLogin() async {
     try {
       final FirebaseAuth auth = FirebaseAuth.instance;
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: '5481212381-5tltq0if3b3s54o0pu0m056jeiovugbj.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
 
-      // Safely disconnect previous session if any without throwing
+      // Safely disconnect & sign out previous session to clear cached stale OAuth tokens
       try {
         await googleSignIn.signOut();
+        await googleSignIn.disconnect();
       } catch (e) {
-        debugPrint('[GoogleSignIn] signOut ignored error: $e');
+        debugPrint('[GoogleSignIn] disconnect/signOut ignored error: $e');
       }
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         // User cancelled Google sign-in dialog
+        debugPrint('[GoogleSignIn] User cancelled Google Sign-In dialog.');
         return;
       }
 
       final googleAuth = await googleUser.authentication;
+
+      debugPrint('[GoogleSignIn] accessToken: ${googleAuth.accessToken != null}, idToken: ${googleAuth.idToken != null}');
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -312,13 +387,64 @@ class LoginController extends GetxController {
           '3404123456780001',
         );
 
+        // ═══ CRITICAL: Cek status SOP sebelum izinkan masuk dashboard ═══
+        final hasPending = userDoc != null && userDoc.data() is Map<String, dynamic>
+            && (userDoc.data() as Map<String, dynamic>)['mitraPendingApproval'] == true;
+        if (hasPending) {
+          final sopQuery = await firestore
+              .collection('sop_submissions')
+              .where('userId', isEqualTo: userCredential.user!.uid)
+              .limit(1)
+              .get();
+
+          if (sopQuery.docs.isEmpty) {
+            Get.offAllNamed('/sop-form');
+            return;
+          }
+
+          final sopDoc = sopQuery.docs.first;
+          final sopData = sopDoc.data() as Map<String, dynamic>? ?? {};
+          final sopStatus = sopData['status'] ?? 'pending';
+
+          if (sopStatus == 'pending') {
+            Get.offAllNamed('/sop-waiting');
+            return;
+          } else if (sopStatus == 'rejected') {
+            final reason = sopData['rejectionReason'] ?? 'Ditolak oleh admin.';
+            Get.snackbar(
+              'Pendaftaran Ditolak',
+              reason,
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.red.shade700,
+              colorText: Colors.white,
+            );
+            await FirebaseAuth.instance.signOut();
+            Get.offAllNamed(AppRoutes.login);
+            return;
+          }
+        }
+
         await prefs.setString('last_active_mode', 'mitra');
         Get.offAllNamed(AppRoutes.mitra);
       } else {
         await prefs.setString('last_active_mode', 'user');
         Get.offAllNamed(AppRoutes.user);
       }
+    } on PlatformException catch (e) {
+      debugPrint('[GoogleSignIn PlatformException] code: ${e.code}, message: ${e.message}, details: ${e.details}');
+      String userMessage = "Login Google gagal (${e.code}).";
+      if (e.code == '10' || e.code == '12500') {
+        userMessage = "Konfigurasi Google Play Services di perangkat ini membutuhkan login Email/Password biasa.";
+      }
+      Get.snackbar(
+        "Petunjuk Login",
+        userMessage,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 4),
+      );
+      return;
     } on FirebaseAuthException catch (e) {
+      debugPrint('[GoogleSignIn FirebaseAuthException] code: ${e.code}, message: ${e.message}');
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(
           "Gagal Login",
@@ -328,10 +454,11 @@ class LoginController extends GetxController {
         return;
       }
       Get.snackbar("Gagal Login Google", e.message ?? "Terjadi kesalahan autentikasi.", snackPosition: SnackPosition.TOP);
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[GoogleSignIn GeneralException] error: $e\n$stack');
       Get.snackbar(
-        "Gagal Login Google",
-        "Login dengan Google gagal. Coba lagi atau gunakan email & password.",
+        "Informasi Login",
+        "Gunakan email dan password atau buat akun baru untuk masuk ke aplikasi.",
         snackPosition: SnackPosition.TOP,
         duration: const Duration(seconds: 4),
       );
