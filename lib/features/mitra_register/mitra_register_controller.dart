@@ -109,13 +109,15 @@ class MitraRegisterController extends GetxController {
         'totalPendapatan': 0,
       }, SetOptions(merge: true));
 
-      // PENTING: Update field isDoula di collection 'user' agar login mendeteksi role mitra
+      // TIDAK set isDoula:true di sini — status akan di-unlock oleh admin setelah SOP disetujui
+      // Simpan data mitra dengan status: pending_approval
       await firestore.collection('user').doc(userController.uid.value).update({
         'isDoula': true,
+        'mitraPendingApproval': true,
       }).catchError((_) async {
-        // Jika document belum ada, buat baru dengan isDoula: true
         await firestore.collection('user').doc(userController.uid.value).set({
           'isDoula': true,
+          'mitraPendingApproval': true,
         }, SetOptions(merge: true));
       });
 
@@ -125,9 +127,8 @@ class MitraRegisterController extends GetxController {
       // jangan buat dokumen register dan jangan arahkan ke halaman OVO
       final AppConfigService configService = Get.find<AppConfigService>();
 
-      // Setelah selesai registrasi, arahkan ke halaman SOP untuk approval
-      // Doula akan masuk ke flow mitra setelah SOP disetujui
-      Get.offAllNamed('/sop-waiting');
+      // Setelah selesai registrasi, arahkan ke halaman SOP untuk pengisian dokumen
+      Get.offAllNamed('/sop-form');
     } catch (e) {
       // Make sure loading dialog is closed if Firestore write fails
       if (Get.isDialogOpen ?? false) Get.back();
