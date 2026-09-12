@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
-import 'package:douce/shared/util/service/payment_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Halaman detail & tracking status pesanan doula.
 class BookingDetailPage extends StatefulWidget {
@@ -18,7 +19,6 @@ class BookingDetailPage extends StatefulWidget {
 }
 
 class _BookingDetailPageState extends State<BookingDetailPage> {
-  final PaymentService _paymentService = PaymentService();
   BookingModel? _booking;
   bool _isLoading = true;
   String? _error;
@@ -176,7 +176,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDark,
               ),
             ),
             const SizedBox(width: 24),
@@ -190,13 +190,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppElevation.level1,
           ),
           child: Row(
             children: [
@@ -222,7 +216,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -249,13 +243,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppElevation.level1,
           ),
           child: Row(
             children: [
@@ -284,7 +272,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -309,13 +297,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppElevation.level1,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,7 +307,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDark,
                 ),
               ),
               const SizedBox(height: 12),
@@ -353,13 +335,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppElevation.level1,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +345,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDark,
                 ),
               ),
               const SizedBox(height: 12),
@@ -391,6 +367,12 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         ),
         const SizedBox(height: 20),
 
+        // Zoom Link & WhatsApp Fallback (hanya untuk layanan scheduled yang sudah paid/confirmed)
+        if (!b.isOnDemand && ['paid', 'confirmed'].contains(b.status)) ...[
+          _buildZoomSection(b),
+          const SizedBox(height: 20),
+        ],
+
         // Timestamps
         Container(
           padding: const EdgeInsets.all(16),
@@ -406,7 +388,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDark,
                 ),
               ),
               const SizedBox(height: 12),
@@ -448,9 +430,10 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         if (b.status == 'paid' || b.status == 'confirmed') ...[
           OutlinedButton(
             onPressed: () => Get.toNamed('/chat-page', arguments: {
-              'doula': null,
-              'user': null,
+              'doula': b.doulaUid,
+              'user': b.userId,
               'isDoula': false,
+              'bookingId': b.id,
             }),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
@@ -479,7 +462,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
+            style: const TextStyle(fontSize: 14, color: AppSemanticColors.textDark),
           ),
         ),
       ],
@@ -495,7 +478,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           style: TextStyle(
             fontSize: isTotal ? 15 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: isTotal ? const Color(0xFF0F172A) : Colors.black54,
+            color: isTotal ? AppSemanticColors.textDark : Colors.black54,
           ),
         ),
         Text(
@@ -503,7 +486,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           style: TextStyle(
             fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-            color: isTotal ? ColorDouce.douceBase : const Color(0xFF0F172A),
+            color: isTotal ? ColorDouce.douceBase : AppSemanticColors.textDark,
           ),
         ),
       ],
@@ -517,10 +500,188 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
-          Text(value, style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A))),
+          Text(value, style: const TextStyle(fontSize: 13, color: AppSemanticColors.textDark)),
         ],
       ),
     );
+  }
+
+  Widget _buildZoomSection(BookingModel b) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppElevation.level1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Link Kelas Online',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppSemanticColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (b.zoomLink != null && b.zoomLink!.isNotEmpty)
+            _buildZoomButton(b.zoomLink!)
+          else
+            _buildWhatsAppFallback(b),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildZoomButton(String link) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F9D58).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF0F9D58).withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F9D58),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.videocam_rounded, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Join Zoom Meeting',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0F9D58),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      link,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                        fontFamily: 'monospace',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.open_in_new, size: 18, color: Color(0xFF0F9D58)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Center(
+          child: InkWell(
+            onTap: () => _launchUrl(link),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F9D58),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.videocam_rounded, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'Buka Zoom',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWhatsAppFallback(BookingModel b) {
+    // Admin WhatsApp number
+    const adminPhone = '6281234567890';
+    final template =
+        'Halo Admin Momsie, saya ${b.namaUser} ingin bergabung di kelas ${b.layanan} (Booking ID: ${b.id}). Mohon link Zoom-nya. Terima kasih.';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFDE68A).withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.info_outline, size: 18, color: Color(0xFFF59E0B)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Menunggu Link Kelas',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: () => _launchUrl('https://wa.me/$adminPhone?text=${Uri.encodeComponent(template)}'),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF25D366),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.chat_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 8),
+                Text(
+                  'Hubungi via WhatsApp',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (Get.context != null) {
+        Get.snackbar('Error', 'Tidak dapat membuka $url');
+      }
+    }
   }
 }
 

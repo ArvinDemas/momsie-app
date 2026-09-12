@@ -52,7 +52,7 @@ class UserPesananController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       final List<BookingModel> all = snapshot.docs
-          .map((doc) => BookingModel.fromMap(doc.data() as Map<String, dynamic>, id: doc.id))
+          .map((doc) => BookingModel.fromMap(doc.data(), id: doc.id))
           .toList();
 
       // Sort by createdAt descending
