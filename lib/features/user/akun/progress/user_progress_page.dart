@@ -47,7 +47,7 @@ class UserProgressPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               MenuContainer(
-                title: "Program Kehailan",
+                title: "Program Kehamilan",
                 image: 'kehamilan.png',
                 icon: Icons.abc,
                 onTap: () => Get.toNamed('/user-program'),
@@ -85,13 +85,40 @@ class UserProgressPage extends StatelessWidget {
               ),
               MenuContainer(
                 title: "Disimpan",
-                icon: Icons.save,
-                onTap: () {},
+                icon: Icons.bookmark_border,
+                onTap: () => _showSavedDialog(context),
               ),
             ],
           ),
         ),
       ),
+        ],
+      ),
+    );
+  }
+
+  void _showSavedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Bookmark Tersimpan"),
+        content: const Text(
+          "Fitur bookmark sedang dalam pengembangan. Anda dapat melihat semua pesanan di menu Pesanan.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Tutup"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              Get.toNamed('/user-pesanan');
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: ColorDouce.douceBase),
+            child: const Text("Lihat Pesanan", style: TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );

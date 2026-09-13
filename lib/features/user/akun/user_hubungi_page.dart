@@ -4,6 +4,7 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserHubungiPage extends StatelessWidget {
   const UserHubungiPage({super.key});
@@ -55,7 +56,7 @@ class UserHubungiPage extends StatelessWidget {
                   "Customer Service",
                   "+62 813-7367-3251",
                   userHubungiController.customerServiceToggle.value,
-                  () => userHubungiController.toggleCustomerService(),
+                  () => _launchWhatsApp(context),
                   Icons.headset_mic_outlined,
                 ),
               ),
@@ -70,7 +71,7 @@ class UserHubungiPage extends StatelessWidget {
                   "WhatsApp",
                   "+62 813-7367-3251",
                   userHubungiController.whatsAppToggle.value,
-                  () => userHubungiController.toggleWhatsApp(),
+                  () => _launchWhatsApp(context),
                   Icons.call,
                 ),
               ),
@@ -85,7 +86,7 @@ class UserHubungiPage extends StatelessWidget {
                   "Instagram",
                   "@momsiee.id",
                   userHubungiController.instagramToggle.value,
-                  () => userHubungiController.toggleInstagram(),
+                  () => _launchInstagram(context),
                   Icons.mobile_friendly_sharp,
                 ),
               )
@@ -96,6 +97,28 @@ class UserHubungiPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _launchWhatsApp(BuildContext context) async {
+    final uri = Uri.parse('https://wa.me/6281373673251');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tidak dapat membuka WhatsApp')),
+      );
+    }
+  }
+
+  Future<void> _launchInstagram(BuildContext context) async {
+    final uri = Uri.parse('https://instagram.com/momsiee.id');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tidak dapat membuka Instagram')),
+      );
+    }
   }
 
   Widget contactContainer(

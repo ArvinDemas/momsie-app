@@ -1,7 +1,7 @@
 import 'package:douce/features/user/pesanan/user_pesanan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
-import 'package:douce/shared/util/model/pesanan_model.dart';
+import 'package:douce/shared/util/service/booking_slot_service.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
 import 'package:douce/shared/widget/payment_sheet.dart';
 import 'package:flutter/material.dart';
@@ -374,10 +374,7 @@ class UserPesananPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 InkWell(
-                  onTap: () async {
-                    await PaymentService().updateStatus(booking.id, 'cancelled');
-                    Get.snackbar('Pesanan Dibatalkan', 'Status pesanan berhasil diperbarui');
-                  },
+                  onTap: () => _showCancelDialog(booking, context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
@@ -559,521 +556,43 @@ class UserPesananPage extends StatelessWidget {
     }
   }
 
-  Widget bookingContainer(PesananModel pesanan) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
+  void _showCancelDialog(BookingModel booking, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Batalkan Pesanan", style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(
+          'Yakin ingin membatalkan "${booking.layanan}" pada ${booking.tanggal} jam ${booking.jam}? Slot akan dikembalikan ke jadwal.',
+          style: const TextStyle(fontSize: 15),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Tetap Lanjut"),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                size: 60,
-                color: ColorDouce.douceBase,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pesanan.layanan,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.black,
-            height: 20,
-            thickness: 0.5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 15),
-                      Text(pesanan.tanggal),
-                      Text(" - ${pesanan.day}"),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(Icons.wallet),
-                      const SizedBox(width: 15),
-                      Text("Rp ${pesanan.harga}")
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 15),
-                      Text(pesanan.jam)
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Icon(Icons.timelapse),
-                      SizedBox(width: 15),
-                      Text("Pending"),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Column(
-            children: [
-              InkWell(
-                onTap: () {
-                  Get.toNamed("/confirm-register", arguments: {
-                    "payment": int.parse(pesanan.harga),
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: ColorDouce.douceBase,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Cara Bayar",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: ColorDouce.douceBase),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Batalkan Pesanan",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: ColorDouce.douceBase,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget pekerjaanContainer(PesananModel pesanan) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                size: 60,
-                color: ColorDouce.douceBase,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pesanan.layanan,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.black,
-            height: 20,
-            thickness: 0.5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 15),
-                      Text(pesanan.tanggal),
-                      Text(" - ${pesanan.day}"),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(Icons.wallet),
-                      const SizedBox(width: 15),
-                      Text("Rp ${pesanan.harga}")
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 15),
-                      Text(pesanan.jam)
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Icon(Icons.timelapse),
-                      SizedBox(width: 15),
-                      Text("Confirmed"),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorDouce.douceBase,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Pesanan Kamu Sudah Terkonfirmasi! Sedang Mencari Doula Untukmu",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget activeContainer(ActiveModel active) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                size: 60,
-                color: ColorDouce.douceBase,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    active.layanan,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    active.namaDoula,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.black,
-            height: 20,
-            thickness: 0.5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 15),
-                      Text(active.tanggal),
-                      Text(" - ${active.day}"),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(Icons.wallet),
-                      const SizedBox(width: 15),
-                      Text("Rp ${active.harga}")
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 15),
-                      Text(active.jam)
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Icon(Icons.timelapse),
-                      SizedBox(width: 15),
-                      Text("Ongoing"),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Column(
-            children: [
-              InkWell(
-                onTap: () => Get.toNamed('/chat-page', arguments: {
-                  "doula": active.doula,
-                  "user": active.pemesan,
-                  "isDoula": false,
-                }),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: ColorDouce.douceBase,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Hubungi Doula",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget riwayatContainer(ActiveModel active) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                size: 60,
-                color: ColorDouce.douceBase,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    active.layanan,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    active.namaDoula,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.black,
-            height: 20,
-            thickness: 0.5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 15),
-                      Text(active.tanggal),
-                      Text(" - ${active.day}"),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(Icons.wallet),
-                      const SizedBox(width: 15),
-                      Text("Rp ${active.harga}")
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 15),
-                      Text(active.jam)
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Icon(Icons.timelapse),
-                      SizedBox(width: 15),
-                      Text("Finished"),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+          ElevatedButton(
+            onPressed: () async {
+              Get.back();
+              await PaymentService().updateStatus(booking.id, 'cancelled');
+              if (booking.doulaUid.isNotEmpty && booking.tanggal.isNotEmpty && booking.jam.isNotEmpty) {
+                await BookingSlotService().decrementBookedCount(
+                  doulaId: booking.doulaUid,
+                  tanggal: booking.tanggal,
+                  time: booking.jam,
+                );
+              }
+              Get.snackbar(
+                'Pesanan Dibatalkan',
+                'Status pesanan berhasil diubah. Slot telah dikembalikan.',
+                backgroundColor: Colors.white,
+                colorText: Colors.black87,
+                snackPosition: SnackPosition.BOTTOM,
+                icon: const Icon(Icons.check_circle, color: Colors.red),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Ya, Batalkan", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
