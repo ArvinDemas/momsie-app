@@ -111,6 +111,7 @@ class PaymentService {
       createdAt: DateTime.now(),
     );
 
+    bool hasReserved = false;
     // Atomic slot reservation for scheduled bookings
     if (booking.doulaUid.isNotEmpty && booking.tanggal.isNotEmpty && booking.jam.isNotEmpty) {
       final reserved = await BookingSlotService().incrementBookedCount(
@@ -121,13 +122,24 @@ class PaymentService {
       if (!reserved) {
         throw Exception('Slot sudah penuh, silakan pilih jam lain');
       }
+      hasReserved = true;
     }
 
-    final batch = _db.batch();
-    batch.set(_db.collection(_collection).doc(txId), transaksi.toMap());
-    batch.set(_db.collection('bookings').doc(bookingId), finalBooking.toMap());
-
-    await batch.commit();
+    try {
+      final batch = _db.batch();
+      batch.set(_db.collection(_collection).doc(txId), transaksi.toMap());
+      batch.set(_db.collection('bookings').doc(bookingId), finalBooking.toMap());
+      await batch.commit();
+    } catch (e) {
+      if (hasReserved) {
+        await BookingSlotService().decrementBookedCount(
+          doulaId: booking.doulaUid,
+          tanggal: booking.tanggal,
+          time: booking.jam,
+        );
+      }
+      rethrow;
+    }
 
     return BookingTransactionResult(txId: txId, bookingId: bookingId);
   }

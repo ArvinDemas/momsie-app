@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   cloud_firestore
+  emoji_picker_flutter
   file_selector_windows
   firebase_auth
   firebase_core
@@ -11,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_windows
   local_auth_windows
   printing
+  record_windows
   url_launcher_windows
 )
 

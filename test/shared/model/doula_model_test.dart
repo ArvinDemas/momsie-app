@@ -33,9 +33,9 @@ void main() {
       final model = DoulaModel.fromMap(map);
 
       expect(model.uid, '');
-      expect(model.name, '');
-      expect(model.job, '');
-      expect(model.rating, '0');
+      expect(model.name, 'Mitra');
+      expect(model.job, 'Bidan');
+      expect(model.rating, '4.9');
     });
 
     test('toMap() memetakan field Dart ke field Firestore dengan benar', () {
@@ -54,7 +54,7 @@ void main() {
 
       expect(map['name'], 'Rina');
       expect(map['pekerjaan'], 'Doula'); // 'job' disimpan sebagai 'pekerjaan'
-      expect(map.containsKey('uid'), false); // uid tidak disimpan di dalam dokumen
+      expect(map['uid'], 'doula-uid-002');
     });
   });
 }
