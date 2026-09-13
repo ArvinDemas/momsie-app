@@ -1,3 +1,32 @@
+### Fix #22 — T-014 Next.js Webhook Handler + T-026 Concurrency & Expiry Tests
+Tanggal: 2026-09-13
+File: app/api/webhooks/midtrans/route.ts (momsie), test/shared/service/booking_slot_service_test.dart, test/shared/service/payment_service_expiry_test.dart (mobile)
+Masalah: T-014 (Next.js webhook endpoint) belum di-commit; T-026 (edge case tests) belum ada.
+Akar: File sudah dibuat di sesi sebelumnya tapi belum di-commit ke git.
+Fix:
+- T-014: Implementasi Next.js API route dengan SHA512 verification (createHash), idempotency check, auto-confirm inline, on-demand materi_access grant
+- T-026: 29 test cases di booking_slot_service_test.dart (race condition, clamp, isFull) + payment_service_expiry_test.dart (expire release, timeout, WhatsApp fallback, on-demand access)
+Verifikasi: flutter analyze 0 errors; flutter test 44/44 PASS (15 baseline + 29 baru); npm run build functions PASS.
+Pelajaran: T-014 perlu di-commit terpisah dari Cloud Functions karena berbeda platform (Next.js vs Firebase Functions).
+Log Keyword: t014-webhook-nextjs, t026-concurrency-tests, 44-tests-pass, spec-completed
+Deploy: PENDING
+
+### Fix #21 — Hubungi Kami: WhatsApp & Instagram URL launcher + error fallback
+Tanggal: 2026-09-13
+File: lib/features/user/akun/user_hubungi_page.dart
+Masalah: Halaman Hubungi Kami memiliki 3 entri (Customer Service, WhatsApp, Instagram) tapi belum terhubung dengan url_launcher — tombol hanya toggle panel, tidak membuka aplikasi eksternal.
+Akar: Method _launchWhatsApp() dan _launchInstagram() belum diimplementasi; import url_launcher belum ada.
+Fix:
+- Tambah import `package:url_launcher/url_launcher.dart`
+- Implementasi `_launchWhatsApp(context)`: parse `https://wa.me/6281373673251`, cek canLaunchUrl(), launch dengan LaunchMode.externalApplication; fallback SnackBar "Tidak dapat membuka WhatsApp" jika gagal
+- Implementasi `_launchInstagram(context)`: parse `https://instagram.com/momsiee.id`, same pattern dengan fallback SnackBar
+- Update onTap callback di ContactCS dan WhatsApp row dari toggle ke _launchWhatsApp
+- Update onTap callback di Instagram row dari toggle ke _launchInstagram
+Verifikasi: flutter analyze 0 errors (95 pre-existing warnings); flutter test 15/15 PASS.
+Pelajaran: url_launcher perlu LaunchMode.externalApplication agar membuka app native (WA/IG), bukan browser.
+Log Keyword: contact-page-launcher, whatsapp-deeplink, instagram-profile, url-launcher
+Deploy: COMMITTED (2101423)
+
 ### Fix #20 — Lupa PIN: tombol "Lupa?" di numpad + alur reset via re-auth password/biometrik
 Tanggal: 2026-09-13
 File: lib/features/pin/pin_entry_page.dart, lib/features/mitra/profil/setup_pin_page.dart
