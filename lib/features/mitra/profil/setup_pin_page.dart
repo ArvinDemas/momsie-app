@@ -6,7 +6,8 @@ import 'package:get/get.dart';
 
 /// Halaman setup PIN pertama kali — tampilan sama dengan PinEntryPage
 class SetupPinPage extends StatefulWidget {
-  const SetupPinPage({super.key});
+  final bool isReset;
+  const SetupPinPage({super.key, this.isReset = false});
   @override
   State<SetupPinPage> createState() => _SetupPinPageState();
 }
@@ -95,14 +96,16 @@ class _SetupPinPageState extends State<SetupPinPage> {
               const SizedBox(height: 16),
               // Title
               Text(
-                _step == 1 ? 'Buat PIN Transaksi' : 'Konfirmasi PIN',
+                _step == 1
+                    ? (widget.isReset ? 'Buat PIN Baru' : 'Buat PIN Transaksi')
+                    : (widget.isReset ? 'Konfirmasi PIN Baru' : 'Konfirmasi PIN'),
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
               Text(
                 _step == 1
-                    ? 'PIN 6 digit diperlukan untuk transaksi & penarikan dana'
+                    ? (widget.isReset ? 'PIN baru akan menggantikan PIN lama Anda' : 'PIN 6 digit diperlukan untuk transaksi & penarikan dana')
                     : 'Masukkan kembali PIN yang sama',
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,

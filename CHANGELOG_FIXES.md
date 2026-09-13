@@ -1,3 +1,16 @@
+### Fix #20 — Lupa PIN: tombol "Lupa?" di numpad + alur reset via re-auth password/biometrik
+Tanggal: 2026-09-13
+File: lib/features/pin/pin_entry_page.dart, lib/features/mitra/profil/setup_pin_page.dart
+Masalah: Tidak ada cara bagi user yang lupa PIN untuk mengubahnya — hanya tersedia "Lupa PIN?" static button yang mengarah ke forgot-password (untuk email, bukan PIN).
+Akar: PinEntryPage tidak memiliki callback onForgotPin; SetupPinPage tidak mendukung mode reset.
+Fix:
+- pin_entry_page.dart: ubah digits array jadi ['1'...'9','Lupa?','0','⌫'], tambahkan _LupaBtn (transparent Material, fontSize 15, w600, textDarkSecondary) di posisi kiri angka 0; tambahkan _ForgotPinBottomSheet dengan input kata sandi + toggle visibilitas, opsi biometrik (jika tersedia), reauthenticateWithCredential(EmailAuthProvider), navigasi ke SetupPinPage(isReset: true); tambah import setup_pin_page.dart.
+- setup_pin_page.dart: tambahkan parameter `isReset` (default false); ubah judul & subtitle saat isReset==true ("Buat PIN Baru" / "Konfirmasi PIN Baru" / "PIN baru akan menggantikan PIN lama Anda").
+Verifikasi: flutter analyze 0 error/warning (3 info pre-existing); flutter test 15/15 PASS.
+Pelajaran: Bottom sheet dengan navigatorContext param needed karena Get.to() membuka halaman baru — pop() harus ke sheet context, bukan build context.
+Log Keyword: forgot-pin-numpad, pin-reset-flow, reauth-password, bottomsheet-navigator
+Deploy: PENDING
+
 ### Fix #19 — T-025: Real-time Firestore streaming filter (Aktif vs Riwayat)
 Tanggal: 2026-09-13
 File: lib/features/user/pesanan/user_pesanan_controller.dart

@@ -1,6 +1,8 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
+import 'package:douce/features/mitra/profil/setup_pin_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -181,18 +183,51 @@ class _PinEntryPageState extends State<PinEntryPage>
                 _PinNumpad(
                   onDigit: _onDigitPressed,
                   onBackspace: _onBackspace,
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => Get.toNamed('/forgot-password'),
-                  child: const Text('Lupa PIN?',
-                      style: TextStyle(color: Colors.grey, fontSize: 13)),
+                  onForgotPin: _handleForgotPin,
                 ),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _handleForgotPin() async {
+    if (!mounted) return;
+
+    final pinService = Get.find<PinAuthService>();
+    final bioAvailable = pinService.isBiometricAvailable.value;
+
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetCtx) => _ForgotPinBottomSheet(
+        bioAvailable: bioAvailable,
+        navigatorContext: sheetCtx,
+      ),
+    );
+
+    if (result != true || !mounted) return;
+
+    setState(() {
+      for (int i = 0; i < 6; i++) _digits[i] = '';
+      _error = false;
+    });
+
+    Get.snackbar(
+      'PIN Baru Tersimpan',
+      'PIN berhasil diubah, silakan gunakan PIN baru Anda',
+      backgroundColor: Colors.green.shade50,
+      colorText: Colors.green.shade800,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -259,12 +294,17 @@ class _PinDot extends StatelessWidget {
 class _PinNumpad extends StatelessWidget {
   final void Function(String) onDigit;
   final VoidCallback onBackspace;
+  final VoidCallback? onForgotPin;
 
-  const _PinNumpad({required this.onDigit, required this.onBackspace});
+  const _PinNumpad({
+    required this.onDigit,
+    required this.onBackspace,
+    this.onForgotPin,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
+    final digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'Lupa?', '0', '⌫'];
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -277,6 +317,10 @@ class _PinNumpad extends StatelessWidget {
       itemCount: digits.length,
       itemBuilder: (context, idx) {
         final d = digits[idx];
+        if (d == 'Lupa?') {
+          if (onForgotPin == null) return const SizedBox.shrink();
+          return _LupaBtn(onPressed: onForgotPin!);
+        }
         if (d.isEmpty) return const SizedBox.shrink();
         if (d == '⌫') {
           return _NumBtn(
@@ -289,6 +333,32 @@ class _PinNumpad extends StatelessWidget {
           onPressed: () => onDigit(d),
         );
       },
+    );
+  }
+}
+
+class _LupaBtn extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _LupaBtn({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onPressed,
+        child: Center(
+          child: Text(
+            'Lupa?',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppSemanticColors.textDarkSecondary,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -320,6 +390,172 @@ class _NumBtn extends StatelessWidget {
                   ),
                 ),
         ),
+      ),
+    );
+  }
+}
+
+class _ForgotPinBottomSheet extends StatefulWidget {
+  final bool bioAvailable;
+  final BuildContext navigatorContext;
+  const _ForgotPinBottomSheet({required this.bioAvailable, required this.navigatorContext});
+
+  @override
+  State<_ForgotPinBottomSheet> createState() => _ForgotPinBottomSheetState();
+}
+
+class _ForgotPinBottomSheetState extends State<_ForgotPinBottomSheet> {
+  final _passwordController = TextEditingController();
+  final _pinService = Get.find<PinAuthService>();
+  bool _obscure = true;
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitPassword() async {
+    final password = _passwordController.text.trim();
+    if (password.isEmpty) {
+      setState(() => _error = 'Masukkan kata sandi akun Momsie');
+      return;
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.email == null) {
+      setState(() => _error = 'Tidak ada akun yang terdaftar');
+      return;
+    }
+
+    setState(() { _isLoading = true; _error = null; });
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      if (!mounted) return;
+      final result = await Get.to<bool>(() => SetupPinPage(isReset: true));
+      if (result == true && mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(widget.navigatorContext).pop(true);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      String msg;
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          msg = 'Kata sandi akun salah';
+          break;
+        case 'too-many-requests':
+          msg = 'Terlalu banyak percobaan. Coba lagi nanti';
+          break;
+        case 'user-not-found':
+          msg = 'Akun tidak ditemukan';
+          break;
+        default:
+          msg = 'Verifikasi gagal: ${e.message}';
+      }
+      setState(() { _error = msg; _isLoading = false; });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() { _error = 'Terjadi kesalahan. Coba lagi.'; _isLoading = false; });
+    }
+  }
+
+  Future<void> _submitBiometric() async {
+    if (!widget.bioAvailable) return;
+    setState(() { _isLoading = true; _error = null; });
+    final success = await _pinService.authenticateBiometric();
+    if (!mounted) return;
+    if (success) {
+      final result = await Get.to<bool>(() => SetupPinPage(isReset: true));
+      if (result == true) {
+        if (mounted) Navigator.of(context).pop(true);
+      }
+    } else {
+      setState(() { _error = 'Verifikasi biometrik gagal'; _isLoading = false; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 24, right: 24, top: 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Verifikasi Lupa PIN',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Masukkan kata sandi akun Momsie untuk membuat PIN baru',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.grey),
+          ),
+          const SizedBox(height: 20),
+          if (widget.bioAvailable) ...[
+            OutlinedButton.icon(
+              onPressed: _isLoading ? null : _submitBiometric,
+              icon: const Icon(Icons.fingerprint, size: 20),
+              label: const Text('Verifikasi dengan Sidik Jari'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(color: ColorDouce.douceBase),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          TextField(
+            controller: _passwordController,
+            obscureText: _obscure,
+            decoration: InputDecoration(
+              labelText: 'Kata Sandi Akun Momsie',
+              hintText: 'Masukkan kata sandi',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              suffixIcon: IconButton(
+                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+                onPressed: () => setState(() => _obscure = !_obscure),
+              ),
+            ),
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submitPassword(),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+          ],
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _submitPassword,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorDouce.douceBase,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _isLoading
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Text('Lanjutkan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Batal', style: TextStyle(color: AppSemanticColors.textMuted)),
+          ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
