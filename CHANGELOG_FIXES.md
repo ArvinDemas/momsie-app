@@ -1,3 +1,14 @@
+### Fix #19 — T-025: Real-time Firestore streaming filter (Aktif vs Riwayat)
+Tanggal: 2026-09-13
+File: lib/features/user/pesanan/user_pesanan_controller.dart
+Masalah: UserPesananPage menampilkan semua booking tanpa filter status per tab — user tidak bisa membedakan pesanan aktif vs riwayat.
+Akar: `_listenBookings()` sebelumnya tidak memfilter berdasarkan status, hanya mengurutkan dan menampilkan semua.
+Fix: Tambah dua RxList terpisah — `activeBookings` (status ∈ ['pending','paid','confirmed','ongoing']) dan `riwayatBookings` (status ∈ ['completed','cancelled','expired']). Stream snapshot dari Firestore collection 'bookings' dengan filter userId, batch-update kedua list setiap snapshot berubah, setLoading=false setelah proses.
+Verifikasi: flutter analyze 0 errors; flutter test 15/15 PASS.
+Pelajaran: Stream-based filtering per tab mengurangi kebutuhan state management tambahan — Firestore snapshot otomatis trigger rebuild.
+Log Keyword: t025-realtime-filter, pesanan-active-history-split, stream-listening
+Deploy: PENDING
+
 ### Fix #18 — Lupa Password alur Firebase Auth link + hilangkan dead-end PIN 4 digit
 Tanggal: 2026-09-13
 File: lib/features/forgot/forgot_controller.dart, lib/features/forgot/forgot_page.dart
