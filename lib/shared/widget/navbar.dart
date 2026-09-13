@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:douce/app/app_routes.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,13 +40,7 @@ class NavBar extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.5),
                     width: 1.5,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                  boxShadow: AppElevation.level3,
                 ),
                 child: isMitra
                     ? Row(
@@ -116,7 +111,7 @@ class NavBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? const Color(0xFFF43F5E) : const Color(0xFF64748B),
+                color: isSelected ? const Color(0xFFF43F5E) : AppSemanticColors.textSecondary,
               ),
             ),
           ],
@@ -193,15 +188,13 @@ class _GeminiAIFloatingButtonState extends State<_GeminiAIFloatingButton>
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: const [
-                  Color(0xFF2563EB), // Royal Blue
-                  Color(0xFF0284C7), // Sky Cyan
-                  Color(0xFF7C3AED), // Electric Purple
-                  Color(0xFFF43F5E), // Momsie Pink
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFFBE185D), // Deep Rose
+                  Color(0xFFF472B6), // Soft Pink
                 ],
-                begin: Alignment(value * 2 - 1, -1),
-                end: Alignment(1 - value * 2, 1),
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
               boxShadow: [

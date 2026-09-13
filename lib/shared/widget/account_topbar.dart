@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/avatar_picker_modal.dart';
@@ -200,13 +201,7 @@ class AccountTopBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(50),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+                    boxShadow: AppElevation.level2,
                   ),
                   padding: const EdgeInsets.all(7),
                   child: Icon(

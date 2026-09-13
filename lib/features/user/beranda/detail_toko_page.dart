@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/data/dummy_data.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:flutter/material.dart';
@@ -95,12 +96,7 @@ class DetailTokoPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 8,
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Icon(
                             Icons.arrow_back_ios_new_rounded,
@@ -114,7 +110,7 @@ class DetailTokoPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                       const SizedBox(width: 36),
@@ -130,13 +126,7 @@ class DetailTokoPage extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.12),
-                              blurRadius: 18,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level3,
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
@@ -152,13 +142,7 @@ class DetailTokoPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level2,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +156,7 @@ class DetailTokoPage extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
+                                      color: AppSemanticColors.textDark,
                                       height: 1.2,
                                     ),
                                   ),
@@ -212,7 +196,7 @@ class DetailTokoPage extends StatelessWidget {
                                     tokoBayi.alamat,
                                     style: const TextStyle(
                                       fontSize: 13,
-                                      color: Color(0xFF475569),
+                                      color: AppSemanticColors.textDarkSecondary,
                                       height: 1.4,
                                     ),
                                   ),
@@ -262,13 +246,7 @@ class DetailTokoPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level2,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +260,7 @@ class DetailTokoPage extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                                    color: AppSemanticColors.textDark,
                                   ),
                                 ),
                               ],
@@ -292,7 +270,7 @@ class DetailTokoPage extends StatelessWidget {
                               tokoBayi.desc,
                               style: const TextStyle(
                                 fontSize: 13,
-                                color: Color(0xFF475569),
+                                color: AppSemanticColors.textDarkSecondary,
                                 height: 1.6,
                               ),
                             ),
@@ -307,7 +285,7 @@ class DetailTokoPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -347,12 +325,7 @@ class DetailTokoPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ColorDouce.douceBase.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-          ),
-        ],
+        boxShadow: AppElevation.level1,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -364,7 +337,7 @@ class DetailTokoPage extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: AppSemanticColors.textDark,
             ),
           ),
         ],

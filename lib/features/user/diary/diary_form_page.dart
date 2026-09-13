@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/diary/diary_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -82,15 +83,9 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                 ? ColorDouce.douceBase
                 : Colors.grey.withValues(alpha: 0.15),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? ColorDouce.douceBase.withValues(alpha: 0.25)
-                  : Colors.black.withValues(alpha: 0.04),
-              blurRadius: isSelected ? 8 : 4,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          boxShadow: isSelected
+              ? AppElevation.softColor(ColorDouce.douceBase)
+              : AppElevation.level1,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -105,7 +100,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                color: isSelected ? Colors.white : AppSemanticColors.textDark,
               ),
             ),
           ],
@@ -137,7 +132,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Color(0xFF0F172A)),
+                        icon: Icon(Icons.close_rounded, color: AppSemanticColors.textDark),
                         onPressed: () {
                           c.clearForm();
                           Get.back();
@@ -149,7 +144,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -198,7 +193,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -236,13 +231,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(color: const Color(0xFFE2E8F0)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Column(
                             children: [
@@ -251,7 +240,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: Color(0xFF0F172A),
+                                  color: AppSemanticColors.textDark,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -294,7 +283,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                                     size: 18,
                                                     color: !c.isBabyBorn.value
                                                         ? Colors.white
-                                                        : const Color(0xFF64748B),
+                                                        : AppSemanticColors.textSecondary,
                                                   ),
                                                   const SizedBox(width: 6),
                                                   Text(
@@ -304,7 +293,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                                       fontWeight: FontWeight.bold,
                                                       color: !c.isBabyBorn.value
                                                           ? Colors.white
-                                                          : const Color(0xFF64748B),
+                                                          : AppSemanticColors.textSecondary,
                                                     ),
                                                   ),
                                                 ],
@@ -341,7 +330,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                                     size: 18,
                                                     color: c.isBabyBorn.value
                                                         ? Colors.white
-                                                        : const Color(0xFF64748B),
+                                                        : AppSemanticColors.textSecondary,
                                                   ),
                                                   const SizedBox(width: 6),
                                                   Text(
@@ -351,7 +340,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                                       fontWeight: FontWeight.bold,
                                                       color: c.isBabyBorn.value
                                                           ? Colors.white
-                                                          : const Color(0xFF64748B),
+                                                          : AppSemanticColors.textSecondary,
                                                     ),
                                                   ),
                                                 ],
@@ -371,12 +360,12 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                   // ── MODE BAYI LAHIR: Center-aligned Numeric Input + Sleek Dropdown ──
                                   return Column(
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Usia Bayi Saat Ini',
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF64748B),
+                                          color: AppSemanticColors.textSecondary,
                                         ),
                                       ),
                                       const SizedBox(height: 12),
@@ -399,7 +388,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                               style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
-                                                color: Color(0xFF0F172A),
+                                                color: AppSemanticColors.textDark,
                                               ),
                                               decoration: InputDecoration(
                                                 counterText: '',
@@ -435,11 +424,11 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                             child: DropdownButtonHideUnderline(
                                               child: DropdownButton<String>(
                                                 value: c.babyAgeUnit.value,
-                                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B)),
+                                                icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppSemanticColors.textSecondary),
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF0F172A),
+                                                  color: AppSemanticColors.textDark,
                                                 ),
                                                 onChanged: (String? val) {
                                                   if (val != null) c.updateUnit(val);
@@ -466,12 +455,12 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                 // ── MODE MASA KEHAMILAN: Center-aligned Stepper (- / +) + Centered Text Box + Slider ──
                                 return Column(
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Usia Kehamilan Saat Ini',
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF64748B),
+                                        color: AppSemanticColors.textSecondary,
                                       ),
                                     ),
                                     const SizedBox(height: 12),
@@ -520,7 +509,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                             style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFF0F172A),
+                                              color: AppSemanticColors.textDark,
                                             ),
                                             decoration: InputDecoration(
                                               counterText: '',
@@ -549,7 +538,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0F172A),
+                                            color: AppSemanticColors.textDark,
                                           ),
                                         ),
                                         const SizedBox(width: 12),
@@ -610,7 +599,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             SizedBox(width: 4),
@@ -629,20 +618,14 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: TextField(
                             controller: c.titleCtrl,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
+                              color: AppSemanticColors.textDark,
                             ),
                             decoration: InputDecoration(
                               hintText: 'Contoh: USG Pertama Adik Bayi / Pertama Kali Senyum',
@@ -676,7 +659,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -684,20 +667,14 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: TextField(
                             controller: c.contentCtrl,
                             maxLines: 5,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF334155),
+                              color: AppSemanticColors.textDarkSecondary,
                               height: 1.5,
                             ),
                             decoration: InputDecoration(
@@ -734,7 +711,7 @@ class _DiaryFormPageState extends State<DiaryFormPage> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             ElevatedButton.icon(

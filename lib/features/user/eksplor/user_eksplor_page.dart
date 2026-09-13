@@ -3,6 +3,7 @@ import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:douce/shared/util/service/artikel_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/rumah_sakit_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
@@ -67,7 +68,7 @@ class UserEksplorPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: AppSemanticColors.textDark,
             ),
           ),
         ),
@@ -118,7 +119,7 @@ class UserEksplorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDark,
                 ),
               ),
             ),
@@ -159,7 +160,7 @@ class UserEksplorPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: AppSemanticColors.textDark,
             ),
           ),
         ),

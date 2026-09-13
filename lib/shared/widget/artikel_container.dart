@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
@@ -22,13 +23,7 @@ class ArtikelContainer extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: AppElevation.level2,
           border: Border.all(color: Colors.grey.withValues(alpha: 0.12)),
         ),
         child: ClipRRect(
@@ -107,7 +102,7 @@ class ArtikelContainer extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDarkSecondary,
                         height: 1.25,
                       ),
                     ),

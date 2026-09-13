@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -105,14 +106,14 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDarkSecondary,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Bagaimana pengalaman Bunda menggunakan Momsie?',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              style: TextStyle(fontSize: 13, color: AppSemanticColors.textSecondary),
             ),
             const SizedBox(height: 16),
             Row(

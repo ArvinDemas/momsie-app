@@ -1,6 +1,7 @@
 import 'package:douce/features/mitra/main_mitra.dart';
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/booking_detail_sheet.dart';
@@ -117,7 +118,7 @@ class MitraBerandaPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
               ),
               Obx(() {
@@ -172,7 +173,7 @@ class MitraBerandaPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDarkSecondary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -300,7 +301,7 @@ class MitraBerandaPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDarkSecondary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -371,7 +372,7 @@ class MitraBerandaPage extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       '${job.tanggal} (${job.day})',
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, color: AppSemanticColors.textDarkSecondary),
                     ),
                   ],
                 ),
@@ -381,7 +382,7 @@ class MitraBerandaPage extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       job.jam,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, color: AppSemanticColors.textDarkSecondary),
                     ),
                   ],
                 ),
@@ -399,7 +400,7 @@ class MitraBerandaPage extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDarkSecondary,
                   ),
                 ),
               ],

@@ -58,6 +58,7 @@ class AppRoutes {
   static const String aiChat = '/ai-chat';
   static const String sizeGuide = '/size-guide';
   static const String onboarding = '/onboarding';
+  static const String maternalContext = '/maternal-context';
   static const String sopForm = '/sop-form';
   static const String sopWaiting = '/sop-waiting';
   static const String sopCsMessage = '/sop-cs-message';

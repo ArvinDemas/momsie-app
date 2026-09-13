@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -53,7 +54,7 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             Text(
@@ -106,13 +107,7 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFEC4899).withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.softColor(const Color(0xFFEC4899)),
                         ),
                         child: Row(
                           children: [
@@ -157,7 +152,7 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -209,13 +204,7 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppElevation.level1,
       ),
       child: Row(
         children: [
@@ -237,15 +226,15 @@ class _PostpartumWellbeingPageState extends State<PostpartumWellbeingPage> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   desc,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
-                    color: Color(0xFF64748B),
+                    color: AppSemanticColors.textSecondary,
                     height: 1.3,
                   ),
                 ),

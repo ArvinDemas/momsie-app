@@ -1,4 +1,5 @@
 import 'package:douce/features/user/checklist/checklist_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
@@ -28,20 +29,21 @@ class ChecklistPage extends StatelessWidget {
                         icon: const Icon(Icons.arrow_back_ios_new_rounded),
                         onPressed: () => Get.back(),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Hospital Bag Checklist',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: AppTypography.h2.fontSize,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
+                            fontFamily: AppTypography.fontFamily,
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                       ),
                       Obx(() => TextButton.icon(
                             onPressed: c.totalDone > 0 ? c.resetAll : null,
                             icon: const Icon(Icons.restart_alt_rounded, size: 16),
-                            label: const Text('Reset', style: TextStyle(fontSize: 12)),
+                            label: const Text('Reset', style: AppTypography.caption),
                           )),
                     ],
                   ),
@@ -60,13 +62,7 @@ class ChecklistPage extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorDouce.douceBase.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+                      boxShadow: AppElevation.softColor(ColorDouce.douceBase),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,19 +70,19 @@ class ChecklistPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Progress Packing',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: AppTypography.h4.fontSize,
                               ),
                             ),
                             Text(
                               '${c.totalDone}/${c.totalItems} item ($pct%)',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 13,
+                                fontSize: AppTypography.bodySm.fontSize,
                               ),
                             ),
                           ],
@@ -102,13 +98,13 @@ class ChecklistPage extends StatelessWidget {
                           ),
                         ),
                         if (pct == 100)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 8),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               '🎉 Semua item sudah di-pack!',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 13,
+                                fontSize: AppTypography.bodyMd.fontSize,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -143,7 +139,7 @@ class ChecklistPage extends StatelessWidget {
                                 side: BorderSide(
                                   color: isSelected
                                       ? ColorDouce.douceBase
-                                      : Colors.grey[300]!,
+                                    : AppSemanticColors.textMuted,
                                 ),
                               ),
                               onSelected: (_) => c.selectCategory(cat),
@@ -181,13 +177,7 @@ class ChecklistPage extends StatelessWidget {
                                   ? ColorDouce.kindaRed.withValues(alpha: 0.5)
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.06),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                              boxShadow: AppElevation.level2,
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
@@ -206,7 +196,7 @@ class ChecklistPage extends StatelessWidget {
                                     border: Border.all(
                                       color: item.isDone
                                           ? ColorDouce.douceBase
-                                          : Colors.grey[400]!,
+                                          : AppSemanticColors.textMuted,
                                       width: 2,
                                     ),
                                   ),
@@ -219,14 +209,14 @@ class ChecklistPage extends StatelessWidget {
                               title: Text(
                                 item.detail,
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'OpenSans',
+                                  fontSize: AppTypography.bodyMd.fontSize,
+                                  fontFamily: AppTypography.fontFamily,
                                   decoration: item.isDone
                                       ? TextDecoration.lineThrough
                                       : null,
                                   color: item.isDone
-                                      ? Colors.grey[500]
-                                      : Colors.black87,
+                                      ? AppSemanticColors.textMuted
+                                      : AppSemanticColors.textDark,
                                 ),
                               ),
                               onTap: () => c.toggleItem(item),

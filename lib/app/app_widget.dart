@@ -64,6 +64,7 @@ import 'package:douce/features/sop/sop_waiting_page.dart';
 import 'package:douce/features/sop/sop_cs_message_page.dart';
 import 'package:douce/features/user/sizeguide/sizeguide_page.dart';
 import 'package:douce/features/user/ai_chat/ai_chat_page.dart';
+import 'package:douce/features/onboarding/maternal_context_page.dart';
 import 'package:douce/features/onboarding/onboarding_page.dart';
 import 'package:douce/features/pin/pin_entry_page.dart';
 import 'package:douce/features/user/kesehatan/payment_success_page.dart';
@@ -328,6 +329,10 @@ class AppWidget extends StatelessWidget {
         GetPage(
           name: AppRoutes.onboarding,
           page: () => const OnboardingPage(),
+        ),
+        GetPage(
+          name: AppRoutes.maternalContext,
+          page: () => const MaternalContextPage(),
         ),
         GetPage(
           name: AppRoutes.sopForm,

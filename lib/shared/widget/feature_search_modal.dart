@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -270,7 +271,7 @@ class _FeatureSearchModalState extends State<FeatureSearchModal> {
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0F172A),
+                                            color: AppSemanticColors.textDarkSecondary,
                                           ),
                                         ),
                                       ],

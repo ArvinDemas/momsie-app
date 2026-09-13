@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/mitra/profil/setup_pin_page.dart';
 import 'package:douce/features/user/kesehatan/booking_doula_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
@@ -106,7 +107,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                     const SizedBox(width: 24),
@@ -156,7 +157,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
+                                  color: AppSemanticColors.textDark,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -200,7 +201,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                     InkWell(
@@ -233,7 +234,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                       ),
@@ -251,7 +252,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                     InkWell(
@@ -284,7 +285,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                       ),
@@ -299,7 +300,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -458,7 +459,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
           style: TextStyle(
             fontSize: isTotal ? 15 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            color: isTotal ? const Color(0xFF0F172A) : Colors.black54,
+            color: isTotal ? AppSemanticColors.textDark : Colors.black54,
           ),
         ),
         Text(
@@ -466,7 +467,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
           style: TextStyle(
             fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-            color: isTotal ? ColorDouce.douceBase : const Color(0xFF0F172A),
+            color: isTotal ? ColorDouce.douceBase : AppSemanticColors.textDark,
           ),
         ),
       ],

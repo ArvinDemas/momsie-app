@@ -1,8 +1,46 @@
+class SlotItem {
+  final String time;
+  final int capacity;
+  final int bookedCount;
+
+  SlotItem({
+    required this.time,
+    required this.capacity,
+    required this.bookedCount,
+  });
+
+  factory SlotItem.fromMap(Map<String, dynamic> map) {
+    return SlotItem(
+      time: map['time'] ?? '',
+      capacity: (map['capacity'] as num?)?.toInt() ?? 1,
+      bookedCount: (map['bookedCount'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'time': time,
+      'capacity': capacity,
+      'bookedCount': bookedCount,
+    };
+  }
+
+  bool get isFull => bookedCount >= capacity;
+
+  SlotItem copyWith({String? time, int? capacity, int? bookedCount}) {
+    return SlotItem(
+      time: time ?? this.time,
+      capacity: capacity ?? this.capacity,
+      bookedCount: bookedCount ?? this.bookedCount,
+    );
+  }
+}
+
 class BookingSlotModel {
   final String docId;
   final String doulaId;
   final String tanggal; // format: "YYYY-MM-DD"
-  final List<String> slots; // contoh: ["09:00", "10:00", "13:00"]
+  final List<SlotItem> slots;
   final DateTime createdAt;
 
   BookingSlotModel({
@@ -15,11 +53,9 @@ class BookingSlotModel {
 
   factory BookingSlotModel.fromMap(Map<String, dynamic> map, {String? docId}) {
     final slotsRaw = map['slots'];
-    List<String> slots = [];
+    List<SlotItem> slots = [];
     if (slotsRaw is List) {
-      slots = slotsRaw.map((e) => e.toString()).toList();
-    } else if (slotsRaw is String) {
-      slots = [slotsRaw];
+      slots = slotsRaw.map((e) => SlotItem.fromMap(e as Map<String, dynamic>)).toList();
     }
     return BookingSlotModel(
       docId: docId ?? map['docId'] ?? '',
@@ -36,12 +72,12 @@ class BookingSlotModel {
     return {
       'doulaId': doulaId,
       'tanggal': tanggal,
-      'slots': slots,
+      'slots': slots.map((s) => s.toMap()).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
     };
   }
 
-  BookingSlotModel copyWith({List<String>? slots}) {
+  BookingSlotModel copyWith({List<SlotItem>? slots}) {
     return BookingSlotModel(
       docId: docId,
       doulaId: doulaId,

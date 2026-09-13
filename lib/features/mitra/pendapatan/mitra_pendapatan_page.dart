@@ -1,5 +1,6 @@
 import 'package:douce/features/mitra/pendapatan/mitra_pendapatan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/model/withdrawal_model.dart';
 import 'package:douce/shared/widget/account_topbar.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -32,7 +33,7 @@ class MitraPendapatanPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDarkSecondary,
                       ),
                     ),
                   ],
@@ -139,7 +140,7 @@ class MitraPendapatanPage extends StatelessWidget {
                 // Withdrawals History
                 const Text(
                   "Riwayat Penarikan",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
                 ),
                 const SizedBox(height: 12),
                 Obx(() {
@@ -172,7 +173,7 @@ class MitraPendapatanPage extends StatelessWidget {
                 // Earnings History (Completed Bookings)
                 const Text(
                   "Riwayat Pekerjaan Selesai",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
                 ),
                 const SizedBox(height: 12),
                 Obx(() {
@@ -238,7 +239,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

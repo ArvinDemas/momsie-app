@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -47,7 +48,7 @@ class VerifyEmailPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -204,7 +205,7 @@ class VerifyEmailPage extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
+              style: TextStyle(fontSize: 14, color: AppSemanticColors.textDarkSecondary),
             ),
           ),
         ],

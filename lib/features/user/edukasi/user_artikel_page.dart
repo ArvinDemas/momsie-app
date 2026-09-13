@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/artikel_model.dart';
 import 'package:flutter/material.dart';
@@ -33,12 +34,7 @@ class UserArtikelPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 8,
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Icon(
                             Icons.arrow_back_ios_new_rounded,
@@ -52,7 +48,7 @@ class UserArtikelPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                       const SizedBox(width: 36),
@@ -68,13 +64,7 @@ class UserArtikelPage extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.12),
-                              blurRadius: 18,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level3,
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
@@ -143,7 +133,7 @@ class UserArtikelPage extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                           height: 1.3,
                         ),
                       ),
@@ -200,14 +190,7 @@ class UserArtikelPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                            border: Border.all(color: ColorDouce.douceBase.withValues(alpha: 0.2)),
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +204,7 @@ class UserArtikelPage extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
+                                      color: AppSemanticColors.textDark,
                                     ),
                                   ),
                                 ],
@@ -239,7 +222,7 @@ class UserArtikelPage extends StatelessWidget {
                                           point,
                                           style: const TextStyle(
                                             fontSize: 13,
-                                            color: Color(0xFF334155),
+                                            color: AppSemanticColors.textDarkSecondary,
                                             height: 1.4,
                                           ),
                                         ),
@@ -260,13 +243,7 @@ class UserArtikelPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level2,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +284,7 @@ class UserArtikelPage extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDark,
                 height: 1.3,
               ),
             ),
@@ -353,7 +330,7 @@ class UserArtikelPage extends StatelessWidget {
         text,
         style: const TextStyle(
           fontSize: 14,
-          color: Color(0xFF334155),
+          color: AppSemanticColors.textDarkSecondary,
           height: 1.6,
         ),
       );
@@ -368,7 +345,7 @@ class UserArtikelPage extends StatelessWidget {
             text: parts[i],
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: AppSemanticColors.textDark,
             ),
           ),
         );
@@ -379,7 +356,7 @@ class UserArtikelPage extends StatelessWidget {
             text: parts[i],
             style: const TextStyle(
               fontWeight: FontWeight.normal,
-              color: Color(0xFF334155),
+              color: AppSemanticColors.textDarkSecondary,
             ),
           ),
         );

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +27,7 @@ class DoulaContainer extends StatelessWidget {
         height: 245,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          boxShadow: AppElevation.level3,
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
@@ -129,7 +124,7 @@ class DoulaContainer extends StatelessWidget {
                         }),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF0F172A),
+                          foregroundColor: AppSemanticColors.textDarkSecondary,
                           elevation: 2,
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/diary/diary_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -104,7 +105,7 @@ class DiaryDetailPage extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
+                                      color: AppSemanticColors.textDark,
                                     ),
                                   ),
                                 ],
@@ -140,7 +141,7 @@ class DiaryDetailPage extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                             height: 1.25,
                           ),
                         ),
@@ -181,7 +182,7 @@ class DiaryDetailPage extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 15,
                                 height: 1.7,
-                                color: Color(0xFF334155),
+                                color: AppSemanticColors.textDarkSecondary,
                               ),
                             ),
                           ),

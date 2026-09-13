@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/theme_service.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class ThemePickerPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'OpenSans',
+                                fontFamily: AppTypography.fontFamily,
                               ),
                             ),
                             Text(
@@ -157,7 +158,7 @@ class ThemePickerPage extends StatelessWidget {
                                             color: theme.primary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
-                                            fontFamily: 'OpenSans',
+                                            fontFamily: AppTypography.fontFamily,
                                           ),
                                         ),
 

@@ -1,14 +1,59 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
+import 'package:douce/shared/util/service/materi_access_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/yoga_streak_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 
-class UserDetailProgramPage extends StatelessWidget {
+class UserDetailProgramPage extends StatefulWidget {
   const UserDetailProgramPage({super.key});
+
+  @override
+  State<UserDetailProgramPage> createState() => _UserDetailProgramPageState();
+}
+
+class _UserDetailProgramPageState extends State<UserDetailProgramPage> {
+  bool _hasAccess = false;
+  bool _isLoadingAccess = true;
+
+  String _getLayananFromProgram(String programName) {
+    if (programName.contains('Yoga') || programName.contains('prenatal')) {
+      return 'prenatal_yoga';
+    }
+    return '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAccess();
+  }
+
+  Future<void> _checkAccess() async {
+    final program = Get.arguments['program'] as ProgramModel;
+    final UserController userController = Get.find<UserController>();
+    final layanan = _getLayananFromProgram(program.name);
+
+    if (layanan.isEmpty) {
+      setState(() {
+        _hasAccess = true;
+        _isLoadingAccess = false;
+      });
+      return;
+    }
+
+    final hasAccess = await MateriAccessService().hasAccess(userController.uid.value, layanan);
+    if (mounted) {
+      setState(() {
+        _hasAccess = hasAccess;
+        _isLoadingAccess = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +82,9 @@ class UserDetailProgramPage extends StatelessWidget {
                     color: ColorDouce.douceBase,
                   ),
                 ),
-                const Text(
+                Text(
                   "Detail Program",
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTypography.h2,
                 ),
                 const Icon(
                   Icons.arrow_back_ios,
@@ -52,19 +93,12 @@ class UserDetailProgramPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            // Live Yoga Daily Streak Badge Header
             Obx(() => Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.cardPadding,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    borderRadius: AppRadius.roundedLg,
+                    boxShadow: AppElevation.level1,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,12 +107,12 @@ class UserDetailProgramPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Status Streak Yoga',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF64748B),
+                                color: AppSemanticColors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -88,7 +122,7 @@ class UserDetailProgramPage extends StatelessWidget {
                                   : 'Rutinitas latihan terawat!',
                               style: const TextStyle(
                                 fontSize: 13,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -101,32 +135,26 @@ class UserDetailProgramPage extends StatelessWidget {
                   ),
                 )),
             const SizedBox(height: 16),
-            programKehamilanContainer(program),
+            if (_isLoadingAccess)
+              const Center(child: CircularProgressIndicator())
+            else if (!_hasAccess)
+              _buildAccessDeniedCard(program)
+            else
+              programKehamilanContainer(program),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               "Deskripsi",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
+              style: AppTypography.h3,
             ),
             const SizedBox(height: 10),
             Text(
               program.desc,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: AppTypography.bodyMd,
             ),
             const SizedBox(height: 20),
             Text(
               "Program ${program.name}",
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
+              style: AppTypography.h3,
             ),
             const SizedBox(height: 10),
             Column(
@@ -137,6 +165,55 @@ class UserDetailProgramPage extends StatelessWidget {
           ],
         ),
       ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccessDeniedCard(ProgramModel program) {
+    return Container(
+      width: double.infinity,
+      padding: AppSpacing.cardPadding,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppRadius.roundedLg,
+        boxShadow: AppElevation.level1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.lock_outline, color: AppSemanticColors.warning, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                "Program ${program.name}",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: ColorDouce.douceBase,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Anda belum memiliki akses ke program ini. Silakan beli terlebih dahulu untuk mengakses materi.",
+            style: AppTypography.bodyMd,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => Get.back(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorDouce.douceBase,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.roundedMd),
+            ),
+            child: const Text(
+              "Kembali",
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
         ],
       ),
     );

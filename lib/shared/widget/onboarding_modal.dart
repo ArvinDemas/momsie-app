@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,16 +46,16 @@ class OnboardingModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDarkSecondary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Platform Pendamping Kehamilan & Persalinan Digital Terpercaya Bunda Indonesia.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF64748B),
+                color: AppSemanticColors.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -135,15 +136,15 @@ class OnboardingModal extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: Color(0xFF64748B),
+                  color: AppSemanticColors.textSecondary,
                   height: 1.3,
                 ),
               ),

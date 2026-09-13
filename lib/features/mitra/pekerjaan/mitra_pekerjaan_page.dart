@@ -1,5 +1,6 @@
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/shared/widget/booking_detail_sheet.dart';
@@ -33,7 +34,7 @@ class MitraPekerjaanPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDarkSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -70,7 +71,7 @@ class MitraPekerjaanPage extends StatelessWidget {
                       ],
                     ),
                     labelColor: Colors.white,
-                    unselectedLabelColor: const Color(0xFF64748B),
+                    unselectedLabelColor: AppSemanticColors.textSecondary,
                     labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                     tabs: [
@@ -190,7 +191,7 @@ class _PekerjaanMasukTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDarkSecondary,
               ),
             ),
           ],
@@ -236,7 +237,7 @@ class _PekerjaanMasukTab extends StatelessWidget {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: AppSemanticColors.textDarkSecondary,
           ),
         ),
         const SizedBox(height: 10),
@@ -296,7 +297,7 @@ class _RiwayatPekerjaanTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textDarkSecondary,
               ),
             ),
             const SizedBox(width: 10),
@@ -345,7 +346,7 @@ class _RiwayatPekerjaanTab extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDarkSecondary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -503,6 +504,27 @@ class _PendingJobCard extends StatelessWidget {
                         SizedBox(width: 6),
                         Text('1 Jam', style: TextStyle(fontSize: 13)),
                       ]),
+                      Obx(() {
+                        final slots = controller.getSlotsForDate(current.tanggal);
+                        final slot = slots.firstWhereOrNull((s) => s.jam == current.jam);
+                        if (slot == null || slot.capacity <= 1) return const SizedBox.shrink();
+                        final utilizationColor = slot.status == 'full'
+                            ? Colors.red.shade700
+                            : (slot.status == 'partial' ? Colors.orange.shade700 : Colors.grey);
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            children: [
+                              Icon(Icons.people_outline, size: 14, color: utilizationColor),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${slot.bookedCount}/${slot.capacity} tempat',
+                                style: TextStyle(fontSize: 11, color: utilizationColor, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ],
@@ -659,6 +681,27 @@ class _ActiveJobCard extends StatelessWidget {
                     SizedBox(width: 6),
                     Text('1 Jam', style: TextStyle(fontSize: 13)),
                   ]),
+                  Obx(() {
+                    final slots = controller.getSlotsForDate(pesanan.tanggal);
+                    final slot = slots.firstWhereOrNull((s) => s.jam == pesanan.jam);
+                    if (slot == null || slot.capacity <= 1) return const SizedBox.shrink();
+                    final utilizationColor = slot.status == 'full'
+                        ? Colors.red.shade700
+                        : (slot.status == 'partial' ? Colors.orange.shade700 : Colors.grey);
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Icon(Icons.people_outline, size: 14, color: utilizationColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${slot.bookedCount}/${slot.capacity} tempat',
+                            style: TextStyle(fontSize: 11, color: utilizationColor, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ]),
               ],
             ),

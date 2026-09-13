@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:douce/app/app_routes.dart';
 import 'package:douce/features/user/kesehatan/user_kesehatan_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/base_page.dart';
@@ -178,7 +179,7 @@ class _UserKesehatanPageState extends State<UserKesehatanPage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: AppSemanticColors.textDark,
           ),
         ),
         const SizedBox(height: 12),
@@ -225,7 +226,7 @@ class _UserKesehatanPageState extends State<UserKesehatanPage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: AppSemanticColors.textDark,
           ),
         ),
         const SizedBox(height: 12),
@@ -290,7 +291,7 @@ class _UserKesehatanPageState extends State<UserKesehatanPage> {
               width: isActive ? 20 : 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isActive ? ColorDouce.douceBase : Colors.grey.shade300,
+                color: isActive ? ColorDouce.douceBase : AppSemanticColors.textMuted.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(6),
               ),
             );

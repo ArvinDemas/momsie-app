@@ -16,6 +16,10 @@ class UserController extends GetxController {
   RxBool isPregnancyLoss = false.obs;
   RxBool isBabyBorn = false.obs;
 
+  // Maternal Context (Onboarding)
+  RxString pregnancyStage = 'none'.obs; // 'none', 'trimester1', 'trimester2', 'trimester3'
+  RxBool hasCompletedMaternalContext = false.obs;
+
   // App Settings
   RxString lengthUnit = 'cm'.obs;
   RxString weightUnit = 'kg'.obs;
@@ -50,6 +54,8 @@ class UserController extends GetxController {
     personalisedAds.value = prefs.getBool('personalised_ads') ?? true;
     age.value = prefs.getInt('user_age') ?? 26;
     relationship.value = prefs.getString('user_relationship') ?? 'Ibu Hamil / Bunda';
+    pregnancyStage.value = prefs.getString('pregnancy_stage') ?? 'none';
+    hasCompletedMaternalContext.value = prefs.getBool('has_completed_maternal_context') ?? false;
   }
 
   Future<void> updateDueDate(String newDate) async {
@@ -116,6 +122,23 @@ class UserController extends GetxController {
     relationship.value = rel;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_relationship', rel);
+  }
+
+  Future<void> updatePregnancyStage(String stage) async {
+    pregnancyStage.value = stage;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pregnancy_stage', stage);
+  }
+
+  Future<void> setMaternalContextComplete() async {
+    hasCompletedMaternalContext.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_completed_maternal_context', true);
+  }
+
+  void resetMaternalContext() {
+    pregnancyStage.value = 'none';
+    hasCompletedMaternalContext.value = false;
   }
 
   RxBool isDoula = false.obs;

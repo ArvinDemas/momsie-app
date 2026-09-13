@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:douce/features/user/diary/diary_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/helper/file_helper.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -79,13 +80,7 @@ class _DiaryPdfPageState extends State<DiaryPdfPage> {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorDouce.douceBase.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      boxShadow: AppElevation.softColor(ColorDouce.douceBase),
                     ),
                     child: Row(
                       children: [
@@ -150,13 +145,7 @@ class _DiaryPdfPageState extends State<DiaryPdfPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Row(
                             children: [

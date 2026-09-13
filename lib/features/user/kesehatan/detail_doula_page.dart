@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/data/dummy_data.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,7 @@ class DetailDoulaPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppSemanticColors.textDark),
                         onPressed: Get.back,
                       ),
                       const Text(
@@ -44,7 +45,7 @@ class DetailDoulaPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                       const SizedBox(width: 40),
@@ -61,13 +62,7 @@ class DetailDoulaPage extends StatelessWidget {
                         height: 240,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level2,
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
@@ -83,13 +78,7 @@ class DetailDoulaPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 15,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level2,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +89,7 @@ class DetailDoulaPage extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                                 height: 1.25,
                               ),
                             ),
@@ -139,7 +128,7 @@ class DetailDoulaPage extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF334155),
+                                      color: AppSemanticColors.textDarkSecondary,
                                     ),
                                   ),
                                 ),
@@ -178,13 +167,7 @@ class DetailDoulaPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          boxShadow: AppElevation.level1,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +177,7 @@ class DetailDoulaPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -202,7 +185,7 @@ class DetailDoulaPage extends StatelessWidget {
                               doula.biografi,
                               style: const TextStyle(
                                 fontSize: 13.5,
-                                color: Color(0xFF475569),
+                                color: AppSemanticColors.textDarkSecondary,
                                 height: 1.6,
                               ),
                             ),
@@ -219,13 +202,7 @@ class DetailDoulaPage extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 12,
-                        offset: const Offset(0, -3),
-                      ),
-                    ],
+                    boxShadow: AppElevation.level2,
                   ),
                   child: SizedBox(
                     width: double.infinity,
@@ -285,12 +262,7 @@ class DetailDoulaPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ColorDouce.douceBase.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-          ),
-        ],
+        boxShadow: AppElevation.level1,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

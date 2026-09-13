@@ -9,6 +9,13 @@ import 'package:douce/shared/theme/design_system.dart';
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
 
+  static String _addHour(String time) {
+    final parts = time.split(':');
+    if (parts.length < 2) return '$time +1j';
+    final hour = int.tryParse(parts[0]) ?? 0;
+    return '${(hour + 1).toString().padLeft(2, '0')}:${parts[1]}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final String doula = Get.arguments['doula'] as String;
@@ -56,6 +63,71 @@ class ChatPage extends StatelessWidget {
                     color: Colors.transparent,
                   ),
                 ],
+              ),
+              Obx(
+                () {
+                  if (chatController.slotIsOnDemand.value) {
+                    return const SizedBox.shrink();
+                  }
+                  final slotTanggal = chatController.slotTanggal.value;
+                  final slotJam = chatController.slotJam.value;
+                  if (slotTanggal.isEmpty && slotJam.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Column(
+                    children: [
+                      const SizedBox(height: AppSpacing.xs),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey.shade600),
+                          const SizedBox(width: 4),
+                          Text(
+                            slotTanggal,
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(Icons.schedule_rounded, size: 14, color: Colors.grey.shade600),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$slotJam - ${_addHour(slotJam)}',
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                          ),
+                          const Spacer(),
+                          Obx(
+                            () {
+                              final status = chatController.slotStatus.value;
+                              String statusText;
+                              Color statusColor;
+                              if (status == 'confirmed' || status == 'ongoing') {
+                                statusText = 'Sedang Berlangsung';
+                                statusColor = Colors.green;
+                              } else if (status == 'paid') {
+                                statusText = 'Segera Dimulai';
+                                statusColor = Colors.orange;
+                              } else {
+                                statusText = '';
+                                statusColor = Colors.grey;
+                              }
+                              if (statusText.isEmpty) return const SizedBox.shrink();
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  statusText,
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.md),
               Expanded(

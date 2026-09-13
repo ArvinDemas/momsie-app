@@ -53,6 +53,14 @@ class ChatController extends GetxController {
       final isOnDemand = data['isOnDemand'] as bool? ?? false;
       final jam = data['jam'] as String?;
       final tanggal = data['tanggal'] as String?;
+      final layanan = data['layanan'] as String? ?? '';
+
+      // Persist slot info for header display
+      slotLayanan.value = layanan;
+      slotIsOnDemand.value = isOnDemand;
+      slotStatus.value = status ?? '';
+      slotTanggal.value = tanggal ?? '';
+      slotJam.value = jam ?? '';
 
       // Validasi 1: status harus aktif
       if (!['paid', 'confirmed', 'ongoing'].contains(status)) {
@@ -111,6 +119,13 @@ class ChatController extends GetxController {
   final RxString imageUser = ''.obs;
   final RxString chatId = ''.obs;
   final RxString pengguna = ''.obs;
+
+  // Slot info for scheduled services
+  final RxString slotTanggal = ''.obs;
+  final RxString slotJam = ''.obs;
+  final RxString slotLayanan = ''.obs;
+  final RxBool slotIsOnDemand = false.obs;
+  final RxString slotStatus = ''.obs;
 
   final TextEditingController messageController = TextEditingController();
 

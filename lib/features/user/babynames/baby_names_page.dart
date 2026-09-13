@@ -1,4 +1,5 @@
 import 'package:douce/features/user/babynames/baby_names_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
@@ -27,13 +28,14 @@ class BabyNamesPage extends StatelessWidget {
                         icon: const Icon(Icons.arrow_back_ios_new_rounded),
                         onPressed: () => Get.back(),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Pencari Nama Bayi',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: AppTypography.h3.fontSize,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
+                            fontFamily: AppTypography.fontFamily,
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                       ),
@@ -48,7 +50,7 @@ class BabyNamesPage extends StatelessWidget {
                               style: TextStyle(
                                 color: ColorDouce.douceBase,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                fontSize: AppTypography.caption.fontSize,
                               ),
                             ),
                           )),
@@ -104,13 +106,13 @@ class BabyNamesPage extends StatelessWidget {
                                       avatar: Icon(
                                         iconData,
                                         size: 14,
-                                        color: sel ? Colors.white : Colors.grey.shade600,
+                                        color: sel ? Colors.white : AppSemanticColors.textMuted,
                                       ),
                                       label: Text(
                                         g,
                                         style: TextStyle(
                                           color: sel ? Colors.white : Colors.black87,
-                                          fontSize: 12,
+                                          fontSize: AppTypography.bodySm.fontSize,
                                           fontWeight: sel ? FontWeight.bold : FontWeight.normal,
                                         ),
                                       ),
@@ -134,16 +136,16 @@ class BabyNamesPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade300),
+                              border: Border.all(color: AppSemanticColors.textMuted.withValues(alpha: 0.3)),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: c.selectedLang.value,
                                 icon: const Icon(Icons.expand_more_rounded, size: 18),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.black87,
-                                  fontSize: 12,
-                                  fontFamily: 'OpenSans',
+                                  fontSize: AppTypography.bodySm.fontSize,
+                                  fontFamily: AppTypography.fontFamily,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 items: c.languages.map((lang) {
@@ -230,10 +232,10 @@ class BabyNamesPage extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (c.filtered.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Text(
                           'Tidak ada nama yang ditemukan.',
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: AppSemanticColors.textMuted),
                         ),
                       );
                     }
@@ -248,13 +250,7 @@ class BabyNamesPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level1,
                           ),
                           child: Row(
                             children: [
@@ -267,10 +263,10 @@ class BabyNamesPage extends StatelessWidget {
                                       n.boy.isEmpty ? '—' : n.boy,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: AppTypography.h4.fontSize,
                                         fontWeight: FontWeight.bold,
                                         color: n.boy.isEmpty
-                                            ? Colors.grey.shade300
+                                            ? AppSemanticColors.textMuted
                                             : const Color(0xFF3B5FDB),
                                       ),
                                     ),
@@ -280,7 +276,7 @@ class BabyNamesPage extends StatelessWidget {
                                 Container(
                                   width: 1,
                                   height: 36,
-                                  color: Colors.grey.shade200,
+                                  color: AppSemanticColors.textMuted.withValues(alpha: 0.2),
                                 ),
                               // Girl name
                               if (gender == 'Semua' || gender == 'Perempuan')
@@ -291,10 +287,10 @@ class BabyNamesPage extends StatelessWidget {
                                       n.girl.isEmpty ? '—' : n.girl,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: AppTypography.h4.fontSize,
                                         fontWeight: FontWeight.bold,
                                         color: n.girl.isEmpty
-                                            ? Colors.grey.shade300
+                                            ? AppSemanticColors.textMuted
                                             : ColorDouce.douceBase,
                                       ),
                                     ),

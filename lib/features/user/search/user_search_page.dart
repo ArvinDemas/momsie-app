@@ -1,4 +1,5 @@
 import 'package:douce/features/user/search/user_search_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:douce/shared/util/model/tokobayi_model.dart';
@@ -49,7 +50,7 @@ class UserSearchPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.3),
+                          color: AppSemanticColors.textMuted.withValues(alpha: 0.3),
                           spreadRadius: 1,
                           blurRadius: 5,
                           offset: const Offset(0, 3),
@@ -107,7 +108,7 @@ class UserSearchPage extends StatelessWidget {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
-                                  fontFamily: 'OpenSans',
+                                  fontFamily: AppTypography.fontFamily,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
@@ -146,7 +147,7 @@ class UserSearchPage extends StatelessWidget {
             'Obat',
             style: TextStyle(
               fontSize: 18,
-              fontFamily: 'OpenSans',
+              fontFamily: AppTypography.fontFamily,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -170,7 +171,7 @@ class UserSearchPage extends StatelessWidget {
             'Toko Bayi',
             style: TextStyle(
               fontSize: 18,
-              fontFamily: 'OpenSans',
+              fontFamily: AppTypography.fontFamily,
               fontWeight: FontWeight.w600,
             ),
           ),

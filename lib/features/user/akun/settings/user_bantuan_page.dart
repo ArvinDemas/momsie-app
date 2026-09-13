@@ -1,4 +1,5 @@
 import 'package:douce/features/user/akun/settings/user_bantuan_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -143,7 +144,7 @@ class UserBantuanPage extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'OpenSans',
+                        fontFamily: AppTypography.fontFamily,
                         color: Colors.black87,
                       ),
                     ),
@@ -166,7 +167,7 @@ class UserBantuanPage extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.black54,
                   fontSize: 13,
-                  fontFamily: 'OpenSans',
+                  fontFamily: AppTypography.fontFamily,
                   height: 1.5,
                 ),
               ),

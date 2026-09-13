@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 
 class AdService {
@@ -105,7 +106,7 @@ class _RewardedAdModalState extends State<_RewardedAdModal> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -184,7 +185,7 @@ class _RewardedAdModalState extends State<_RewardedAdModal> {
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Stack(

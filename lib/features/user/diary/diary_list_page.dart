@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/diary/diary_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/diary_model.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -27,10 +28,10 @@ class DiaryListPage extends StatelessWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppSemanticColors.textDark),
                         onPressed: () => Get.back(),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -39,12 +40,12 @@ class DiaryListPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textPrimary,
                               ),
                             ),
                             Text(
                               'Abadikan kenangan momen indah kehamilan',
-                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                              style: TextStyle(fontSize: 11, color: AppSemanticColors.textMuted),
                             ),
                           ],
                         ),
@@ -74,13 +75,7 @@ class DiaryListPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: ColorDouce.douceBase,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: ColorDouce.douceBase.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                            boxShadow: AppElevation.softColor(ColorDouce.douceBase),
                           ),
                           child: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
                         ),
@@ -131,12 +126,12 @@ class DiaryListPage extends StatelessWidget {
               child: Icon(Icons.book_rounded, size: 64, color: ColorDouce.douceBase),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Belum Ada Catatan Diary',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -223,13 +218,7 @@ class _DiaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: AppElevation.level2,
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
@@ -273,10 +262,10 @@ class _DiaryCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 entry.moodLabel,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
+                                  color: AppSemanticColors.textPrimary,
                                 ),
                               ),
                             ],
@@ -350,10 +339,10 @@ class _DiaryCard extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       entry.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -362,9 +351,9 @@ class _DiaryCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         entry.content,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF475569),
+                          color: AppSemanticColors.textDarkSecondary,
                           height: 1.4,
                         ),
                         maxLines: 2,

@@ -1,4 +1,5 @@
 import 'package:douce/shared/util/model/booking_model.dart';
+import 'package:douce/shared/util/model/booking_slot_model.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:douce/shared/util/service/booking_slot_service.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
@@ -20,17 +21,48 @@ class BookingDoulaController extends GetxController {
   // Calendar State
   final Rx<DateTime> focusedMonth = DateTime.now().obs;
   final Rx<DateTime> selectedDate = DateTime.now().obs;
-  final RxString viewMode = 'bulanan'.obs; // 'bulanan', 'mingguan'
+  final RxString viewMode = 'bulanan'.obs;
 
   final Rx<DoulaModel?> selectedDoula = Rx<DoulaModel?>(null);
   final RxBool isLoadingSlots = false.obs;
-  final RxList<String> availableSlots = <String>[].obs;
+  final RxList<SlotItem> availableSlots = <SlotItem>[].obs;
   final RxString errorMessage = ''.obs;
 
   final DateFormat _dateStorageFmt = DateFormat('yyyy-MM-dd');
   final DateFormat monthYearFormat = DateFormat('MMMM yyyy');
 
   late final BookingSlotService _slotService;
+
+  // Service type classification
+  static const Set<String> scheduledServices = {
+    'chat_doula',
+    'prenatal_yoga',
+    'doula_offline',
+  };
+
+  static const Set<String> onDemandServices = {
+    'materi_online',
+    'paket_bundling',
+  };
+
+  static const Map<String, int> servicePrices = {
+    'chat_doula': 30000,
+    'materi_online': 99000,
+    'prenatal_yoga': 75000,
+    'paket_bundling': 135000,
+    'doula_offline': 3000000,
+  };
+
+  static const Map<String, String> serviceLabels = {
+    'chat_doula': 'Konsultasi Online via Chat',
+    'materi_online': 'Kelas Online: Materi Prenatal',
+    'prenatal_yoga': 'Kelas Online: Prenatal Yoga',
+    'paket_bundling': 'Kelas Online: Bundling Edukasi & Yoga',
+    'doula_offline': 'Full Journey Doula Care',
+  };
+
+  bool get isOnDemand => onDemandServices.contains(selectedLayanan.value);
+  bool get isScheduled => scheduledServices.contains(selectedLayanan.value);
 
   @override
   void onInit() {
@@ -39,13 +71,12 @@ class BookingDoulaController extends GetxController {
     if (Get.arguments != null && Get.arguments['doula'] != null) {
       selectedDoula.value = Get.arguments['doula'] as DoulaModel;
     }
-    // Default set ke hari ini
     onDateSelected(selectedDate.value);
   }
 
   void setDoula(DoulaModel doula) {
     selectedDoula.value = doula;
-    if (selectedTanggal.value.isNotEmpty) {
+    if (selectedTanggal.value.isNotEmpty && isScheduled) {
       _loadAvailableSlots(selectedTanggal.value);
     }
   }
@@ -64,7 +95,9 @@ class BookingDoulaController extends GetxController {
     selectedTanggal.value = _dateStorageFmt.format(date);
     selectedDay.value = DateFormat('E').format(date);
     selectedJam.value = '';
-    _loadAvailableSlots(selectedTanggal.value);
+    if (isScheduled) {
+      _loadAvailableSlots(selectedTanggal.value);
+    }
   }
 
   void setHarga(int value) {
@@ -77,14 +110,24 @@ class BookingDoulaController extends GetxController {
 
   void setSelectedLayanan(String value) {
     selectedLayanan.value = value;
+    if (value.isEmpty) {
+      selectedTanggal.value = '';
+      selectedDay.value = '';
+      selectedJam.value = '';
+      availableSlots.value = [];
+      return;
+    }
+    final price = servicePrices[value] ?? 0;
+    harga.value = price;
+    if (isScheduled && selectedTanggal.value.isNotEmpty) {
+      _loadAvailableSlots(selectedTanggal.value);
+    }
   }
 
-  /// Load slot ketersediaan Doula dari Firestore
   Future<void> _loadAvailableSlots(String tanggal) async {
     if (selectedDoula.value == null) {
-      // Warm fallback slots jika Doula belum diset dari list
-      availableSlots.value = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
-      errorMessage.value = '';
+      availableSlots.value = [];
+      errorMessage.value = 'Pilih doula terlebih dahulu.';
       return;
     }
 
@@ -93,26 +136,36 @@ class BookingDoulaController extends GetxController {
 
     try {
       final doulaId = selectedDoula.value!.uid;
-
       final slotDoc = await _slotService.getSlot(doulaId, tanggal);
+
+      if (slotDoc != null && slotDoc.slots.isNotEmpty) {
+        availableSlots.value = slotDoc.slots;
+      } else {
+        // Default slots jika doula belum atur slot
+        final defaultTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+        availableSlots.value = defaultTimes.map((t) => SlotItem(time: t, capacity: 1, bookedCount: 0)).toList();
+      }
+
+      // Check booked status from bookings collection
       final bookedSlots = await _slotService.getBookedSlots(
         doulaId: doulaId,
         tanggalList: [tanggal],
       );
-
       final booked = bookedSlots[tanggal] ?? [];
 
-      if (slotDoc != null && slotDoc.slots.isNotEmpty) {
-        availableSlots.value = slotDoc.slots.where((s) => !booked.contains(s)).toList();
-      } else {
-        // Fallback default jam operasional jika Doula baru terdaftar
-        final defaultSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-        availableSlots.value = defaultSlots.where((s) => !booked.contains(s)).toList();
+      // Mark booked slots
+      for (var slot in availableSlots) {
+        if (booked.contains(slot.time)) {
+          // Find and update the slot
+          final index = availableSlots.indexWhere((s) => s.time == slot.time);
+          if (index >= 0) {
+            final updated = availableSlots[index].copyWith(bookedCount: slot.bookedCount + 1);
+            availableSlots[index] = updated;
+          }
+        }
       }
 
-      if (availableSlots.isEmpty) {
-        errorMessage.value = 'Semua jam pada tanggal ini telah penuh terisi / tidak tersedia.';
-      }
+      errorMessage.value = availableSlots.isEmpty ? 'Semua jam pada tanggal ini telah penuh terisi.' : '';
     } catch (e) {
       debugPrint('Error loading user slots: $e');
       errorMessage.value = 'Gagal memuat jadwal ketersediaan.';
@@ -122,14 +175,24 @@ class BookingDoulaController extends GetxController {
     }
   }
 
+  bool get canProceed {
+    if (selectedDoula.value == null) return false;
+    if (selectedLayanan.value.isEmpty) return false;
+    if (isScheduled) {
+      if (selectedTanggal.value.isEmpty || selectedJam.value.isEmpty) return false;
+    }
+    if (selectedLayanan.value == 'doula_offline' && alamatUser.value.isEmpty) return false;
+    return true;
+  }
+
   BookingModel toBookingModel() {
     final userController = Get.isRegistered<UserController>() ? Get.find<UserController>() : null;
     final doula = selectedDoula.value;
+    final layanan = selectedLayanan.value;
 
     final hargaLayananVal = harga.value;
     const biayaAdminVal = 2000;
     final totalVal = hargaLayananVal + biayaAdminVal;
-
     final split = PaymentService.calculateSplit(hargaLayananVal);
 
     return BookingModel(
@@ -146,8 +209,8 @@ class BookingDoulaController extends GetxController {
       tanggal: selectedTanggal.value,
       day: selectedDay.value,
       jam: selectedJam.value,
-      layanan: selectedLayanan.value,
-      alamat: alamatUser.value,
+      layanan: layanan,
+      alamat: selectedLayanan.value == 'doula_offline' ? alamatUser.value : null,
       catatan: catatanUser.value,
       hargaLayanan: hargaLayananVal,
       biayaAdmin: biayaAdminVal,
@@ -155,6 +218,7 @@ class BookingDoulaController extends GetxController {
       platformFee: split['platformFee'] ?? 0,
       doulaEarnings: split['doulaEarnings'] ?? 0,
       status: 'pending',
+      isOnDemand: onDemandServices.contains(layanan),
       createdAt: DateTime.now(),
     );
   }

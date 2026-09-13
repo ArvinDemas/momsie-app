@@ -3,15 +3,18 @@ import 'package:douce/features/user/beranda/user_beranda_controller.dart';
 import 'package:douce/features/user/main_user.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/features/user/sizeguide/sizeguide_card.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/widget/feedback_dialog.dart';
 import 'package:douce/shared/widget/onboarding_modal.dart';
+import 'package:douce/shared/widget/spotlight_tour.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserBerandaPage extends StatefulWidget {
   const UserBerandaPage({
@@ -30,6 +33,10 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
   Timer? _carouselTimer;
   int _activeSlideIndex = 0;
   late UserBerandaController controller;
+  final GlobalKey _sizeGuideKey = GlobalKey();
+  final GlobalKey _aiChatKey = GlobalKey();
+  final GlobalKey _bentoGridKey = GlobalKey();
+  bool _tourTriggered = false;
 
   @override
   void initState() {
@@ -38,7 +45,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
     controller = Get.find<UserBerandaController>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      OnboardingModal.checkAndShow(context);
+      _maybeStartTour();
     });
 
     // Auto-Play Carousel Banner (Pergeseran Otomatis setiap 6 detik agar lebih tenang & nyaman)
@@ -52,6 +59,50 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         );
       }
     });
+  }
+
+  Future<void> _maybeStartTour() async {
+    if (_tourTriggered) return;
+    _tourTriggered = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    final hasSeenTour = prefs.getBool('has_seen_spotlight_tour') ?? false;
+    if (hasSeenTour) return;
+
+    final steps = [
+      SpotlightStep(
+        title: 'Panduan Ukuran Janin',
+        description:
+            'Pantau perkembangan bayi mingguan dengan Size Guide interaktif — lihat perkiraan ukuran sesuai minggu kehamilan.',
+        icon: Icons.child_care_rounded,
+        iconColor: ColorDouce.douceBase,
+      ),
+      SpotlightStep(
+        title: '5 Fitur Utama',
+        description:
+            'Akses cepat ke Hospital Bag, Birth Plan, Diary, Postpartum, dan Nama Bayi — semua dalam satu sentuhan.',
+        icon: Icons.grid_view_rounded,
+        iconColor: const Color(0xFF8B5CF6),
+      ),
+      SpotlightStep(
+        title: 'Momsie AI Chatbot',
+        description:
+            'Konsultasi keluhan kehamilan & rekomendasi nutrisi 24/7 langsung bersama AI pintar kami.',
+        icon: Icons.smart_toy_rounded,
+        iconColor: const Color(0xFFBE185D),
+      ),
+    ];
+
+    await SpotlightTourOverlay.showOnce(
+      context: context,
+      steps: steps,
+      targetKey: _sizeGuideKey,
+      prefsKey: 'has_seen_spotlight_tour',
+      onComplete: () async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('has_seen_spotlight_tour', true);
+      },
+    );
   }
 
   @override
@@ -83,7 +134,10 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
           const SizedBox(height: 20),
 
           // ── 2. Size Guide Card (Ukuran Bayi Minggu Ini) ─────────────
-          const SizeGuideCard(),
+          KeyedSubtree(
+            key: _sizeGuideKey,
+            child: const SizeGuideCard(),
+          ),
 
           const SizedBox(height: 20),
 
@@ -96,12 +150,12 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Layanan & Fitur Utama",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textPrimary,
                       ),
                     ),
                     InkWell(
@@ -133,7 +187,10 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 const SizedBox(height: 14),
 
                 // ── 3. Apple Bento Grid Layout (Bebas Emoji) ──────────
-                _buildBentoGrid(),
+                KeyedSubtree(
+                  key: _bentoGridKey,
+                  child: _buildBentoGrid(),
+                ),
 
                 const SizedBox(height: 36),
 
@@ -141,12 +198,12 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Pusat Perlengkapan Bayi",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textPrimary,
                       ),
                     ),
                     Obx(
@@ -205,12 +262,12 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Edukasi & Artikel Terkini",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textPrimary,
                       ),
                     ),
                     Obx(
@@ -296,7 +353,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         'subtitle': 'Konsultasikan keluhan kehamilan & nutrisi kapan saja bersama AI',
         'cta': 'Tanya AI',
         'image': 'assets/images/banner_ai.jpg',
-        'gradient': const [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
+        'gradient': const [Color(0xFFBE185D), Color(0xFFF472B6), Color(0xFFFFD1DC)],
         'icon': Icons.smart_toy_rounded,
         'action': () => Get.toNamed(AppRoutes.aiChat),
       },
@@ -305,7 +362,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         'subtitle': 'Checklist perlengkapan bersalin lengkap untuk Ibu & Si Kecil',
         'cta': 'Cek Tas Bersalin',
         'image': 'assets/images/banner_hospital_bag.jpg',
-        'gradient': const [Color(0xFF7C3AED), Color(0xFFC084FC)],
+        'gradient': const [Color(0xFFF43F5E), Color(0xFFFB7185)],
         'icon': Icons.backpack_rounded,
         'action': () => Get.toNamed(AppRoutes.checklist),
       },
@@ -331,7 +388,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
             itemBuilder: (context, index) {
               final slide = slides[index];
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
@@ -490,12 +547,15 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         ),
         const SizedBox(height: 12),
         // Row 4: Full Width AI Chatbot (Gemini Dynamic Gradient)
-        _bentoCardWide(
-          title: 'Momsie AI Chatbot Assistant 24/7',
-          subtitle: 'Tanya keluhan kehamilan & rekomendasi medis instan',
-          icon: Icons.smart_toy_rounded,
-          colorsList: const [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
-          onTap: () => Get.toNamed(AppRoutes.aiChat),
+        KeyedSubtree(
+          key: _aiChatKey,
+          child: _bentoCardWide(
+            title: 'Momsie AI Chatbot Assistant 24/7',
+            subtitle: 'Tanya keluhan kehamilan & rekomendasi medis instan',
+            icon: Icons.smart_toy_rounded,
+            colorsList: const [Color(0xFFBE185D), Color(0xFFF472B6), Color(0xFFFFD1DC)],
+            onTap: () => Get.toNamed(AppRoutes.aiChat),
+          ),
         ),
       ],
     );
@@ -516,13 +576,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: AppElevation.level2,
           border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
         ),
         child: Column(
@@ -539,18 +593,18 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
             const SizedBox(height: 14),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: AppSemanticColors.textPrimary,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: Color(0xFF64748B),
+                color: AppSemanticColors.textSecondary,
               ),
             ),
           ],
@@ -578,13 +632,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: colorsList.first.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: AppElevation.softColor(colorsList.first),
         ),
         child: Row(
           children: [

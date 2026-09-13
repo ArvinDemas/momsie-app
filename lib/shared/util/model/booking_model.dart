@@ -20,6 +20,9 @@ class BookingModel {
   final int doulaEarnings; // 85% dari hargaLayanan
   final String status; // 'pending' | 'paid' | 'confirmed' | 'ongoing' | 'completed' | 'cancelled'
   final DateTime createdAt;
+  final String? zoomLink;
+  final bool isOnDemand;
+  final DateTime? expiredAt;
   final DateTime? paidAt;
   final DateTime? confirmedAt;
   final DateTime? completedAt;
@@ -46,9 +49,12 @@ class BookingModel {
     required this.doulaEarnings,
     required this.status,
     required this.createdAt,
+    this.zoomLink,
+    this.isOnDemand = false,
     this.paidAt,
     this.confirmedAt,
     this.completedAt,
+    this.expiredAt,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map, {String? id}) {
@@ -73,10 +79,13 @@ class BookingModel {
       platformFee: (map['platformFee'] as num?)?.toInt() ?? 0,
       doulaEarnings: (map['doulaEarnings'] as num?)?.toInt() ?? 0,
       status: map['status'] ?? 'pending',
+      zoomLink: map['zoomLink'] as String?,
+      isOnDemand: map['isOnDemand'] as bool? ?? false,
       createdAt: _parseDateTime(map['createdAt']) ?? DateTime.now(),
       paidAt: _parseDateTime(map['paidAt']),
       confirmedAt: _parseDateTime(map['confirmedAt']),
       completedAt: _parseDateTime(map['completedAt']),
+      expiredAt: _parseDateTime(map['expiredAt']),
     );
   }
 
@@ -123,10 +132,13 @@ class BookingModel {
       'platformFee': platformFee,
       'doulaEarnings': doulaEarnings,
       'status': status,
+      'zoomLink': zoomLink,
+      'isOnDemand': isOnDemand,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'paidAt': paidAt?.millisecondsSinceEpoch,
       'confirmedAt': confirmedAt?.millisecondsSinceEpoch,
       'completedAt': completedAt?.millisecondsSinceEpoch,
+      'expiredAt': expiredAt?.millisecondsSinceEpoch,
     };
   }
 
@@ -135,6 +147,9 @@ class BookingModel {
     DateTime? paidAt,
     DateTime? confirmedAt,
     DateTime? completedAt,
+    String? zoomLink,
+    bool? isOnDemand,
+    DateTime? expiredAt,
   }) {
     return BookingModel(
       id: id,
@@ -157,10 +172,13 @@ class BookingModel {
       platformFee: platformFee,
       doulaEarnings: doulaEarnings,
       status: status ?? this.status,
+      zoomLink: zoomLink ?? this.zoomLink,
+      isOnDemand: isOnDemand ?? this.isOnDemand,
       createdAt: createdAt,
       paidAt: paidAt ?? this.paidAt,
       confirmedAt: confirmedAt ?? this.confirmedAt,
       completedAt: completedAt ?? this.completedAt,
+      expiredAt: expiredAt ?? this.expiredAt,
     );
   }
 }

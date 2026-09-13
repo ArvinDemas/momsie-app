@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/health_consent_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,6 +65,16 @@ class SplashController extends GetxController {
       // Cek mode aktif terakhir yang disimpan di SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final lastActiveMode = prefs.getString('last_active_mode') ?? 'user';
+
+      // Redirect ke maternal context page jika belum mengisi profil kehamilan
+      if (lastActiveMode == 'user' && !userDoc['isDoula']) {
+        final hasMaternalContext =
+            prefs.getBool('has_completed_maternal_context') ?? false;
+        if (!hasMaternalContext) {
+          Get.offNamed(AppRoutes.maternalContext);
+          return;
+        }
+      }
 
       // Cek apakah consent sudah pernah diberikan.
       final alreadyConsented = await HealthConsentDialog.isConsentGiven();

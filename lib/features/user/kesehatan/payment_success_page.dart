@@ -1,4 +1,5 @@
 import 'package:douce/app/app_routes.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -87,7 +88,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage>
         ),
         title: const Text(
           'Bukti Pembayaran',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppSemanticColors.textDark),
         ),
         centerTitle: true,
       ),
@@ -143,7 +144,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDark,
                   ),
                 ),
               ),
@@ -297,7 +298,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage>
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isStatus ? Colors.green.shade700 : const Color(0xFF0F172A),
+                color: isStatus ? Colors.green.shade700 : AppSemanticColors.textDark,
               ),
             ),
           ),

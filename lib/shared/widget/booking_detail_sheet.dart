@@ -1,5 +1,6 @@
 import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,7 @@ class BookingDetailSheet extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDarkSecondary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -295,7 +296,7 @@ class _DetailSection extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF475569),
+            color: AppSemanticColors.textDarkSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -355,7 +356,7 @@ class _DetailRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-                color: valueColor ?? const Color(0xFF0F172A),
+                color: valueColor ?? AppSemanticColors.textDarkSecondary,
               ),
               textAlign: TextAlign.end,
             ),

@@ -1,12 +1,21 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/feature_search_modal.dart';
 import 'package:douce/shared/widget/job_search_modal.dart';
 import 'package:douce/shared/widget/yoga_streak_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+String _getTimeGreeting() {
+  final hour = DateTime.now().hour;
+  if (hour < 12) return 'Selamat Pagi';
+  if (hour < 15) return 'Selamat Siang';
+  if (hour < 18) return 'Selamat Sore';
+  return 'Selamat Malam';
+}
 
 class TopBar extends StatelessWidget {
   const TopBar({
@@ -108,13 +117,7 @@ class TopBar extends StatelessWidget {
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: ColorDouce.douceBase.withValues(alpha: 0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppElevation.level3,
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -169,11 +172,11 @@ class TopBar extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Halo, Selamat Datang 👋',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontWeight: FontWeight.w400,
+                              '${_getTimeGreeting()}, ${isDoula ? 'Mitra' : 'Bunda'}!',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             Obx(
@@ -290,7 +293,7 @@ class TopBar extends StatelessWidget {
                           child: Text(
                             searchHint ?? (isDoula ? 'Cari pekerjaan, nama pemesan...' : 'Cari fitur, menu, atau obat...'),
                             style: TextStyle(
-                              color: Colors.grey.shade400,
+                              color: AppSemanticColors.textMuted,
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
                             ),

@@ -1,5 +1,6 @@
 import 'package:douce/features/user/ai_chat/ai_chat_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/theme_service.dart';
 import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -72,7 +73,7 @@ class _AiChatPageState extends State<AiChatPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDark,
                       ),
                     ),
                   ],
@@ -125,7 +126,7 @@ class _AiChatPageState extends State<AiChatPage> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected ? const Color(0xFFFF6B8B) : const Color(0xFF0F172A),
+                          color: isSelected ? const Color(0xFFFF6B8B) : AppSemanticColors.textDark,
                         ),
                       ),
                       subtitle: Text(
@@ -187,22 +188,22 @@ class _AiChatPageState extends State<AiChatPage> {
       {
         'title': 'Pertanda Awal Persalinan',
         'prompt': 'Apa saja tanda-tanda awal persalinan yang perlu diperhatikan?',
-        'icon': '🌸',
+        'icon': 'Icons.medical_services_rounded',
       },
       {
         'title': 'Yoga Trimester 3',
         'prompt': 'Apa saja gerakan yoga yang aman dan bermanfaat untuk trimester 3?',
-        'icon': '🧘‍♀️',
+        'icon': 'Icons.sports_yoga_rounded',
       },
       {
         'title': 'Nutrisi Cegah Anemia',
         'prompt': 'Makanan dan nutrisi apa saja yang ampuh mencegah anemia saat hamil?',
-        'icon': '🍏',
+        'icon': 'Icons.eco_rounded',
       },
       {
         'title': 'Tas Bersalin ke RS',
         'prompt': 'Apa saja daftar barang wajib di dalam Hospital Bag untuk persalinan?',
-        'icon': '🎒',
+        'icon': 'Icons.backpack_rounded',
       },
     ];
 
@@ -218,18 +219,12 @@ class _AiChatPageState extends State<AiChatPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF7C3AED), Color(0xFFF43F5E)],
+                colors: [const Color(0xFFBE185D), const Color(0xFFF472B6), const Color(0xFFFFD1DC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
-                  blurRadius: 20,
-                  spreadRadius: 4,
-                ),
-              ],
+              boxShadow: AppElevation.softColor(const Color(0xFFBE185D)),
             ),
             child: const Icon(
               Icons.smart_toy_rounded,
@@ -246,17 +241,17 @@ class _AiChatPageState extends State<AiChatPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: AppSemanticColors.textDark,
               height: 1.3,
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             "Tanyakan seputar nutrisi, kesehatan janin, persalinan & laktasi 24/7",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.5,
-              color: Color(0xFF64748B),
+              color: AppSemanticColors.textSecondary,
             ),
           ),
 
@@ -280,13 +275,7 @@ class _AiChatPageState extends State<AiChatPage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: const Color(0xFFE2E8F0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: AppElevation.level1,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -298,7 +287,7 @@ class _AiChatPageState extends State<AiChatPage> {
                         style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF334155),
+                          color: AppSemanticColors.textDarkSecondary,
                         ),
                       ),
                     ],
@@ -329,13 +318,7 @@ class _AiChatPageState extends State<AiChatPage> {
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: AppElevation.level1,
                   ),
                   child: Row(
                     children: [
@@ -347,12 +330,12 @@ class _AiChatPageState extends State<AiChatPage> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                          color: const Color(0xFFBE185D).withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.smart_toy_rounded,
-                          color: Color(0xFF2563EB),
+                          color: const Color(0xFFBE185D),
                           size: 22,
                         ),
                       ),
@@ -366,7 +349,7 @@ class _AiChatPageState extends State<AiChatPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             Text(
@@ -398,7 +381,7 @@ class _AiChatPageState extends State<AiChatPage> {
                       // Button Menu Riwayat Chat
                       IconButton(
                         tooltip: 'Riwayat Chat',
-                        icon: const Icon(Icons.history_rounded, color: Color(0xFF64748B)),
+                        icon: Icon(Icons.history_rounded, color: AppSemanticColors.textSecondary),
                         onPressed: () => _showHistoryModal(context, c),
                       ),
                     ],
@@ -457,12 +440,7 @@ class _AiChatPageState extends State<AiChatPage> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 6,
-                                  ),
-                                ],
+                                boxShadow: AppElevation.level1,
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -497,13 +475,7 @@ class _AiChatPageState extends State<AiChatPage> {
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.95),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
+                    boxShadow: AppElevation.level1,
                   ),
                   child: Row(
                     children: [
@@ -561,13 +533,7 @@ class _AiChatPageState extends State<AiChatPage> {
                                   shape: BoxShape.circle,
                                   boxShadow: c.isLoading.value
                                       ? []
-                                      : [
-                                          BoxShadow(
-                                            color: ColorDouce.douceBase.withOpacity(0.3),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
+                                      : AppElevation.softColor(ColorDouce.douceBase),
                                 ),
                                 child: const Icon(
                                   Icons.send_rounded,
@@ -612,12 +578,12 @@ class _MessageBubble extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                color: const Color(0xFFBE185D).withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.smart_toy_rounded,
-                color: Color(0xFF2563EB),
+                color: const Color(0xFFBE185D),
                 size: 16,
               ),
             ),
@@ -636,13 +602,7 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 boxShadow: isUser
                     ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                    : AppElevation.level1,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -687,7 +647,7 @@ class _MessageBubble extends StatelessWidget {
     final baseStyle = TextStyle(
       fontSize: 14,
       height: 1.45,
-      color: isUser ? Colors.white : const Color(0xFF0F172A),
+      color: isUser ? Colors.white : AppSemanticColors.textDark,
     );
 
     // Replace list bullet asterisks at the beginning of lines

@@ -84,33 +84,8 @@ class _PaymentSheetState extends State<PaymentSheet> {
 
     try {
       final String txId;
-
-      // Jika Midtrans belum dikonfigurasi (server key kosong), gunakan mode manual
-      if (_selectedMethod == 'midtrans_snap' && MidtransService.serverKey.isEmpty) {
-        // Tampilkan loading sebentar
-        await Future.delayed(const Duration(seconds: 1));
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-
-        // Langsung buka halaman instruksi pembayaran manual
-        final transactionId = 'BKG-${DateTime.now().millisecondsSinceEpoch}';
-        Navigator.pop(context);
-        if (!context.mounted) return;
-        await showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => PaymentInstructionSheet(
-            transactionId: transactionId,
-            metodePembayaran: 'transfer_bca',
-            nominal: widget.nominal,
-            deskripsi: widget.deskripsi,
-          ),
-        );
-        return;
-      }
-
       String? bookingId;
+
       if (widget.booking != null) {
         final result = await PaymentService().createBookingTransaction(
           booking: widget.booking!,
@@ -129,85 +104,71 @@ class _PaymentSheetState extends State<PaymentSheet> {
 
       if (!mounted) return;
 
-      // Jika Midtrans Snap dipilih, panggil Midtrans API & buka Halaman Bayar Resmi
-      if (_selectedMethod == 'midtrans_snap') {
-        final snapRes = await MidtransService().createSnapTransaction(
-          orderId: txId,
-          grossAmount: widget.nominal,
-          customerName: widget.booking?.namaUser ?? 'Bunda Momsie',
-          customerEmail: 'user@momsie.id',
-          itemDetails: widget.deskripsi,
-        );
+      // Midtrans Snap — one and only payment method
+      final snapRes = await MidtransService().createSnapTransaction(
+        orderId: txId,
+        grossAmount: widget.nominal,
+        customerName: widget.booking?.namaUser ?? 'Bunda Momsie',
+        customerEmail: 'user@momsie.id',
+        itemDetails: widget.deskripsi,
+      );
 
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-
-        if (snapRes != null && snapRes.redirectUrl.isNotEmpty) {
-          // Launch Midtrans Payment Page (user bayar di browser/external)
-          await MidtransService().launchSnapPayment(snapRes.redirectUrl);
-
-          // Tutup payment sheet — SEBELUM cek mounted, karena setelah pop widget sudah unmounted
-          // Tapi kita cek mounted dulu supaya Navigator.pop tidak crash
-          if (mounted) Navigator.pop(context);
-
-          // Poll status Midtrans (5x, tiap 2 detik) — cukup untuk QRIS/credit card sandbox
-          // JANGAN cek mounted setelah ini karena widget sudah unmounted setelah pop!
-          // Get.offAllNamed adalah global navigator, aman dipanggil tanpa mounted check.
-          String? status;
-          for (int i = 0; i < 5; i++) {
-            status = await MidtransService().checkStatus(txId);
-            debugPrint('[Payment] Poll $i status: $status');
-            if (status == 'settlement' || status == 'capture') break;
-            await Future.delayed(const Duration(seconds: 2));
-          }
-
-          if (status == 'settlement' || status == 'capture') {
-            // Berhasil bayar! Update Firestore ke 'paid'
-            await PaymentService().updateStatus(txId, 'paid');
-            if (widget.jenisLayanan == 'subscription') {
-              await SubscriptionService.to.setPremium(true);
-            }
-            Get.offAllNamed(AppRoutes.paymentSuccess, arguments: {
-              'transactionId': txId,
-              'nominal': widget.nominal,
-              'layanan': widget.deskripsi,
-            });
-          } else {
-            // Pending / belum bayar → ke halaman Pesanan agar bisa bayar nanti
-            Get.snackbar(
-              'Status Pembayaran',
-              'Pembayaran belum dikonfirmasi. Lanjutkan pembayaran di menu Pesanan.',
-              snackPosition: SnackPosition.TOP,
-              backgroundColor: Colors.orange.shade800,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 4),
-            );
-            Get.offAllNamed('/user-pesanan');
-          }
-          return;
-        } // end if (snapRes != null)
-      } // end if (_selectedMethod == 'midtrans_snap')
-
+      if (!mounted) return;
       setState(() => _isLoading = false);
 
-      final ctx = context;
-      final method = _selectedMethod!;
-      final nominal = widget.nominal;
-      final deskripsi = widget.deskripsi;
+      if (snapRes != null && snapRes.redirectUrl.isNotEmpty) {
+        // Launch Midtrans Payment Page
+        await MidtransService().launchSnapPayment(snapRes.redirectUrl);
 
-      // Navigasi ke Step 2 (Instruksi Transfer Manual)
-      Navigator.pop(ctx);
-      if (!ctx.mounted) return;
-      await showModalBottomSheet(
-        context: ctx,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) => PaymentInstructionSheet(
-          transactionId: txId,
-          metodePembayaran: method,
-          nominal: nominal,
-          deskripsi: deskripsi,
-        ),
+        if (mounted) Navigator.pop(context);
+
+        // Poll status Midtrans (18 polling × 10 detik = 3 menit max)
+        String? status;
+        for (int i = 0; i < 18; i++) {
+          status = await MidtransService().checkStatus(txId);
+          debugPrint('[Payment] Poll $i status: $status');
+          if (status == 'settlement' || status == 'capture') break;
+          await Future.delayed(const Duration(seconds: 10));
+        }
+
+        if (status == 'settlement' || status == 'capture') {
+          await PaymentService().updateStatus(txId, 'paid');
+
+          // Auto-confirm untuk layanan yang mendukung
+          if (widget.booking != null) {
+            await PaymentService().autoConfirmBooking(
+              bookingId ?? '',
+              widget.booking!.layanan,
+            );
+          }
+
+          Get.offAllNamed(AppRoutes.paymentSuccess, arguments: {
+            'transactionId': txId,
+            'bookingId': bookingId,
+            'nominal': widget.nominal,
+            'layanan': widget.deskripsi,
+          });
+        } else {
+          Get.snackbar(
+            'Status Pembayaran',
+            'Pembayaran belum dikonfirmasi. Lanjutkan pembayaran di menu Pesanan.',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.orange.shade800,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 4),
+          );
+          Get.offAllNamed('/user-pesanan');
+        }
+        return;
+      }
+
+      // Fallback: jika Snap token gagal dibuat
+      Get.snackbar(
+        'Error',
+        'Gagal memulai pembayaran. Silakan coba lagi.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.shade800,
+        colorText: Colors.white,
       );
     } catch (e) {
       if (!mounted) return;

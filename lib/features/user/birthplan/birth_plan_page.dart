@@ -1,4 +1,5 @@
 import 'package:douce/features/user/birthplan/birth_plan_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
@@ -102,13 +103,7 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFF43F5E).withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    boxShadow: AppElevation.softColor(const Color(0xFFF43F5E)),
                   ),
                   child: Row(
                     children: [
@@ -154,7 +149,7 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF475569),
+                            color: AppSemanticColors.textDarkSecondary,
                           ),
                         ),
                         if (sel > 0)
@@ -197,13 +192,7 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                              boxShadow: AppElevation.level2,
                             ),
                             child: Column(
                               children: [
@@ -222,7 +211,7 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
-                                              color: Color(0xFF0F172A),
+                                              color: AppSemanticColors.textDark,
                                             ),
                                           ),
                                         ),
@@ -300,8 +289,8 @@ class _BirthPlanPageState extends State<BirthPlanPage> {
                                                     style: TextStyle(
                                                       fontSize: 13.5,
                                                       color: item.isSelected
-                                                          ? const Color(0xFF0F172A)
-                                                          : const Color(0xFF64748B),
+                                                          ? AppSemanticColors.textDark
+                                                          : AppSemanticColors.textSecondary,
                                                       fontWeight: item.isSelected
                                                           ? FontWeight.w600
                                                           : FontWeight.normal,

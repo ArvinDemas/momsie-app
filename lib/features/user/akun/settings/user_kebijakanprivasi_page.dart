@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -53,7 +54,7 @@ class UserKebijakanPrivasiPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.black54,
-                        fontFamily: 'OpenSans',
+                        fontFamily: AppTypography.fontFamily,
                       ),
                     ),
                     SizedBox(height: 20),
@@ -146,7 +147,7 @@ class _SectionTitle extends StatelessWidget {
           fontSize: 15,
           fontWeight: FontWeight.w700,
           color: Colors.black87,
-          fontFamily: 'OpenSans',
+          fontFamily: AppTypography.fontFamily,
         ),
       ),
     );
@@ -165,7 +166,7 @@ class _SectionBody extends StatelessWidget {
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: Colors.black87,
-        fontFamily: 'OpenSans',
+        fontFamily: AppTypography.fontFamily,
         height: 1.6,
       ),
     );

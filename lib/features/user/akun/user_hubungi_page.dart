@@ -1,4 +1,5 @@
 import 'package:douce/features/user/akun/user_hubungi_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
@@ -126,7 +127,7 @@ class UserHubungiPage extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
-                      fontFamily: 'OpenSans',
+                      fontFamily: AppTypography.fontFamily,
                     ),
                   ),
                 ),
@@ -164,7 +165,7 @@ class UserHubungiPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w300,
-                  fontFamily: 'OpenSans',
+                  fontFamily: AppTypography.fontFamily,
                 ),
               ),
               const Spacer(),

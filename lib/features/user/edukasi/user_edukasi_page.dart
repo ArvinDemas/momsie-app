@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/edukasi/user_edukasi_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
+import 'package:douce/shared/util/service/materi_access_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/base_page.dart';
@@ -10,8 +12,49 @@ import 'package:douce/shared/widget/yoga_streak_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class UserEdukasiPage extends StatelessWidget {
+class UserEdukasiPage extends StatefulWidget {
   const UserEdukasiPage({super.key});
+
+  @override
+  State<UserEdukasiPage> createState() => _UserEdukasiPageState();
+}
+
+class _UserEdukasiPageState extends State<UserEdukasiPage> {
+  final Map<String, bool> _accessCache = {};
+
+  String _getLayananFromProgram(String programName) {
+    final lower = programName.toLowerCase();
+    if (lower.contains('yoga') || lower.contains('prenatal')) {
+      return 'prenatal_yoga';
+    }
+    if (lower.contains('materi') || lower.contains('bundling')) {
+      return lower.contains('bundling') ? 'paket_bundling' : 'materi_online';
+    }
+    return '';
+  }
+
+  Future<void> _checkAccess(String programName) async {
+    if (_accessCache.containsKey(programName)) return;
+    final layanan = _getLayananFromProgram(programName);
+    if (layanan.isEmpty) {
+      setState(() => _accessCache[programName] = true);
+      return;
+    }
+    final UserController uc = Get.find<UserController>();
+    final hasAccess = await MateriAccessService().hasAccess(uc.uid.value, layanan);
+    if (mounted) setState(() => _accessCache[programName] = hasAccess);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Get.find<UserEdukasiController>();
+      for (final program in controller.programList) {
+        _checkAccess(program.name);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +210,7 @@ class UserEdukasiPage extends StatelessWidget {
                                     Icon(
                                       Icons.self_improvement_rounded,
                                       size: 22,
-                                      color: isProgram ? Colors.white : const Color(0xFF64748B),
+                                      color: isProgram ? Colors.white : AppSemanticColors.textSecondary,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -175,7 +218,7 @@ class UserEdukasiPage extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: isProgram ? FontWeight.bold : FontWeight.w600,
-                                        color: isProgram ? Colors.white : const Color(0xFF64748B),
+                                        color: isProgram ? Colors.white : AppSemanticColors.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -219,7 +262,7 @@ class UserEdukasiPage extends StatelessWidget {
                                     Icon(
                                       Icons.article_rounded,
                                       size: 20,
-                                      color: !isProgram ? Colors.white : const Color(0xFF64748B),
+                                      color: !isProgram ? Colors.white : AppSemanticColors.textSecondary,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -227,7 +270,7 @@ class UserEdukasiPage extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: !isProgram ? FontWeight.bold : FontWeight.w600,
-                                        color: !isProgram ? Colors.white : const Color(0xFF64748B),
+                                        color: !isProgram ? Colors.white : AppSemanticColors.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -289,24 +332,23 @@ class UserEdukasiPage extends StatelessWidget {
 
   Widget programKehamilanContainer(ProgramModel program) {
     final UserController userController = Get.find<UserController>();
+    final layanan = _getLayananFromProgram(program.name);
+    final hasAccess = _accessCache[program.name] ?? false;
+    final isLoadingAccess = !_accessCache.containsKey(program.name);
+
+    void navigateToDetail() {
+      Get.toNamed('/user-detail-program', arguments: {'program': program});
+    }
 
     return InkWell(
-      onTap: () => Get.toNamed('/user-detail-program', arguments: {
-        'program': program,
-      }),
+      onTap: layanan.isEmpty ? navigateToDetail : null,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(18),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: AppRadius.roundedLg,
+          boxShadow: AppElevation.level1,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +378,7 @@ class UserEdukasiPage extends StatelessWidget {
                     program.desc,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 13, color: AppSemanticColors.textSecondary),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -357,6 +399,41 @@ class UserEdukasiPage extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            if (layanan.isNotEmpty && !isLoadingAccess)
+              hasAccess
+                  ? OutlinedButton.icon(
+                      onPressed: navigateToDetail,
+                      icon: const Icon(Icons.play_circle_outline, size: 18),
+                      label: const Text(
+                        "Mulai Sesi",
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ColorDouce.douceBase,
+                        side: BorderSide(color: ColorDouce.douceBase),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: AppRadius.roundedMd),
+                      ),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: ColorDouce.douceBase.withValues(alpha: 0.08),
+                        borderRadius: AppRadius.roundedMd,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.lock_outline, size: 14, color: ColorDouce.douceBase),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Butuh Langganan",
+                            style: TextStyle(fontSize: 12, color: ColorDouce.douceBase),
+                          ),
+                        ],
+                      ),
+                    ),
           ],
         ),
       ),

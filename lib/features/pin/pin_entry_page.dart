@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -129,7 +130,7 @@ class _PinEntryPageState extends State<PinEntryPage>
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -309,13 +310,13 @@ class _NumBtn extends StatelessWidget {
         onTap: onPressed,
         child: Center(
           child: icon != null
-              ? Icon(icon, size: 28, color: const Color(0xFF0F172A))
+              ? Icon(icon, size: 28, color: AppSemanticColors.textDarkSecondary)
               : Text(
                   label!,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDarkSecondary,
                   ),
                 ),
         ),

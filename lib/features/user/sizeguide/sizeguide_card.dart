@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/sizeguide/sizeguide_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,13 +34,7 @@ class _SizeGuideCardState extends State<SizeGuideCard> {
       height: 230,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: ColorDouce.douceBase.withValues(alpha: 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: AppElevation.level3,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -155,7 +150,7 @@ class _SizeGuideCardState extends State<SizeGuideCard> {
                     onPressed: () => Get.toNamed('/size-guide'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF0F172A),
+                      foregroundColor: AppSemanticColors.textDark,
                       elevation: 4,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       shape: RoundedRectangleBorder(

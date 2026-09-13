@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/widget/payment_sheet.dart';
 
 class PaywallModal extends StatelessWidget {
@@ -124,16 +125,16 @@ class PaywallModal extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDarkSecondary,
                     letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Buka seluruh fitur & alat perencanaan kehamilan eksklusif dengan 1 kali pembayaran',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF64748B),
+                    color: AppSemanticColors.textSecondary,
                     height: 1.4,
                   ),
                 ),
@@ -198,7 +199,7 @@ class PaywallModal extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.close_rounded,
-                  color: Color(0xFF334155),
+                  color: AppSemanticColors.textDarkSecondary,
                   size: 20,
                 ),
               ),
@@ -269,7 +270,7 @@ class PaywallModal extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF334155),
+                color: AppSemanticColors.textDarkSecondary,
               ),
             ),
           ),

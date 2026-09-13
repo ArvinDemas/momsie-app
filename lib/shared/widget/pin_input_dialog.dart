@@ -1,5 +1,6 @@
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -81,7 +82,7 @@ class _PinInputDialogState extends State<PinInputDialog> {
 
           Text(
             widget.reason.isNotEmpty ? widget.reason : 'Verifikasi PIN',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),

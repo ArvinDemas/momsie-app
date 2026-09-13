@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/kesehatan/booking_doula_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/model/booking_slot_model.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -37,12 +39,7 @@ class BookingDoulaPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 6,
-                                ),
-                              ],
+                              boxShadow: AppElevation.level1,
                             ),
                             child: Icon(
                               Icons.arrow_back_ios_new_rounded,
@@ -59,7 +56,7 @@ class BookingDoulaPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDark,
                           ),
                         ),
                       ),
@@ -77,13 +74,7 @@ class BookingDoulaPage extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        boxShadow: AppElevation.level1,
                       ),
                       child: Row(
                         children: [
@@ -112,7 +103,7 @@ class BookingDoulaPage extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                                    color: AppSemanticColors.textDark,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -129,30 +120,36 @@ class BookingDoulaPage extends StatelessWidget {
                   }),
 
                   // Google Calendar Style Month Navigator Header
-                  const Text(
-                    "Pilih Tanggal Kunjungan",
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                  // Tampil hanya untuk layanan scheduled (bukan on-demand)
+                  Obx(() {
+                    if (controller.isOnDemand) {
+                      return const SizedBox();
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Pilih Tanggal Kunjungan",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: AppSemanticColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  }),
 
                   Obx(() {
+                    if (controller.isOnDemand) return const SizedBox();
                     final monthText = controller.monthYearFormat.format(controller.focusedMonth.value);
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                        boxShadow: AppElevation.level1,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,7 +180,7 @@ class BookingDoulaPage extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                                    color: AppSemanticColors.textDark,
                                   ),
                                 ),
                                 const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
@@ -203,6 +200,7 @@ class BookingDoulaPage extends StatelessWidget {
 
                   // View Mode Tabs (Bulanan / Mingguan)
                   Obx(() {
+                    if (controller.isOnDemand) return const SizedBox();
                     return Container(
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
@@ -222,6 +220,7 @@ class BookingDoulaPage extends StatelessWidget {
 
                   // Dynamic Calendar Grid View
                   Obx(() {
+                    if (controller.isOnDemand) return const SizedBox();
                     if (controller.viewMode.value == 'mingguan') {
                       return _buildWeekView(controller);
                     }
@@ -230,8 +229,9 @@ class BookingDoulaPage extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Jam Kunjungan Section
+                  // Jam Kunjungan Section (hanya untuk layanan scheduled)
                   Obx(() {
+                    if (controller.isOnDemand) return const SizedBox();
                     final displayDateStr = DateFormat('EEEE, dd MMMM yyyy').format(controller.selectedDate.value);
 
                     return Column(
@@ -245,7 +245,7 @@ class BookingDoulaPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             Text(
@@ -289,7 +289,7 @@ class BookingDoulaPage extends StatelessWidget {
                             spacing: 10,
                             runSpacing: 10,
                             children: controller.availableSlots
-                                .map((jam) => jamContainer(jam, controller))
+                                .map((slot) => jamContainer(slot, controller))
                                 .toList(),
                           ),
                       ],
@@ -304,7 +304,7 @@ class BookingDoulaPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: AppSemanticColors.textDark,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -370,7 +370,7 @@ class BookingDoulaPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDark,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -396,21 +396,14 @@ class BookingDoulaPage extends StatelessWidget {
 
                   // Next Step Submit Button
                   ElevatedButton(
-                    onPressed: () {
-                      if (controller.selectedTanggal.value.isEmpty ||
-                          controller.selectedJam.value.isEmpty ||
-                          controller.selectedLayanan.value.isEmpty) {
-                        Get.snackbar(
-                          "Pilih Kelengkapan Booking",
-                          "Silakan pilih tanggal, jam kunjungan, dan jenis layanan terlebih dahulu.",
-                          backgroundColor: ColorDouce.kindaRed,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
+                    onPressed: controller.canProceed ? () {
+                      if (controller.isOnDemand) {
+                        // On-demand: skip slot, go directly to confirmation
+                        Get.toNamed("/confirm-booking");
                       } else {
                         Get.toNamed("/confirm-booking");
                       }
-                    },
+                    } : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorDouce.douceBase,
                       minimumSize: const Size(double.infinity, 52),
@@ -450,14 +443,7 @@ class BookingDoulaPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSel ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: isSel
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 4,
-                    )
-                  ]
-                : null,
+            boxShadow: isSel ? AppElevation.level1 : null,
           ),
           child: Center(
             child: Text(
@@ -488,13 +474,7 @@ class BookingDoulaPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        boxShadow: AppElevation.level1,
       ),
       child: Column(
         children: [
@@ -505,10 +485,10 @@ class BookingDoulaPage extends StatelessWidget {
                 child: Center(
                   child: Text(
                     h,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF64748B),
+                      color: AppSemanticColors.textSecondary,
                     ),
                   ),
                 ),
@@ -555,7 +535,7 @@ class BookingDoulaPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                        color: isSelected ? Colors.white : AppSemanticColors.textDark,
                       ),
                     ),
                   ),
@@ -614,7 +594,7 @@ class BookingDoulaPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isSel ? Colors.white : const Color(0xFF0F172A),
+                      color: isSel ? Colors.white : AppSemanticColors.textDark,
                     ),
                   ),
                 ],
@@ -626,29 +606,65 @@ class BookingDoulaPage extends StatelessWidget {
     );
   }
 
-  Widget jamContainer(String time, BookingDoulaController controller) {
+  Widget jamContainer(SlotItem slot, BookingDoulaController controller) {
+    final isFull = slot.isFull;
+    final isSelected = controller.selectedJam.value == slot.time;
     return InkWell(
-      onTap: () => controller.setSelectedJam(time),
+      onTap: isFull ? null : () => controller.setSelectedJam(slot.time),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: controller.selectedJam.value == time ? ColorDouce.douceBase : Colors.grey.shade300,
-            width: controller.selectedJam.value == time ? 2 : 1,
+            color: isFull
+                ? Colors.grey.shade300
+                : isSelected
+                    ? ColorDouce.douceBase
+                    : Colors.grey.shade300,
+            width: isSelected && !isFull ? 2 : 1,
           ),
-          color: controller.selectedJam.value == time
-              ? ColorDouce.douceBase.withValues(alpha: 0.1)
-              : Colors.white,
+          color: isFull
+              ? Colors.grey.shade100
+              : isSelected
+                  ? ColorDouce.douceBase.withValues(alpha: 0.1)
+                  : Colors.white,
         ),
-        child: Text(
-          time,
-          style: TextStyle(
-            color: controller.selectedJam.value == time ? ColorDouce.douceBase : const Color(0xFF0F172A),
-            fontSize: 13,
-            fontWeight: controller.selectedJam.value == time ? FontWeight.bold : FontWeight.normal,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              slot.time,
+              style: TextStyle(
+                color: isFull
+                    ? Colors.grey.shade400
+                    : isSelected
+                        ? ColorDouce.douceBase
+                        : AppSemanticColors.textDark,
+                fontSize: 13,
+                fontWeight: isSelected && !isFull ? FontWeight.bold : FontWeight.normal,
+                decoration: isFull ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            if (isFull) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'FULL',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.shade700,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -677,13 +693,7 @@ class BookingDoulaPage extends StatelessWidget {
             color: isSelected ? ColorDouce.douceBase : Colors.grey.shade200,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: AppElevation.level1,
         ),
         child: Row(
           children: [
@@ -709,7 +719,7 @@ class BookingDoulaPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? ColorDouce.douceBase : const Color(0xFF0F172A),
+                      color: isSelected ? ColorDouce.douceBase : AppSemanticColors.textDark,
                     ),
                   ),
                   const SizedBox(height: 2),

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -264,7 +265,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
+                                color: AppSemanticColors.textDarkSecondary,
                                 height: 1.25,
                               ),
                             ),

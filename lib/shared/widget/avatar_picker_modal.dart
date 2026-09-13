@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,7 @@ class AvatarPickerModal extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: AppSemanticColors.textDarkSecondary,
                 ),
               ),
               IconButton(
@@ -237,7 +238,7 @@ class AvatarPickerModal extends StatelessWidget {
                                 : FontWeight.w600,
                             color: isSelected
                                 ? ColorDouce.douceBase
-                                : const Color(0xFF0F172A),
+                                : AppSemanticColors.textDarkSecondary,
                           ),
                         ),
                       ],

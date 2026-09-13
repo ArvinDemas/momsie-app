@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/obat_model.dart';
 import 'package:douce/shared/widget/payment_sheet.dart';
@@ -133,7 +134,7 @@ class DetailObatPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           color: Color(0xFF856404),
-                          fontFamily: 'OpenSans',
+                          fontFamily: AppTypography.fontFamily,
                           height: 1.4,
                         ),
                       ),

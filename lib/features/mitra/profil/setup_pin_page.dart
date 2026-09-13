@@ -1,4 +1,5 @@
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -95,7 +96,7 @@ class _SetupPinPageState extends State<SetupPinPage> {
               // Title
               Text(
                 _step == 1 ? 'Buat PIN Transaksi' : 'Konfirmasi PIN',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
@@ -206,8 +207,8 @@ class _NumBtn extends StatelessWidget {
         onTap: onPressed,
         child: Center(
           child: icon != null
-              ? Icon(icon, size: 28, color: const Color(0xFF0F172A))
-              : Text(label!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
+              ? Icon(icon, size: 28, color: AppSemanticColors.textDarkSecondary)
+              : Text(label!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: AppSemanticColors.textDarkSecondary)),
         ),
       ),
     );

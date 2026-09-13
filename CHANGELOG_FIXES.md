@@ -1,3 +1,19 @@
+### Fix #15 — T-018 ChatPage slot header + T-024 MateriAccessService gating on edukasi pages
+Tanggal: 2026-09-13
+File: lib/features/user/chat/chat_page.dart, lib/features/user/edukasi/user_detailprogram_page.dart, lib/features/user/edukasi/user_edukasi_page.dart
+Masalah:
+(1) ChatPage belum menampilkan info slot (tanggal/jam/durasi/status) di header;
+(2) Edukasi pages belum memverifikasi akses materi — user bisa melihat program tanpa memiliki akses.
+Akar: T-017 sudah menambahkan slot fields ke ChatController, tapi T-018 belum di-render di UI. T-023 sudah membuat MateriAccessService, tapi T-024 belum mengintegrasikannya ke halaman edukasi.
+Fix:
+- T-018 ChatPage: tampilkan Row dengan calendar/schedule icon + tanggal + jam (format "HH:00 - HH+1:00") + badge status (Sedang Berlangsung=green, Segera Dimulai=orange) saat slotIsOnDemand=false dan data tersedia
+- T-024 user_detailprogram_page.dart: ubah State StatefulWidget, tambah _checkAccess() yang call MateriAccessService.hasAccess(uid, layanan) via _getLayananFromProgram (heuristic berdasarkan nama program); tampilkan loading spinner saat cek, atau card "Anda belum memiliki akses" dengan tombol kembali jika deny
+- T-024 user_edukasi_page.dart: ubah State StatefulWidget, pre-fetch access per program di initState (batch via addPostFrameCallback); tampilkan badge "Butuh Langganan" (lock icon) saat belum akses, atau button "Mulai Sesi" saat sudah akses; disable tap pada program yang belum di-access
+Verifikasi: flutter analyze 0 errors pada ketiga file target; flutter analyze full project 0 errors (94 warnings only); flutter test 15/15 PASS.
+Pelajaran: ProgramModel tidak punya field layanan — perlu heuristic mapping dari nama program (contains yoga → prenatal_yoga). Jika program berasal dari Firestore, sebaiknya tambahkan field `layanan` di model dan service untuk menghindari mapping error.
+Log Keyword: chat-slot-header, materi-access-gating, detailprogram-conditional-render, edukasilist-access-badge
+Deploy: PENDING
+
 ### Fix #13 — BookingDetail UI (zoomLink display + WhatsApp fallback), UserPesanan actions per status, ChatController access validation, booking_slot_service errors
 Tanggal: 2026-09-12
 File: lib/features/user/pesanan/booking_detail_page.dart, lib/features/user/pesanan/user_pesanan_page.dart, lib/features/user/chat/chat_controller.dart, lib/shared/util/service/booking_slot_service.dart, lib/shared/util/service/payment_service.dart

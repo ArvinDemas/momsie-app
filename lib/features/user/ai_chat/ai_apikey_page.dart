@@ -1,4 +1,5 @@
 import 'package:douce/features/user/ai_chat/ai_chat_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,12 +17,12 @@ class AiApiKeyPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppSemanticColors.textDark),
           onPressed: () => Get.back(),
         ),
         title: const Text(
           'Status API Key',
-          style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppSemanticColors.textDark, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -86,7 +87,7 @@ class AiApiKeyPage extends StatelessWidget {
             // Info section
             const Text(
               'Cara Mengatur API Key',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDark),
             ),
             const SizedBox(height: 12),
             _stepItem(context, '1', 'Buka Firebase Console → Firestore Database'),

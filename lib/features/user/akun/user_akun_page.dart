@@ -2,6 +2,7 @@ import 'package:douce/app/app_routes.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/avatar_picker_modal.dart';
@@ -64,7 +65,7 @@ class UserAkunPage extends StatelessWidget {
                     : userController.babyName.value,
                 style: TextStyle(
                   color: userController.babyName.value.isEmpty
-                      ? Colors.grey.shade400
+                      ? AppSemanticColors.textMuted
                       : Colors.black87,
                   fontSize: 14,
                 ),
@@ -311,7 +312,7 @@ class UserAkunPage extends StatelessWidget {
                     "Pencadangan Terakhir: ${DateFormat('dd MMM yyyy, HH:mm').format(DateTime.now())}",
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.grey.shade500,
+                      color: AppSemanticColors.textMuted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -319,7 +320,7 @@ class UserAkunPage extends StatelessWidget {
                     "Akun: ${userController.email.value.isNotEmpty ? userController.email.value : 'bunda@gmail.com'}",
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.grey.shade500,
+                      color: AppSemanticColors.textMuted,
                     ),
                   ),
                 ],
@@ -360,7 +361,7 @@ class UserAkunPage extends StatelessWidget {
                         : "Bunda",
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey.shade600,
+                      color: AppSemanticColors.textSecondary,
                     ),
                   ),
                 ),
@@ -475,10 +476,10 @@ class UserAkunPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8, top: 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.grey,
+          color: AppSemanticColors.textMuted,
           letterSpacing: 0.5,
         ),
       ),
@@ -519,7 +520,7 @@ class UserAkunPage extends StatelessWidget {
             ),
           ),
         ),
-        Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
+        Divider(height: 1, thickness: 0.5, color: AppSemanticColors.textMuted.withValues(alpha: 0.3)),
       ],
     );
   }

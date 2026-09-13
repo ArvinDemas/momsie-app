@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/edukasi/user_detailgerakan_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/program_model.dart';
 import 'package:flutter/material.dart';
@@ -258,7 +259,7 @@ class UserDetailGerakanPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: AppSemanticColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 8),

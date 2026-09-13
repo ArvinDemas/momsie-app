@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/sizeguide/sizeguide_controller.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
@@ -120,7 +121,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppSemanticColors.textDark),
                         onPressed: () => Get.back(),
                       ),
                       const SizedBox(width: 8),
@@ -129,7 +130,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: AppSemanticColors.textDark,
                         ),
                       ),
                     ],
@@ -148,25 +149,19 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 15,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level2,
                           ),
                           child: Column(
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Usia Kehamilan',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF64748B),
+                                      color: AppSemanticColors.textSecondary,
                                     ),
                                   ),
                                   Container(
@@ -225,16 +220,16 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Row(
+                              Row(
                                 children: [
-                                  Icon(Icons.category_rounded, color: Color(0xFFFF6972), size: 20),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.category_rounded, color: Color(0xFFFF6972), size: 20),
+                                  const SizedBox(width: 8),
                                   Text(
                                     'Perbandingan:',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF64748B),
+                                      color: AppSemanticColors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -244,7 +239,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                                   value: _selectedCategory,
                                   icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFFF6972)),
                                   style: const TextStyle(
-                                    color: Color(0xFF0F172A),
+                                    color: AppSemanticColors.textDark,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
@@ -275,13 +270,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                           height: 260,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
+                            boxShadow: AppElevation.level3,
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(24),
@@ -291,17 +280,17 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                                 if (isTooSmall)
                                   Container(
                                     color: const Color(0xFFF1F5F9),
-                                    child: const Column(
+                                    child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.visibility_off_rounded, size: 54, color: Color(0xFF64748B)),
+                                        Icon(Icons.visibility_off_rounded, size: 54, color: AppSemanticColors.textSecondary),
                                         SizedBox(height: 12),
                                         Text(
                                           'Belum Ada Ukuran Visual',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0F172A),
+                                            color: AppSemanticColors.textDark,
                                           ),
                                         ),
                                         SizedBox(height: 4),
@@ -309,7 +298,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
                                           'Janin baru mengalami pembuahan mikroskopis',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Color(0xFF64748B),
+                                            color: AppSemanticColors.textSecondary,
                                           ),
                                         ),
                                       ],
@@ -424,13 +413,7 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppElevation.level1,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,10 +424,10 @@ class _SizeGuidePageState extends State<SizeGuidePage> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF64748B),
+                  color: AppSemanticColors.textSecondary,
                 ),
               ),
             ],

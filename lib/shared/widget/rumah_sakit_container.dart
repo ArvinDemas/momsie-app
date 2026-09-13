@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/rumahsakit_model.dart';
 import 'package:flutter/material.dart';
@@ -53,13 +54,7 @@ class RumahSakitContainer extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          boxShadow: AppElevation.level2,
           border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
         ),
         child: ClipRRect(
@@ -164,7 +159,7 @@ class RumahSakitContainer extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: AppSemanticColors.textDarkSecondary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -180,7 +175,7 @@ class RumahSakitContainer extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF475569),
+                              color: AppSemanticColors.textDarkSecondary,
                               height: 1.3,
                             ),
                           ),

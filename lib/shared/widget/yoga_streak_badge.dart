@@ -1,3 +1,4 @@
+import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 
 class YogaStreakBadge extends StatelessWidget {
@@ -20,7 +21,7 @@ class YogaStreakBadge extends StatelessWidget {
     if (streak == 0) {
       flameColor = const Color(0xFF94A3B8); // Slate Gray
       bgColor = const Color(0xFFF1F5F9);
-      borderColor = const Color(0xFFCBD5E1);
+      borderColor = const Color(0xFFE2E8F0);
       streakLabel = 'Belum Ada Streak';
     } else if (streak < 4) {
       flameColor = const Color(0xFFFF6B00); // Warm Orange (Level 1)
@@ -69,7 +70,7 @@ class YogaStreakBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w900,
-                color: streak == 0 ? const Color(0xFF64748B) : flameColor,
+                color: streak == 0 ? AppSemanticColors.textSecondary : flameColor,
               ),
             ),
           ],
@@ -106,7 +107,7 @@ class YogaStreakBadge extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: streak == 0 ? const Color(0xFF475569) : flameColor,
+              color: streak == 0 ? AppSemanticColors.textDarkSecondary : flameColor,
             ),
           ),
         ],
