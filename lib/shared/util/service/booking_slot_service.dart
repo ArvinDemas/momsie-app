@@ -232,7 +232,8 @@ class BookingSlotService {
 
           if (index >= 0) {
             final current = (slotsRaw[index] as Map<String, dynamic>)['bookedCount'] ?? 0;
-            slotsRaw[index]['bookedCount'] = (current as int? ?? 0) - 1;
+            final currentInt = (current as int? ?? 0);
+            slotsRaw[index]['bookedCount'] = currentInt > 0 ? currentInt - 1 : 0;
             tx.update(slotRef, {'slots': slotsRaw});
           }
         });
