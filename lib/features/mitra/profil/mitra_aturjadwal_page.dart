@@ -1,5 +1,7 @@
 import 'package:douce/features/mitra/profil/mitra_aturjadwal_controller.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/theme/design_system.dart';
+import 'package:douce/shared/util/model/booking_slot_model.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,7 +29,7 @@ class MitraAturJadwalPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 10),
 
-                // Clean Header (Without Baby Avatar Picture)
+                // Header
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -39,7 +41,7 @@ class MitraAturJadwalPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            color: AppSemanticColors.textDarkSecondary,
                           ),
                         ),
                         SizedBox(height: 4),
@@ -53,7 +55,7 @@ class MitraAturJadwalPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // Google Calendar Style Month Navigator Header
+                // Month Navigator
                 Obx(() {
                   final monthText = controller.monthYearFormat.format(controller.focusedMonth.value);
 
@@ -99,7 +101,7 @@ class MitraAturJadwalPage extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
+                                  color: AppSemanticColors.textDarkSecondary,
                                 ),
                               ),
                               const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
@@ -117,7 +119,7 @@ class MitraAturJadwalPage extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // Mode Tampilan Switcher (Bulanan / Mingguan / Harian)
+                // View Mode Switcher
                 Obx(() {
                   return Container(
                     padding: const EdgeInsets.all(4),
@@ -152,12 +154,12 @@ class MitraAturJadwalPage extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Time Slot Manager Card for Selected Date
+                // Time Slot Manager Card
                 Obx(() {
                   final selDate = controller.selectedDate.value;
                   final storageTgl = controller.storageDate(selDate);
                   final displayTgl = controller.displayDate(selDate);
-                  final activeSlots = controller.slotState[storageTgl] ?? [];
+                  final slots = controller.slotState[storageTgl] ?? [];
 
                   return Container(
                     padding: const EdgeInsets.all(20),
@@ -187,21 +189,31 @@ class MitraAturJadwalPage extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0F172A),
+                                      color: AppSemanticColors.textDarkSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '${activeSlots.length} Jam Aktif Dipilih',
+                                    '${slots.length} Jam Aktif Dipilih',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: activeSlots.isNotEmpty ? Colors.green.shade700 : Colors.grey,
+                                      color: slots.isNotEmpty ? Colors.green.shade700 : Colors.grey,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            Obx(() {
+                              if (controller.isLoading.value) {
+                                return const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
                           ],
                         ),
 
@@ -227,35 +239,20 @@ class MitraAturJadwalPage extends StatelessWidget {
 
                         const SizedBox(height: 16),
 
-                        // Interactive Hour Grid
+                        // Slot Grid dengan Capacity
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: _allJams.map((jam) {
-                            final isSelected = activeSlots.contains(jam);
-                            return InkWell(
-                              onTap: () => controller.toggleJam(storageTgl, jam),
-                              borderRadius: BorderRadius.circular(10),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 150),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? ColorDouce.douceBase : Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: isSelected ? ColorDouce.douceBase : Colors.grey.shade300,
-                                    width: isSelected ? 2 : 1,
-                                  ),
-                                ),
-                                child: Text(
-                                  jam,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                    color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                                  ),
-                                ),
-                              ),
+                            final slot = slots.firstWhere(
+                              (s) => s.time == jam,
+                              orElse: () => SlotItem(time: jam, capacity: 1, bookedCount: 0),
+                            );
+                            return _buildSlotChip(
+                              context: context,
+                              slot: slot,
+                              onToggle: () => controller.toggleJam(storageTgl, jam),
+                              onEditCapacity: () => _showEditCapacityDialog(context, slot, storageTgl, jam, controller),
                             );
                           }).toList(),
                         ),
@@ -289,6 +286,120 @@ class MitraAturJadwalPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showEditCapacityDialog(BuildContext context, SlotItem slot, String tanggal, String jam, MitraAturJadwalController controller) {
+    final currentCapacity = slot.capacity.toString();
+    final currentBooked = slot.bookedCount.toString();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final controllerCapacity = TextEditingController(text: currentCapacity);
+        return AlertDialog(
+          title: const Text('Edit Capacity'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Jam: $jam'),
+              const SizedBox(height: 8),
+              Text('Booking aktif: $currentBooked'),
+              const SizedBox(height: 8),
+              Text('Capacity harus >= $currentBooked'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controllerCapacity,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Capacity baru',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Batal'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final newCapacity = int.tryParse(controllerCapacity.text.trim());
+                if (newCapacity == null) return;
+                controller.updateSlotCapacity(tanggal, jam, newCapacity);
+                Navigator.pop(ctx);
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSlotChip({
+    required BuildContext context,
+    required SlotItem slot,
+    required VoidCallback onToggle,
+    required VoidCallback onEditCapacity,
+  }) {
+    final isSelected = slot.time.isNotEmpty;
+    final isFull = slot.isFull;
+
+    return InkWell(
+      onTap: isSelected ? onEditCapacity : onToggle,
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? (isFull ? Colors.red.shade100 : ColorDouce.douceBase) : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? (isFull ? Colors.red.shade300 : ColorDouce.douceBase) : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              slot.time,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? (isFull ? Colors.red.shade700 : Colors.white) : AppSemanticColors.textDarkSecondary,
+              ),
+            ),
+            if (isSelected)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.people_outline, size: 10, color: isFull ? Colors.red.shade600 : Colors.white70),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${slot.bookedCount}/${slot.capacity}',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: isFull ? Colors.red.shade600 : Colors.white70,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (!isFull)
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 10, color: Colors.white70),
+                        onPressed: onEditCapacity,
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -333,7 +444,7 @@ class MitraAturJadwalPage extends StatelessWidget {
     final monthDate = controller.focusedMonth.value;
     final firstDayOfMonth = DateTime(monthDate.year, monthDate.month, 1);
     final daysInMonth = DateTime(monthDate.year, monthDate.month + 1, 0).day;
-    final leadingEmptyDays = firstDayOfMonth.weekday - 1; // Mon=1..Sun=7
+    final leadingEmptyDays = firstDayOfMonth.weekday - 1;
 
     final List<String> dayHeaders = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
@@ -360,10 +471,10 @@ class MitraAturJadwalPage extends StatelessWidget {
                 child: Center(
                   child: Text(
                     h,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF64748B),
+                      color: AppSemanticColors.textSecondary,
                     ),
                   ),
                 ),
@@ -391,7 +502,8 @@ class MitraAturJadwalPage extends StatelessWidget {
               final thisDate = DateTime(monthDate.year, monthDate.month, dayNum);
               final dateStr = controller.storageDate(thisDate);
               final isSelected = controller.storageDate(controller.selectedDate.value) == dateStr;
-              final slotCount = (controller.slotState[dateStr] ?? []).length;
+              final slots = controller.slotState[dateStr] ?? [];
+              final totalCapacity = slots.fold<int>(0, (sum, s) => sum + s.capacity);
 
               return InkWell(
                 onTap: () => controller.setFocusedDate(thisDate),
@@ -401,12 +513,12 @@ class MitraAturJadwalPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? ColorDouce.douceBase
-                        : (slotCount > 0 ? Colors.pink.shade50 : Colors.grey.shade50),
+                        : (totalCapacity > 0 ? Colors.pink.shade50 : Colors.grey.shade50),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
                           ? ColorDouce.douceBase
-                          : (slotCount > 0 ? Colors.pink.shade200 : Colors.grey.shade200),
+                          : (totalCapacity > 0 ? Colors.pink.shade200 : Colors.grey.shade200),
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -417,13 +529,13 @@ class MitraAturJadwalPage extends StatelessWidget {
                         '$dayNum',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: isSelected || slotCount > 0 ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isSelected || totalCapacity > 0 ? FontWeight.bold : FontWeight.normal,
                           color: isSelected
                               ? Colors.white
-                              : (slotCount > 0 ? ColorDouce.douceBase : const Color(0xFF0F172A)),
+                              : (totalCapacity > 0 ? ColorDouce.douceBase : AppSemanticColors.textDarkSecondary),
                         ),
                       ),
-                      if (slotCount > 0)
+                      if (totalCapacity > 0)
                         Container(
                           margin: const EdgeInsets.only(top: 2),
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -432,11 +544,11 @@ class MitraAturJadwalPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            '${slotCount}j',
-                            style: TextStyle(
+                            '${slots.length}j',
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : Colors.white,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -466,7 +578,8 @@ class MitraAturJadwalPage extends StatelessWidget {
           final date = weekDates[i];
           final dateStr = controller.storageDate(date);
           final isSel = controller.storageDate(selDate) == dateStr;
-          final slotCount = (controller.slotState[dateStr] ?? []).length;
+          final slots = controller.slotState[dateStr] ?? [];
+          final totalCapacity = slots.fold<int>(0, (sum, s) => sum + s.capacity);
 
           return InkWell(
             onTap: () => controller.setFocusedDate(date),
@@ -497,12 +610,12 @@ class MitraAturJadwalPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isSel ? Colors.white : const Color(0xFF0F172A),
+                      color: isSel ? Colors.white : AppSemanticColors.textDarkSecondary,
                     ),
                   ),
-                  if (slotCount > 0)
+                  if (totalCapacity > 0)
                     Text(
-                      '${slotCount} slot',
+                      '${slots.length} slot',
                       style: TextStyle(
                         fontSize: 10,
                         color: isSel ? Colors.white : Colors.green.shade700,
@@ -530,7 +643,7 @@ class MitraAturJadwalPage extends StatelessWidget {
         ),
         Text(
           controller.displayDate(selDate),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
         ),
         IconButton(
           icon: const Icon(Icons.arrow_forward_ios_rounded, size: 18),

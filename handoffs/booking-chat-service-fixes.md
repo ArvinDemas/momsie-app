@@ -1,8 +1,8 @@
 # Booking Detail UI, User Pesanan Actions, Chat Access Control, Service Fixes
-Status: BERJALAN · Service: user/pesanan, user/chat, shared/services · Diperbarui: 2026-09-12 14:00
+Status: SIAP COMMIT · Service: user/pesanan, user/chat, shared/services, mitra/profil · Diperbarui: 2026-09-13 10:00
 
 ## Sedang dikerjakan
-Implementasi T-015 (BookingDetail zoom link), T-016 (UserPesanan actions per status), T-017 (ChatController access validation), dan perbaikan compile errors di service layer.
+T-015 s.d. T-020 selesai diimplementasi. Tinggal commit + verifikasi visual.
 
 ## Status terakhir
 - ✅ Fix #13 entry di CHANGELOG_FIXES.md
@@ -10,6 +10,10 @@ Implementasi T-015 (BookingDetail zoom link), T-016 (UserPesanan actions per sta
 - ✅ payment_service.dart: fixed `split['platformFee']` nullable assign, fixed `$userId_$bookingId` string interpolation
 - ✅ flutter analyze: 0 errors, 95 warnings (pre-existing)
 - ✅ flutter test: 15/15 PASS
+- ✅ T-018: ChatPage slot time display (chat_controller + chat_page)
+- ✅ T-019: MitraAturJadwalController upgrade ke `List<SlotItem>` dengan capacity logic
+- ✅ T-020: MitraAturJadwalPage UI menampilkan capacity per slot + dialog edit capacity
+- ✅ Fix #14 entry di CHANGELOG_FIXES.md
 - ⏳ Belum di-commit ke git
 - ⏳ Belum deploy verifikasi visual
 
@@ -19,8 +23,8 @@ Implementasi T-015 (BookingDetail zoom link), T-016 (UserPesanan actions per sta
 - BookingDetailPage: badge "Menunggu Link Kelas" untuk paid/confirmed booking tanpa zoomLink; tombol WhatsApp fallback dengan template pesan auto-fill Booking ID
 
 ## Langkah berikutnya
-1. Commit semua perubahan ke git dengan message yang mencakup Fix #13
-2. Verifikasi visual di device/emulator untuk T-015, T-016, T-017
+1. Commit semua perubahan ke git dengan message Fix #13 + Fix #14
+2. Verifikasi visual di device/emulator untuk T-015 s.d T-020
 3. Update status changelog ke ✅ LIVE setelah deploy
 4. Hapus file handoff ini
 

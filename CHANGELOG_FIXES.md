@@ -19,6 +19,24 @@ Pelajaran: Setiap fitur baru yang menyentuh banyak file harus dicek compilasi se
 Log Keyword: booking-detail-zoom, pesanan-actions, chat-access-validation, booking-slot-service-fix, payment-service-fix
 Deploy: PENDING
 
+### Fix #14 — MitraAturJadwalController & Page: Slot capacity upgrade (List<SlotItem>)
+Tanggal: 2026-09-13
+File: lib/features/mitra/profil/mitra_aturjadwal_controller.dart, lib/features/mitra/profil/mitra_aturjadwal_page.dart
+Masalah: Controller lama pakai `List<String>` untuk slot, tidak ada informasi capacity per slot — mitra tidak bisa mengatur multi-seat booking.
+Akar: Fitur scheduled service butuh capacity per jam untuk allow multiple clients per slot.
+Fix:
+- Upgrade `slotState` dari `RxMap<String, List<String>>` ke `RxMap<String, List<SlotItem>>` dengan fields time, capacity, bookedCount
+- Tambah method: `createSlot()`, `updateSlotCapacity()`, `deleteSlot()`, `getBookingsForSlot()`, `loadMySlots()`
+- Controller load all slots per bulan via Firestore query (startStr/endStr)
+- SaveAllSlots pakai batch write
+- View: slot chip menampilkan bookedCount/capacity, click slot aktif buka dialog edit capacity, slot penuh tampil merah
+- Preset Normal/Malam/Semua Jam menggunakan capacity default
+- Validasi: tidak bisa hapus slot dengan booking aktif, tidak bisa kurangi capacity di bawah bookedCount
+Verifikasi: flutter analyze 0 errors, 0 warnings di kedua file.
+Pelajaran: Model-driven slot management lebih aman daripada string list — semua operasi capacity-aware mencegah race condition.
+Log Keyword: mitra-atur-jadwal-capacity, slotitem-upgrade, booking-slot-service, batch-save
+Deploy: PENDING
+
 ### Fix #12d — Spotlight Tour Dismiss Button & Code Cleanup
 Tanggal: 2026-09-09
 File: lib/shared/widget/spotlight_tour.dart, lib/features/onboarding/maternal_context_page.dart
