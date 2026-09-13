@@ -111,6 +111,18 @@ class PaymentService {
       createdAt: DateTime.now(),
     );
 
+    // Atomic slot reservation for scheduled bookings
+    if (booking.doulaUid.isNotEmpty && booking.tanggal.isNotEmpty && booking.jam.isNotEmpty) {
+      final reserved = await BookingSlotService().incrementBookedCount(
+        doulaId: booking.doulaUid,
+        tanggal: booking.tanggal,
+        time: booking.jam,
+      );
+      if (!reserved) {
+        throw Exception('Slot sudah penuh, silakan pilih jam lain');
+      }
+    }
+
     final batch = _db.batch();
     batch.set(_db.collection(_collection).doc(txId), transaksi.toMap());
     batch.set(_db.collection('bookings').doc(bookingId), finalBooking.toMap());

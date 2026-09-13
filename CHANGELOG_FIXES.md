@@ -1,3 +1,29 @@
+### Fix #17 — Atomic slot reservation saat checkout
+Tanggal: 2026-09-13
+File: lib/shared/util/service/payment_service.dart
+Masalah: createBookingTransaction() membuat transaksi + booking tanpa memeriksa ketersediaan slot — risiko overbooking jika capacity sudah penuh.
+Akar: BookingSlotService.incrementBookedCount() sudah ada dan atomic via Firestore transaction, tapi belum dipanggil sebelum batch commit di payment service.
+Fix: Di createBookingTransaction(), sebelum batch.commit(), cek apakah booking memiliki jadwal spesifik (doulaUid, tanggal, jam tidak kosong). Jika ya, panggil incrementBookedCount() terlebih dahulu. Jika kembali false (slot penuh), lemparkan Exception 'Slot sudah penuh, silakan pilih jam lain'. On-demand services (tanpa jadwal) dilewati.
+Verifikasi: flutter analyze 0 errors; flutter test 15/15 PASS.
+Pelajaran: Slot reservation harus atomic dan pre-commit — jika gagal, batalkan seluruh transaksi, jangan biarkan booking termohon tanpa slot.
+Log Keyword: atomic-slot-reservation, payment-service-fix, booking-slot-guard
+Deploy: PENDING
+
+### Fix #16 — T-019/T-020/T-021: Slot capacity management & filtering
+Tanggal: 2026-09-13
+File: lib/features/mitra/profil/mitra_aturjadwal_controller.dart, mitra_aturjadwal_page.dart, mitra_pekerjaan_controller.dart
+Masalah: Controller jadwal pakai List<String> tanpa capacity — tidak support multi-seat booking.
+Akar: Scheduled services butuh capacity management per slot.
+Fix:
+- T-019: Upgrade slotState ke RxMap<String, List<SlotItem>> dengan fields time/capacity/bookedCount
+- T-019: Method baru loadMySlots(), createSlot(), updateSlotCapacity(), deleteSlot(), getBookingsForSlot()
+- T-020: UI slot chips menampilkan "bookedCount/capacity", dialog edit capacity, slot penuh tampil merah
+- T-021: MitraPekerjaanController filter bookings by slot date+time, tampilkan capacity utilization
+Verifikasi: flutter analyze 0 errors di ketiga file target.
+Pelajaran: Model-driven slot management prevent race condition saat capacity update.
+Log Keyword: slot-capacity-management, slotitem-upgrade, mitra-atur-jadwal, kapasitas-filtering
+Deploy: PENDING
+
 ### Fix #15 — T-018 ChatPage slot header + T-024 MateriAccessService gating on edukasi pages
 Tanggal: 2026-09-13
 File: lib/features/user/chat/chat_page.dart, lib/features/user/edukasi/user_detailprogram_page.dart, lib/features/user/edukasi/user_edukasi_page.dart
