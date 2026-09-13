@@ -1,3 +1,16 @@
+### Fix #18 — Lupa Password alur Firebase Auth link + hilangkan dead-end PIN 4 digit
+Tanggal: 2026-09-13
+File: lib/features/forgot/forgot_controller.dart, lib/features/forgot/forgot_page.dart
+Masalah: Forgot page mengarahkan ke verification_page (PIN 4 digit) padahal Firebase mengirim tautan web reset password — dead-end untuk user.
+Akar: Alur lama mengasumsikan Firebase mengirimkan kode OTP 4 digit, padahal default behavior Firebase adalah kirim tautan email (sendPasswordResetEmail).
+Fix:
+- forgot_controller.dart: tambahkan RxBool isLoading, RxInt resendCountdown, RxBool canResend; method openEmailApp() via url_launcher mailto:; resendCountdown 60s cooldown; perbaikan penanganan FirebaseAuthException dengan pesan Indonesia (user-not-found/invalid-email/too-many-requests/default); hapus navigateToVerification().
+- forgot_page.dart: hapus typo "kode knfirmasi" dan navigasi ke verification_page; tampilkan form email + tombol Kirim Link Reset saat isSent==false; tampilkan kartu sukses dengan ikon, deskripsi, tombol Buka Aplikasi Email, Kirim Ulang (cooldown), Kembali ke Login saat isSent==true.
+Verifikasi: flutter analyze lib/features/forgot/ 0 error/warning; flutter test 15/15 PASS.
+Pelajaran: Firebase sendPasswordResetEmail mengirim link web, bukan kode PIN — jangan arahkan user ke halaman verifikasi kode.
+Log Keyword: forgot-password-fix, firebase-auth-link, pin-dead-end-removed
+Deploy: PENDING
+
 ### Fix #17 — Atomic slot reservation saat checkout
 Tanggal: 2026-09-13
 File: lib/shared/util/service/payment_service.dart
