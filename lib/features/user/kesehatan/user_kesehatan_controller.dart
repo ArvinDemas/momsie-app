@@ -23,6 +23,14 @@ class UserKesehatanController extends GetxController {
     super.onInit();
   }
 
+  static int _doulaPriority(DoulaModel d) {
+    final name = d.name.toLowerCase();
+    if (name.contains('dewi riana')) return 0;
+    if (name.contains('laily')) return 1;
+    if (name.contains('arvin')) return 9999;
+    return 100;
+  }
+
   void _loadData() {
     DoulaService().getDoula().then((list) {
       final combined = <DoulaModel>[...DummyData.doulas];
@@ -31,19 +39,24 @@ class UserKesehatanController extends GetxController {
           combined.add(d);
         }
       }
+      combined.sort((a, b) => _doulaPriority(a).compareTo(_doulaPriority(b)));
       doulaList.assignAll(combined);
       isLoading.value = false;
     }).catchError((_) {
-      doulaList.assignAll(DummyData.doulas);
+      final fallback = <DoulaModel>[...DummyData.doulas];
+      fallback.sort((a, b) => _doulaPriority(a).compareTo(_doulaPriority(b)));
+      doulaList.assignAll(fallback);
       isLoading.value = false;
     });
 
     RumahSakitService().getRumahSakit().then((list) {
-      if (list.isNotEmpty) {
-        rumahSakitList.assignAll(list);
-      } else {
-        rumahSakitList.assignAll(DummyData.rumahSakitList);
+      final combined = <RumahSakitModel>[...DummyData.rumahSakitList];
+      for (var r in list) {
+        if (!combined.any((existing) => existing.nama.toLowerCase() == r.nama.toLowerCase())) {
+          combined.add(r);
+        }
       }
+      rumahSakitList.assignAll(combined);
       isLoading.value = false;
     }).catchError((_) {
       rumahSakitList.assignAll(DummyData.rumahSakitList);

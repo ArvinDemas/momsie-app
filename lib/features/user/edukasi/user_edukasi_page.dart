@@ -24,9 +24,6 @@ class _UserEdukasiPageState extends State<UserEdukasiPage> {
 
   String _getLayananFromProgram(String programName) {
     final lower = programName.toLowerCase();
-    if (lower.contains('yoga') || lower.contains('prenatal')) {
-      return 'prenatal_yoga';
-    }
     if (lower.contains('materi') || lower.contains('bundling')) {
       return lower.contains('bundling') ? 'paket_bundling' : 'materi_online';
     }
@@ -43,6 +40,49 @@ class _UserEdukasiPageState extends State<UserEdukasiPage> {
     final UserController uc = Get.find<UserController>();
     final hasAccess = await MateriAccessService().hasAccess(uc.uid.value, layanan);
     if (mounted) setState(() => _accessCache[programName] = hasAccess);
+  }
+
+  Widget _buildProgramImage(String image) {
+    if (image.startsWith('assets/')) {
+      return Image.asset(
+        image,
+        width: 65,
+        height: 65,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _defaultYogaImage(),
+      );
+    }
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      return CachedNetworkImage(
+        imageUrl: image,
+        width: 65,
+        height: 65,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _defaultYogaImage(),
+      );
+    }
+    return _defaultYogaImage();
+  }
+
+  Widget _defaultYogaImage() {
+    return Image.asset(
+      'assets/images/promo_doula_3_yoga.jpg',
+      width: 65,
+      height: 65,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Image.asset(
+        'assets/images/yoga.png',
+        width: 65,
+        height: 65,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          width: 65,
+          height: 65,
+          color: Colors.pink.shade50,
+          child: Icon(Icons.self_improvement_rounded, color: ColorDouce.douceBase),
+        ),
+      ),
+    );
   }
 
   @override
@@ -332,16 +372,14 @@ class _UserEdukasiPageState extends State<UserEdukasiPage> {
 
   Widget programKehamilanContainer(ProgramModel program) {
     final UserController userController = Get.find<UserController>();
-    final layanan = _getLayananFromProgram(program.name);
-    final hasAccess = _accessCache[program.name] ?? false;
-    final isLoadingAccess = !_accessCache.containsKey(program.name);
 
     void navigateToDetail() {
       Get.toNamed('/user-detail-program', arguments: {'program': program});
     }
 
     return InkWell(
-      onTap: layanan.isEmpty ? navigateToDetail : null,
+      onTap: navigateToDetail,
+      borderRadius: AppRadius.roundedLg,
       child: Container(
         width: double.infinity,
         padding: AppSpacing.cardPadding,
@@ -384,56 +422,25 @@ class _UserEdukasiPageState extends State<UserEdukasiPage> {
                 const SizedBox(width: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: program.image,
-                    width: 65,
-                    height: 65,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => Container(
-                      width: 65,
-                      height: 65,
-                      color: Colors.pink.shade50,
-                      child: Icon(Icons.self_improvement_rounded, color: ColorDouce.douceBase),
-                    ),
-                  ),
+                  child: _buildProgramImage(program.image),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            if (layanan.isNotEmpty && !isLoadingAccess)
-              hasAccess
-                  ? OutlinedButton.icon(
-                      onPressed: navigateToDetail,
-                      icon: const Icon(Icons.play_circle_outline, size: 18),
-                      label: const Text(
-                        "Mulai Sesi",
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ColorDouce.douceBase,
-                        side: BorderSide(color: ColorDouce.douceBase),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: AppRadius.roundedMd),
-                      ),
-                    )
-                  : Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: ColorDouce.douceBase.withValues(alpha: 0.08),
-                        borderRadius: AppRadius.roundedMd,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.lock_outline, size: 14, color: ColorDouce.douceBase),
-                          const SizedBox(width: 6),
-                          Text(
-                            "Butuh Langganan",
-                            style: TextStyle(fontSize: 12, color: ColorDouce.douceBase),
-                          ),
-                        ],
-                      ),
-                    ),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: navigateToDetail,
+              icon: const Icon(Icons.play_circle_outline, size: 18),
+              label: const Text(
+                "Mulai Sesi Yoga",
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: ColorDouce.douceBase,
+                side: BorderSide(color: ColorDouce.douceBase),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.roundedMd),
+              ),
+            ),
           ],
         ),
       ),

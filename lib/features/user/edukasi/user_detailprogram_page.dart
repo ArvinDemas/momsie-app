@@ -21,8 +21,9 @@ class _UserDetailProgramPageState extends State<UserDetailProgramPage> {
   bool _isLoadingAccess = true;
 
   String _getLayananFromProgram(String programName) {
-    if (programName.contains('Yoga') || programName.contains('prenatal')) {
-      return 'prenatal_yoga';
+    final lower = programName.toLowerCase();
+    if (lower.contains('materi') || lower.contains('bundling')) {
+      return lower.contains('bundling') ? 'paket_bundling' : 'materi_online';
     }
     return '';
   }
@@ -222,7 +223,29 @@ class _UserDetailProgramPageState extends State<UserDetailProgramPage> {
   Widget programKehamilanContainer(ProgramModel program) {
     final String yogaHeaderImage = (program.image.isNotEmpty && !program.image.contains('flowers'))
         ? program.image
-        : 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format&fit=crop&q=80';
+        : 'assets/images/promo_doula_3_yoga.jpg';
+
+    Widget buildHeaderImage() {
+      if (yogaHeaderImage.startsWith('assets/')) {
+        return Image.asset(
+          yogaHeaderImage,
+          width: 75,
+          height: 75,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _defaultHeaderFallback(),
+        );
+      }
+      if (yogaHeaderImage.startsWith('http://') || yogaHeaderImage.startsWith('https://')) {
+        return CachedNetworkImage(
+          imageUrl: yogaHeaderImage,
+          width: 75,
+          height: 75,
+          fit: BoxFit.cover,
+          errorWidget: (_, __, ___) => _defaultHeaderFallback(),
+        );
+      }
+      return _defaultHeaderFallback();
+    }
 
     return Container(
       width: double.infinity,
@@ -258,20 +281,24 @@ class _UserDetailProgramPageState extends State<UserDetailProgramPage> {
           const SizedBox(width: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: CachedNetworkImage(
-              imageUrl: yogaHeaderImage,
-              width: 75,
-              height: 75,
-              fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => Container(
-                width: 75,
-                height: 75,
-                color: Colors.pink.shade50,
-                child: Icon(Icons.self_improvement_rounded, size: 36, color: ColorDouce.douceBase),
-              ),
-            ),
+            child: buildHeaderImage(),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _defaultHeaderFallback() {
+    return Image.asset(
+      'assets/images/promo_doula_3_yoga.jpg',
+      width: 75,
+      height: 75,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        width: 75,
+        height: 75,
+        color: Colors.pink.shade50,
+        child: Icon(Icons.self_improvement_rounded, size: 36, color: ColorDouce.douceBase),
       ),
     );
   }

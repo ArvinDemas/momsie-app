@@ -99,21 +99,42 @@ class ProgramService {
 
       List<ProgramModel> programs = await Future.wait(programFutures);
 
-      // Cache the result
-      _cache = programs;
-      _cachedAt = DateTime.now();
+      final mockList = _getMockPrograms();
+      final defaultYoga = mockList.first;
 
-      if (programs.isEmpty) {
-        return _getMockPrograms();
-      }
-      return programs;
+      // Smart enrichment: pastikan jika Firestore hanya menyimpan data parsial (tanpa subkoleksi bulan/gerakan),
+      // program tetap memiliki kurikulum 9 bulan dan foto yang valid.
+      final enrichedPrograms = (programs.isEmpty ? mockList : programs).map((p) {
+        final image = (p.image.isNotEmpty && !p.image.contains('flowers'))
+            ? p.image
+            : 'assets/images/promo_doula_3_yoga.jpg';
+        final months = p.months.isNotEmpty ? p.months : defaultYoga.months;
+        final name = (p.name.isNotEmpty && p.name.toLowerCase() != 'program yoga')
+            ? p.name
+            : defaultYoga.name;
+        final desc = p.desc.isNotEmpty ? p.desc : defaultYoga.desc;
+        return ProgramModel(
+          image: image,
+          name: name,
+          desc: desc,
+          months: months,
+        );
+      }).toList();
+
+      // Cache the result
+      _cache = enrichedPrograms;
+      _cachedAt = DateTime.now();
+      return enrichedPrograms;
     } catch (e) {
-      return _getMockPrograms();
+      final mock = _getMockPrograms();
+      _cache = mock;
+      _cachedAt = DateTime.now();
+      return mock;
     }
   }
 
   List<ProgramModel> _getMockPrograms() {
-    const yogaMainImage = 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format&fit=crop&q=80';
+    const yogaMainImage = 'assets/images/promo_doula_3_yoga.jpg';
     const weekYogaImages = [
       'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&auto=format&fit=crop&q=80',

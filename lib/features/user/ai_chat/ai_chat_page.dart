@@ -184,26 +184,30 @@ class _AiChatPageState extends State<AiChatPage> {
 
   /// Gemini AI Style Welcoming Canvas (Sparkle Icon + Centered Headline + Quick Suggestion Chips)
   Widget _buildGeminiWelcomingCanvas(BuildContext context, AiChatController c) {
-    final List<Map<String, String>> suggestionChips = [
+    final List<Map<String, dynamic>> suggestionChips = [
       {
         'title': 'Pertanda Awal Persalinan',
         'prompt': 'Apa saja tanda-tanda awal persalinan yang perlu diperhatikan?',
-        'icon': 'Icons.medical_services_rounded',
+        'icon': Icons.medical_services_rounded,
+        'color': const Color(0xFFE11D48),
       },
       {
         'title': 'Yoga Trimester 3',
         'prompt': 'Apa saja gerakan yoga yang aman dan bermanfaat untuk trimester 3?',
-        'icon': 'Icons.sports_yoga_rounded',
+        'icon': Icons.self_improvement_rounded,
+        'color': const Color(0xFF0D9488),
       },
       {
         'title': 'Nutrisi Cegah Anemia',
         'prompt': 'Makanan dan nutrisi apa saja yang ampuh mencegah anemia saat hamil?',
-        'icon': 'Icons.eco_rounded',
+        'icon': Icons.eco_rounded,
+        'color': const Color(0xFF16A34A),
       },
       {
         'title': 'Tas Bersalin ke RS',
         'prompt': 'Apa saja daftar barang wajib di dalam Hospital Bag untuk persalinan?',
-        'icon': 'Icons.backpack_rounded',
+        'icon': Icons.backpack_rounded,
+        'color': const Color(0xFFD97706),
       },
     ];
 
@@ -219,7 +223,7 @@ class _AiChatPageState extends State<AiChatPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [const Color(0xFFBE185D), const Color(0xFFF472B6), const Color(0xFFFFD1DC)],
+                colors: [Color(0xFFBE185D), Color(0xFFF472B6), Color(0xFFFFD1DC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -265,11 +269,14 @@ class _AiChatPageState extends State<AiChatPage> {
             children: suggestionChips.map((chip) {
               return InkWell(
                 onTap: () {
-                  c.messageCtrl.text = chip['prompt']!;
+                  c.messageCtrl.text = chip['prompt'] as String;
                   c.sendMessage();
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width - 48,
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -280,14 +287,21 @@ class _AiChatPageState extends State<AiChatPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(chip['icon']!, style: const TextStyle(fontSize: 14)),
+                      Icon(
+                        chip['icon'] as IconData,
+                        size: 16,
+                        color: chip['color'] as Color,
+                      ),
                       const SizedBox(width: 8),
-                      Text(
-                        chip['title']!,
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppSemanticColors.textDarkSecondary,
+                      Flexible(
+                        child: Text(
+                          chip['title'] as String,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppSemanticColors.textDarkSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -335,7 +349,7 @@ class _AiChatPageState extends State<AiChatPage> {
                         ),
                         child: const Icon(
                           Icons.smart_toy_rounded,
-                          color: const Color(0xFFBE185D),
+                          color: Color(0xFFBE185D),
                           size: 22,
                         ),
                       ),
@@ -583,7 +597,7 @@ class _MessageBubble extends StatelessWidget {
               ),
               child: const Icon(
                 Icons.smart_toy_rounded,
-                color: const Color(0xFFBE185D),
+                color: Color(0xFFBE185D),
                 size: 16,
               ),
             ),

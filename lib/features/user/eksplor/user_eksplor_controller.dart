@@ -22,21 +22,26 @@ class UserEksplorController extends GetxController {
 
   void _loadData() {
     TokoBayiService().getTokoBayi().then((raw) {
-      if (raw.isNotEmpty) {
-        tokoBayiList.assignAll(raw.map((m) => TokoBayiModel.fromMap(m)).toList());
-      } else {
-        tokoBayiList.assignAll(DummyData.tokoBayis);
+      final combined = <TokoBayiModel>[...DummyData.tokoBayis];
+      for (var m in raw) {
+        final remote = TokoBayiModel.fromMap(m);
+        if (!combined.any((existing) => existing.nama.toLowerCase() == remote.nama.toLowerCase())) {
+          combined.add(remote);
+        }
       }
+      tokoBayiList.assignAll(combined);
     }).catchError((_) {
       tokoBayiList.assignAll(DummyData.tokoBayis);
     });
 
     RumahSakitService().getRumahSakit().then((list) {
-      if (list.isNotEmpty) {
-        rumahSakitList.assignAll(list);
-      } else {
-        rumahSakitList.assignAll(DummyData.rumahSakitList);
+      final combined = <RumahSakitModel>[...DummyData.rumahSakitList];
+      for (var r in list) {
+        if (!combined.any((existing) => existing.nama.toLowerCase() == r.nama.toLowerCase())) {
+          combined.add(r);
+        }
       }
+      rumahSakitList.assignAll(combined);
       isLoading.value = false;
     }).catchError((_) {
       rumahSakitList.assignAll(DummyData.rumahSakitList);

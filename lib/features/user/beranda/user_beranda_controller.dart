@@ -5,7 +5,6 @@ import 'package:douce/shared/util/model/tokobayi_model.dart';
 import 'package:douce/shared/util/service/artikel_service.dart';
 import 'package:douce/shared/util/service/doula_service.dart';
 import 'package:douce/shared/util/service/tokobayi_service.dart';
-import 'package:douce/shared/util/user_controller.dart';
 import 'package:get/get.dart';
 
 class UserBerandaController extends GetxController {
@@ -47,11 +46,14 @@ class UserBerandaController extends GetxController {
     if (tokoBayiList.isNotEmpty && artikelList.isNotEmpty) return;
 
     TokoBayiService().getTokoBayi().then((raw) {
-      if (raw.isNotEmpty) {
-        tokoBayiList.assignAll(raw.map((m) => TokoBayiModel.fromMap(m)).toList());
-      } else {
-        tokoBayiList.assignAll(DummyData.tokoBayis);
+      final combined = <TokoBayiModel>[...DummyData.tokoBayis];
+      for (var m in raw) {
+        final remote = TokoBayiModel.fromMap(m);
+        if (!combined.any((existing) => existing.nama.toLowerCase() == remote.nama.toLowerCase())) {
+          combined.add(remote);
+        }
       }
+      tokoBayiList.assignAll(combined);
       isTokoBayiLoading.value = false;
     }).catchError((e) {
       tokoBayiList.assignAll(DummyData.tokoBayis);
@@ -70,15 +72,32 @@ class UserBerandaController extends GetxController {
       isArtikelLoading.value = false;
     });
 
+    _loadDoulaData();
+  }
+
+  static int _doulaPriority(DoulaModel d) {
+    final name = d.name.toLowerCase();
+    if (name.contains('dewi riana')) return 0;
+    if (name.contains('laily')) return 1;
+    if (name.contains('arvin')) return 9999;
+    return 100;
+  }
+
+  void _loadDoulaData() {
     DoulaService().getDoula().then((list) {
-      if (list.isNotEmpty) {
-        doulaList.assignAll(list);
-      } else {
-        doulaList.assignAll(DummyData.doulas);
+      final combined = <DoulaModel>[...DummyData.doulas];
+      for (var d in list) {
+        if (!combined.any((existing) => existing.name.toLowerCase() == d.name.toLowerCase())) {
+          combined.add(d);
+        }
       }
+      combined.sort((a, b) => _doulaPriority(a).compareTo(_doulaPriority(b)));
+      doulaList.assignAll(combined);
       isDoulaLoading.value = false;
     }).catchError((e) {
-      doulaList.assignAll(DummyData.doulas);
+      final fallback = <DoulaModel>[...DummyData.doulas];
+      fallback.sort((a, b) => _doulaPriority(a).compareTo(_doulaPriority(b)));
+      doulaList.assignAll(fallback);
       isDoulaLoading.value = false;
     });
   }

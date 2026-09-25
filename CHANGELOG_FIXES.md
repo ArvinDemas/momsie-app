@@ -1,3 +1,17 @@
+### Fix #23 — Smart Merge & Dedup RS/TokoBayi + Smart Image Fallback (Local Asset Resolution)
+Tanggal: 2026-09-18
+File: lib/features/user/beranda/user_beranda_controller.dart, lib/features/user/eksplor/user_eksplor_controller.dart, lib/shared/widget/rumah_sakit_container.dart, lib/shared/widget/tokobayi_container.dart
+Masalah: Section Rumah Sakit & Toko Bayi hanya menampilkan 2-4 item karena controller menggunakan `isNotEmpty` threshold — jika Firestore return 2 docs, dummy 14 RS dan 15 Toko Bayi terbuang. Gambar network (Unsplash) sering 402/quota limit dan langsung fallback ke icon polos tanpa mencoba asset lokal.
+Akar: Pola merge/dedup seperti modul Doula belum diterapkan untuk RS & TokoBayi. `_buildImageWidget` di RS container hanya mengecek null/empty, tidak mapping nama → aset lokal. TokoBayiContainer tidak punya fallback mechanism sama sekali.
+Fix:
+- user_beranda_controller.dart & user_eksplor_controller.dart: Ganti pola `if (raw.isNotEmpty)` dengan smart merge — mulai dari DummyData, loop Firestore docs, tambahkan jika nama belum ada (case-insensitive match)
+- rumah_sakit_container.dart: Tambah `_localAssetMap` static Map (14 entri nama→path), `_resolveLocalAsset()` helper, `_imageWithLocalFallback()` yang mencoba asset lokal sebelum fallback icon
+- tokobayi_container.dart: Tambah `_buildTokoImage()` dengan CachedNetworkImage + errorWidget ke `_buildTokoFallback()` (gradient warm pink dengan icon storefront)
+Verifikasi: flutter analyze 0 errors/warnings; flutter test 44/44 PASS.
+Pelajaran: Pola smart merge dari modul Doula harus konsisten diterapkan ke semua fitur directory-based. Image fallback harus multi-tier: network → local asset → thematic gradient → icon.
+Log Keyword: smart-merge-rs-tokobayi, local-asset-fallback, dedup-by-name, 44-tests-pass
+Deploy: PENDING
+
 ### Fix #22 — T-014 Next.js Webhook Handler + T-026 Concurrency & Expiry Tests
 Tanggal: 2026-09-13
 File: app/api/webhooks/midtrans/route.ts (momsie), test/shared/service/booking_slot_service_test.dart, test/shared/service/payment_service_expiry_test.dart (mobile)

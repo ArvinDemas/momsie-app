@@ -15,6 +15,32 @@ class TokoBayiContainer extends StatelessWidget {
 
   final TokoBayiModel tokoBayi;
 
+  Widget _buildTokoImage(String imageUrl) {
+    if (imageUrl.trim().isEmpty || !imageUrl.startsWith('http')) {
+      return _buildTokoFallback();
+    }
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      errorWidget: (_, __, ___) => _buildTokoFallback(),
+    );
+  }
+
+  Widget _buildTokoFallback() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [ColorDouce.douceBase.withValues(alpha: 0.3), ColorDouce.veryLightPink],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(Icons.storefront_rounded, size: 48, color: ColorDouce.douceBase),
+      ),
+    );
+  }
+
   Future<void> _openGoogleMaps() async {
     final query = Uri.encodeComponent('${tokoBayi.nama} ${tokoBayi.alamat}');
     final String url = tokoBayi.mapUrl.isNotEmpty
@@ -57,16 +83,7 @@ class TokoBayiContainer extends StatelessWidget {
                   SizedBox(
                     height: 135,
                     width: double.infinity,
-                    child: CachedNetworkImage(
-                      imageUrl: tokoBayi.image,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => Container(
-                        color: ColorDouce.veryLightPink,
-                        child: const Center(
-                          child: Icon(Icons.storefront_rounded, size: 48, color: Color(0xFFFF6972)),
-                        ),
-                      ),
-                    ),
+                    child: _buildTokoImage(tokoBayi.image),
                   ),
 
                   // Gradient Overlay

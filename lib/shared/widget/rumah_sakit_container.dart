@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
@@ -243,29 +242,74 @@ class RumahSakitContainer extends StatelessWidget {
     );
   }
 
+  static final Map<String, String> _localAssetMap = {
+    'rskia sadewa': 'assets/images/rskia_sadewa.jpg',
+    'rskia rachmi': 'assets/images/rskia_rachmi.jpg',
+    'rsu sakina idaman': 'assets/images/rsu_sakina_idaman.jpg',
+    'rskia permata bunda': 'assets/images/rskia_permata_bunda.jpg',
+    'rskia pku muhammadiyah kotagede': 'assets/images/rskia_pku_kotagede.jpg',
+    'rsia arvita bunda': 'assets/images/rsia_arvita_bunda.webp',
+    'rumah bersalin khadijah': 'assets/images/rumah_bersalin_khadijah.jpg',
+    'hermina hospital yogya': 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=80',
+    'rumah sakit jih': 'assets/images/rumah_sakit_jih.webp',
+    'siloam hospitals yogyakarta': 'assets/images/siloam_hospitals.jpg',
+    'rumah sakit bethesda yogyakarta': 'assets/images/rs_bethesda.jpg',
+    'rumah sakit panti rapih': 'assets/images/rs_panti_rapih.jpg',
+    'rs happy land medical centre': 'assets/images/rs_happy_land.jpg',
+    'rsi hidayatullah': 'assets/images/rsi_hidayatullah.jpg',
+  };
+
+  String _resolveLocalAsset(String nama) {
+    final key = nama.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (_localAssetMap.containsKey(key)) {
+      return _localAssetMap[key]!;
+    }
+    for (var entry in _localAssetMap.entries) {
+      if (key.contains(entry.key) || entry.key.contains(key)) {
+        return entry.value;
+      }
+    }
+    return '';
+  }
+
   Widget _buildImageWidget(String imagePath) {
-    if (imagePath.trim().isEmpty) {
-      return _buildFallback();
-    }
-    if (imagePath.startsWith('http')) {
-      return CachedNetworkImage(
-        imageUrl: imagePath,
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _buildFallback(),
-      );
-    }
-    if (imagePath.startsWith('assets/')) {
+    final cleanPath = imagePath.trim();
+    if (cleanPath.startsWith('assets/')) {
       return Image.asset(
-        imagePath,
+        cleanPath,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildFallback(),
+        errorBuilder: (_, __, ___) => _fallbackForHospital(),
       );
     }
-    return Image.file(
-      File(imagePath),
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => _buildFallback(),
-    );
+    if (cleanPath.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: cleanPath,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _fallbackForHospital(),
+      );
+    }
+    return _fallbackForHospital();
+  }
+
+  Widget _fallbackForHospital() {
+    final assetOrUrl = _resolveLocalAsset(rumahSakit.nama);
+    if (assetOrUrl.isNotEmpty) {
+      if (assetOrUrl.startsWith('assets/')) {
+        return Image.asset(
+          assetOrUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildFallback(),
+        );
+      }
+      if (assetOrUrl.startsWith('http')) {
+        return CachedNetworkImage(
+          imageUrl: assetOrUrl,
+          fit: BoxFit.cover,
+          errorWidget: (_, __, ___) => _buildFallback(),
+        );
+      }
+    }
+    return _buildFallback();
   }
 
   Widget _buildFallback() {

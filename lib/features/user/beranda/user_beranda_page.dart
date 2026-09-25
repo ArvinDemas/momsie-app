@@ -8,7 +8,6 @@ import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/widget/base_page.dart';
 import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/widget/feedback_dialog.dart';
-import 'package:douce/shared/widget/onboarding_modal.dart';
 import 'package:douce/shared/widget/spotlight_tour.dart';
 import 'package:douce/shared/widget/artikel_container.dart';
 import 'package:douce/shared/widget/tokobayi_container.dart';
@@ -68,6 +67,7 @@ class _UserBerandaPageState extends State<UserBerandaPage> {
     final prefs = await SharedPreferences.getInstance();
     final hasSeenTour = prefs.getBool('has_seen_spotlight_tour') ?? false;
     if (hasSeenTour) return;
+    if (!mounted) return;
 
     final steps = [
       SpotlightStep(

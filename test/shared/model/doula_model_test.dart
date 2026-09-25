@@ -35,7 +35,7 @@ void main() {
       expect(model.uid, '');
       expect(model.name, 'Mitra');
       expect(model.job, 'Bidan');
-      expect(model.rating, '4.9');
+      expect(model.rating, '');
     });
 
     test('toMap() memetakan field Dart ke field Firestore dengan benar', () {

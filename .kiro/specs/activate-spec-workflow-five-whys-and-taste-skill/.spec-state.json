@@ -1,0 +1,45 @@
+{
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "Auto-confirmation trigger",
+      "answer": "Cloud Function on webhook — server-side, no client race condition",
+      "rationale": "Webhook handler runs server-side, can safely apply business logic without exposing to client"
+    },
+    {
+      "id": "D2",
+      "question": "Slot capacity concurrency",
+      "answer": "Firestore transactions (atomic increment/decrement)",
+      "rationale": "Prevents double-booking same slot; transaction guarantees consistency"
+    },
+    {
+      "id": "D3",
+      "question": "Countdown timer implementation",
+      "answer": "Cloud Function timer (server-side accurate)",
+      "rationale": "Client-side timers can be manipulated; server-side ensures accuracy"
+    },
+    {
+      "id": "D4",
+      "question": "On-demand access gating",
+      "answer": "materi_access collection + client check",
+      "rationale": "Explicit access control, scalable for future content restrictions"
+    },
+    {
+      "id": "D5",
+      "question": "Auto-confirm vs manual-confirm branching",
+      "answer": "isAutoConfirm(layanan) check in webhook handler",
+      "rationale": "Chat, Yoga, Edukasi, Bundling = auto; Offline = manual optional"
+    }
+  ],
+  "blocking": null,
+  "context": {
+    "template": "feature"
+  },
+  "specFiles": {
+    "requirements": ".kiro/specs/activate-spec-workflow-five-whys-and-taste-skill/requirements.md",
+    "design": ".kiro/specs/activate-spec-workflow-five-whys-and-taste-skill/design.md",
+    "tasks": ".kiro/specs/activate-spec-workflow-five-whys-and-taste-skill/tasks.md",
+    "phasingChecklist": ".kiro/specs/activate-spec-workflow-five-whys-and-taste-skill/phasing-checklist.md"
+  },
+  "status": "READY_FOR_EXECUTION"
+}
