@@ -9,9 +9,9 @@ class SlotItem {
     required this.bookedCount,
   });
 
-  factory SlotItem.fromMap(Map<String, dynamic> map) {
+  factory SlotItem.fromMap(Map<dynamic, dynamic> map) {
     return SlotItem(
-      time: map['time'] ?? '',
+      time: map['time']?.toString() ?? '',
       capacity: (map['capacity'] as num?)?.toInt() ?? 1,
       bookedCount: (map['bookedCount'] as num?)?.toInt() ?? 0,
     );
@@ -55,16 +55,33 @@ class BookingSlotModel {
     final slotsRaw = map['slots'];
     List<SlotItem> slots = [];
     if (slotsRaw is List) {
-      slots = slotsRaw.map((e) => SlotItem.fromMap(e as Map<String, dynamic>)).toList();
+      for (var e in slotsRaw) {
+        if (e is Map) {
+          slots.add(SlotItem.fromMap(e));
+        } else if (e is String) {
+          slots.add(SlotItem(time: e, capacity: 1, bookedCount: 0));
+        }
+      }
     }
+
+    DateTime createdAt = DateTime.now();
+    final rawCreated = map['createdAt'];
+    if (rawCreated is int) {
+      createdAt = DateTime.fromMillisecondsSinceEpoch(rawCreated);
+    } else if (rawCreated != null) {
+      try {
+        createdAt = (rawCreated as dynamic).toDate();
+      } catch (_) {
+        createdAt = DateTime.now();
+      }
+    }
+
     return BookingSlotModel(
-      docId: docId ?? map['docId'] ?? '',
-      doulaId: map['doulaId'] ?? '',
-      tanggal: map['tanggal'] ?? '',
+      docId: docId ?? map['docId']?.toString() ?? '',
+      doulaId: map['doulaId']?.toString() ?? '',
+      tanggal: map['tanggal']?.toString() ?? '',
       slots: slots,
-      createdAt: map['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
-          : DateTime.now(),
+      createdAt: createdAt,
     );
   }
 

@@ -376,22 +376,24 @@ class MitraPekerjaanController extends GetxController {
       final snapshot = await FirebaseFirestore.instance
           .collection('booking_slots')
           .where('doulaId', isEqualTo: doulaId)
-          .where('tanggal', isGreaterThanOrEqualTo: startStr)
-          .where('tanggal', isLessThanOrEqualTo: endStr)
           .get();
 
       final Map<String, List<SlotUtilization>> utilization = {};
       for (var doc in snapshot.docs) {
         final model = BookingSlotModel.fromMap(doc.data(), docId: doc.id);
-        for (var slot in model.slots) {
-          utilization[model.tanggal] ??= [];
-          utilization[model.tanggal]!.add(SlotUtilization(
-            tanggal: model.tanggal,
-            jam: slot.time,
-            capacity: slot.capacity,
-            bookedCount: slot.bookedCount,
-            status: slot.isFull ? 'full' : (slot.bookedCount > 0 ? 'partial' : 'available'),
-          ));
+        if (model.tanggal.isNotEmpty &&
+            model.tanggal.compareTo(startStr) >= 0 &&
+            model.tanggal.compareTo(endStr) <= 0) {
+          for (var slot in model.slots) {
+            utilization[model.tanggal] ??= [];
+            utilization[model.tanggal]!.add(SlotUtilization(
+              tanggal: model.tanggal,
+              jam: slot.time,
+              capacity: slot.capacity,
+              bookedCount: slot.bookedCount,
+              status: slot.isFull ? 'full' : (slot.bookedCount > 0 ? 'partial' : 'available'),
+            ));
+          }
         }
       }
       slotUtilization.assignAll(utilization);

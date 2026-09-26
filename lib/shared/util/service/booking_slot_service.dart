@@ -43,11 +43,14 @@ class BookingSlotService {
     return _firestore
         .collection(_collection)
         .where('doulaId', isEqualTo: doulaId)
-        .orderBy('tanggal')
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => BookingSlotModel.fromMap(doc.data(), docId: doc.id))
-            .toList());
+        .map((snap) {
+          final list = snap.docs
+              .map((doc) => BookingSlotModel.fromMap(doc.data(), docId: doc.id))
+              .toList();
+          list.sort((a, b) => a.tanggal.compareTo(b.tanggal));
+          return list;
+        });
   }
 
   /// Simpan/update slot untuk satu tanggal

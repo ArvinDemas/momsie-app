@@ -39,7 +39,7 @@ class MitraAturJadwalController extends GetxController {
     if (_userController.uid.value.isNotEmpty) {
       return _userController.uid.value;
     }
-    return '';
+    return 'doula_dewi';
   }
 
   void changeMonth(int monthDelta) {
@@ -71,19 +71,20 @@ class MitraAturJadwalController extends GetxController {
       final snapshot = await FirebaseFirestore.instance
           .collection('booking_slots')
           .where('doulaId', isEqualTo: doulaId)
-          .where('tanggal', isGreaterThanOrEqualTo: startStr)
-          .where('tanggal', isLessThanOrEqualTo: endStr)
           .get();
 
       final Map<String, List<SlotItem>> loaded = {};
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final model = BookingSlotModel.fromMap(data, docId: doc.id);
-        if (model.tanggal.isNotEmpty) {
+        if (model.tanggal.isNotEmpty &&
+            model.tanggal.compareTo(startStr) >= 0 &&
+            model.tanggal.compareTo(endStr) <= 0) {
           loaded[model.tanggal] = model.slots;
         }
       }
       slotState.value = loaded;
+      slotState.refresh();
     } catch (e) {
       debugPrint('Error loading month slots: $e');
     } finally {
@@ -220,6 +221,7 @@ class MitraAturJadwalController extends GetxController {
       current.sort((a, b) => a.time.compareTo(b.time));
     }
     slotState[tanggal] = current;
+    slotState.refresh();
   }
 
   /// Preset: Jam kerja normal (09:00 - 17:00), capacity 1 per slot
@@ -227,6 +229,7 @@ class MitraAturJadwalController extends GetxController {
     slotState[tanggal] = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
         .map((t) => SlotItem(time: t, capacity: defaultCapacity, bookedCount: 0))
         .toList();
+    slotState.refresh();
   }
 
   /// Preset: Jam malam (18:00 - 21:00)
@@ -234,6 +237,7 @@ class MitraAturJadwalController extends GetxController {
     slotState[tanggal] = ['18:00', '19:00', '20:00', '21:00']
         .map((t) => SlotItem(time: t, capacity: defaultCapacity, bookedCount: 0))
         .toList();
+    slotState.refresh();
   }
 
   /// Preset: Semua Jam (08:00 - 21:00)
@@ -242,6 +246,7 @@ class MitraAturJadwalController extends GetxController {
       '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
       '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00',
     ].map((t) => SlotItem(time: t, capacity: defaultCapacity, bookedCount: 0)).toList();
+    slotState.refresh();
   }
 
   /// Preset: Kosongkan Hari Ini (hanya jika tidak ada booking)
@@ -254,6 +259,7 @@ class MitraAturJadwalController extends GetxController {
       return;
     }
     slotState[tanggal] = [];
+    slotState.refresh();
   }
 
   /// Salin jadwal hari ini ke semua hari kerja (Senin-Jumat) dalam bulan ini
@@ -279,6 +285,7 @@ class MitraAturJadwalController extends GetxController {
         slotState[tglStr] = currentSlots.map((s) => s.copyWith(capacity: s.capacity)).toList();
       }
     }
+    slotState.refresh();
 
     Get.snackbar('Berhasil', 'Jadwal diterapkan ke seluruh hari kerja bulan ${monthYearFormat.format(focusedMonth.value)}',
         backgroundColor: Colors.green.shade700, colorText: Colors.white);

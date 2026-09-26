@@ -141,14 +141,18 @@ class MitraAturJadwalPage extends StatelessWidget {
 
                 // Main Dynamic View Content
                 Obx(() {
+                  final selDate = controller.selectedDate.value;
+                  final _ = controller.slotState.length;
+                  final __ = controller.focusedMonth.value;
+
                   switch (controller.viewMode.value) {
                     case 'mingguan':
-                      return _buildWeekView(controller);
+                      return _buildWeekView(controller, selDate);
                     case 'harian':
-                      return _buildDayView(controller);
+                      return _buildDayView(controller, selDate);
                     case 'bulanan':
                     default:
-                      return _buildMonthGridView(controller);
+                      return _buildMonthGridView(controller, selDate);
                   }
                 }),
 
@@ -244,13 +248,16 @@ class MitraAturJadwalPage extends StatelessWidget {
                           spacing: 8,
                           runSpacing: 8,
                           children: _allJams.map((jam) {
-                            final slot = slots.firstWhere(
-                              (s) => s.time == jam,
-                              orElse: () => SlotItem(time: jam, capacity: 1, bookedCount: 0),
-                            );
+                            final slotIndex = slots.indexWhere((s) => s.time == jam);
+                            final isSelected = slotIndex >= 0;
+                            final slot = isSelected
+                                ? slots[slotIndex]
+                                : SlotItem(time: jam, capacity: 1, bookedCount: 0);
+
                             return _buildSlotChip(
                               context: context,
                               slot: slot,
+                              isSelected: isSelected,
                               onToggle: () => controller.toggleJam(storageTgl, jam),
                               onEditCapacity: () => _showEditCapacityDialog(context, slot, storageTgl, jam, controller),
                             );
@@ -343,14 +350,15 @@ class MitraAturJadwalPage extends StatelessWidget {
   Widget _buildSlotChip({
     required BuildContext context,
     required SlotItem slot,
+    required bool isSelected,
     required VoidCallback onToggle,
     required VoidCallback onEditCapacity,
   }) {
-    final isSelected = slot.time.isNotEmpty;
-    final isFull = slot.isFull;
+    final isFull = isSelected && slot.isFull;
 
     return InkWell(
-      onTap: isSelected ? onEditCapacity : onToggle,
+      onTap: onToggle,
+      onLongPress: isSelected ? onEditCapacity : null,
       borderRadius: BorderRadius.circular(10),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
@@ -390,11 +398,11 @@ class MitraAturJadwalPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (!isFull)
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 10, color: Colors.white70),
-                        onPressed: onEditCapacity,
-                      ),
+                    const SizedBox(width: 4),
+                    InkWell(
+                      onTap: onEditCapacity,
+                      child: Icon(Icons.edit, size: 11, color: isFull ? Colors.red.shade700 : Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -440,15 +448,17 @@ class MitraAturJadwalPage extends StatelessWidget {
   }
 
   /// Full Month Interactive Calendar Grid (Google Calendar Style)
-  Widget _buildMonthGridView(MitraAturJadwalController controller) {
+  Widget _buildMonthGridView(MitraAturJadwalController controller, DateTime selectedDate) {
     final monthDate = controller.focusedMonth.value;
     final firstDayOfMonth = DateTime(monthDate.year, monthDate.month, 1);
     final daysInMonth = DateTime(monthDate.year, monthDate.month + 1, 0).day;
     final leadingEmptyDays = firstDayOfMonth.weekday - 1;
+    final selDateStr = controller.storageDate(selectedDate);
 
     final List<String> dayHeaders = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
     return Container(
+      key: ValueKey('month_grid_${monthDate.year}_${monthDate.month}_${selectedDate.year}_${selectedDate.month}_${selectedDate.day}_${controller.slotState.length}'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -485,6 +495,7 @@ class MitraAturJadwalPage extends StatelessWidget {
 
           // Days Grid
           GridView.builder(
+            key: ValueKey('grid_builder_${monthDate.year}_${monthDate.month}_${selectedDate.day}'),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -501,7 +512,7 @@ class MitraAturJadwalPage extends StatelessWidget {
               final dayNum = index - leadingEmptyDays + 1;
               final thisDate = DateTime(monthDate.year, monthDate.month, dayNum);
               final dateStr = controller.storageDate(thisDate);
-              final isSelected = controller.storageDate(controller.selectedDate.value) == dateStr;
+              final isSelected = selDateStr == dateStr;
               final slots = controller.slotState[dateStr] ?? [];
               final totalCapacity = slots.fold<int>(0, (sum, s) => sum + s.capacity);
 
@@ -564,12 +575,13 @@ class MitraAturJadwalPage extends StatelessWidget {
   }
 
   /// Week View Horizontal Cards
-  Widget _buildWeekView(MitraAturJadwalController controller) {
-    final selDate = controller.selectedDate.value;
-    final monday = selDate.subtract(Duration(days: selDate.weekday - 1));
+  Widget _buildWeekView(MitraAturJadwalController controller, DateTime selectedDate) {
+    final monday = selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
     final weekDates = List.generate(7, (i) => monday.add(Duration(days: i)));
+    final selDateStr = controller.storageDate(selectedDate);
 
     return SizedBox(
+      key: ValueKey('week_strip_${selectedDate.year}_${selectedDate.month}_${selectedDate.day}'),
       height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -577,7 +589,7 @@ class MitraAturJadwalPage extends StatelessWidget {
         itemBuilder: (_, i) {
           final date = weekDates[i];
           final dateStr = controller.storageDate(date);
-          final isSel = controller.storageDate(selDate) == dateStr;
+          final isSel = selDateStr == dateStr;
           final slots = controller.slotState[dateStr] ?? [];
           final totalCapacity = slots.fold<int>(0, (sum, s) => sum + s.capacity);
 
@@ -632,22 +644,21 @@ class MitraAturJadwalPage extends StatelessWidget {
   }
 
   /// Day View Selector Card
-  Widget _buildDayView(MitraAturJadwalController controller) {
-    final selDate = controller.selectedDate.value;
+  Widget _buildDayView(MitraAturJadwalController controller, DateTime selectedDate) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded, size: 18),
-          onPressed: () => controller.setFocusedDate(selDate.subtract(const Duration(days: 1))),
+          onPressed: () => controller.setFocusedDate(selectedDate.subtract(const Duration(days: 1))),
         ),
         Text(
-          controller.displayDate(selDate),
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
+          controller.displayDate(selectedDate),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppSemanticColors.textDarkSecondary),
         ),
         IconButton(
           icon: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
-          onPressed: () => controller.setFocusedDate(selDate.add(const Duration(days: 1))),
+          onPressed: () => controller.setFocusedDate(selectedDate.add(const Duration(days: 1))),
         ),
       ],
     );
