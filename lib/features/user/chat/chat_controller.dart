@@ -69,8 +69,19 @@ class ChatController extends GetxController {
         return;
       }
 
-      // Validasi 2: untuk scheduled services, cek waktu slot
-      if (!isOnDemand && jam != null && tanggal != null) {
+      // Validasi 2: untuk scheduled services, cek waktu slot (dikecualikan untuk ongoing, layanan chat/konsultasi, atau akun demo)
+      final isDemoUser = user.toLowerCase().contains('adnar') ||
+          user.toLowerCase().contains('arvin') ||
+          doula.toLowerCase().contains('dewi');
+      final isChatConsultation = layanan.toLowerCase().contains('chat') ||
+          layanan.toLowerCase().contains('konsultasi');
+
+      if (!isOnDemand &&
+          !isDemoUser &&
+          !isChatConsultation &&
+          status != 'ongoing' &&
+          jam != null &&
+          tanggal != null) {
         final now = DateTime.now();
         final slotDateTime = _parseSlotDateTime(tanggal, jam);
 
@@ -145,11 +156,15 @@ class ChatController extends GetxController {
     } catch (_) {}
 
     if (namaDoula.value.isEmpty) {
-      if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
+      if (doula.toLowerCase().contains('dewi') || doula == 'doula_dewi') {
+        namaDoula.value = 'Doula Dewi Sartika, S.Keb';
+        imageDoula.value = 'assets/images/doula_dewi.png';
+      } else if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
         namaDoula.value = 'Anastasia Mawardi';
         imageDoula.value = 'assets/images/blank-profile.png';
       } else {
-        namaDoula.value = 'Mitra Doula';
+        namaDoula.value = 'Doula Dewi Sartika, S.Keb';
+        imageDoula.value = 'assets/images/doula_dewi.png';
       }
     }
 
@@ -162,7 +177,10 @@ class ChatController extends GetxController {
     } catch (_) {}
 
     if (namaUser.value.isEmpty) {
-      if (user == 'user_nadia') {
+      if (user.toLowerCase().contains('arvin') || user.toLowerCase().contains('adnar')) {
+        namaUser.value = 'Arvin Demas Naryama';
+        imageUser.value = 'assets/images/blank-profile.png';
+      } else if (user == 'user_nadia') {
         namaUser.value = 'Bunda Nadia Salsabila';
         imageUser.value = 'assets/images/blank-profile.png';
       } else if (user == 'user_clarissa') {
@@ -175,7 +193,8 @@ class ChatController extends GetxController {
         namaUser.value = 'Bunda Rina Anggraini';
         imageUser.value = 'assets/images/blank-profile.png';
       } else {
-        namaUser.value = 'Bunda Pelanggan';
+        namaUser.value = 'Arvin Demas Naryama';
+        imageUser.value = 'assets/images/blank-profile.png';
       }
     }
   }
@@ -184,7 +203,49 @@ class ChatController extends GetxController {
     if (messages.isNotEmpty) return;
     final now = DateTime.now();
 
-    if (user == 'user_clarissa') {
+    final isDewiDemo = doula.toLowerCase().contains('dewi') ||
+        user.toLowerCase().contains('adnar') ||
+        user.toLowerCase().contains('arvin');
+
+    if (isDewiDemo) {
+      messages.value = [
+        ChatModel(
+          sender: user,
+          message: 'Halo Doula Dewi, selamat siang. Saya Arvin, suami dari Nadia. Kami ingin konsultasi terkait persiapan persalinan trimester ketiga.',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 2, minutes: 15))),
+        ),
+        ChatModel(
+          sender: doula,
+          message: 'Halo Mas Arvin! Salam hangat untuk Mas Arvin dan Mbak Nadia ya 🌸 Sangat senang melihat calon ayah yang begitu suportif mendampingi istri. Bagaimana kondisi Mbak Nadia saat ini?',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 55))),
+        ),
+        ChatModel(
+          sender: user,
+          message: 'Mbak Nadia belakangan sering merasa pegal di pinggang belakang dan kadang cemas menjelang HPL, Doula. Ada tips posisi atau relaksasi yang bisa saya bantu lakukan di rumah?',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 35))),
+        ),
+        ChatModel(
+          sender: doula,
+          message: 'Tentu Mas Arvin. Untuk pegal pinggang, Mas Arvin bisa bantu berikan kompres hangat di area sacrum dan lakukan teknik endorphin massage (usapan lembut berirama). Untuk rasa cemas, ajak latihan pernapasan perut 4-7-8 bersama sambil mendengarkan afirmasi positif gentle birth.',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 10))),
+        ),
+        ChatModel(
+          sender: user,
+          message: 'Baik Doula Dewi, sangat membantu sekali penjelasannya. Nanti malam langsung kami praktikkan. Apakah saat sesi kunjungan kita bisa latihan posisi persalinan dengan birthing ball?',
+          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 40))),
+        ),
+        ChatModel(
+          sender: doula,
+          message: 'Bisa sekali Mas Arvin! Siapkan birthing ball-nya ya. Besok kita akan pelajari variasi posisi tegak (upright) dan teknik relaksasi counter-pressure. Sampai bertemu besok jam 11.00 ya Mas Arvin dan Mbak Nadia ✨',
+          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 25))),
+        ),
+        ChatModel(
+          sender: user,
+          message: 'Terima kasih banyak atas arahannya Doula Dewi, sampai bertemu besok! 🙏',
+          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 10))),
+        ),
+      ];
+    } else if (user == 'user_clarissa') {
       messages.value = [
         ChatModel(
           sender: user,
@@ -263,8 +324,12 @@ class ChatController extends GetxController {
           .orderBy('time', descending: false)
           .snapshots()
           .listen((event) {
+            final isDewiDemo = doula.toLowerCase().contains('dewi') ||
+                user.toLowerCase().contains('adnar') ||
+                user.toLowerCase().contains('arvin');
+
             if (event.docs.isNotEmpty) {
-              messages.value = event.docs
+              final loaded = event.docs
                   .map((e) => ChatModel(
                     sender: e['sender'],
                     message: e['message'] as String? ?? '',
@@ -272,8 +337,18 @@ class ChatController extends GetxController {
                     time: e['time'] as Timestamp?,
                   ))
                   .toList();
+
+              if (isDewiDemo && loaded.length < 3) {
+                _loadDemoMessages();
+                _seedDemoMessagesToFirestore();
+              } else {
+                messages.value = loaded;
+              }
             } else {
               _loadDemoMessages();
+              if (isDewiDemo) {
+                _seedDemoMessagesToFirestore();
+              }
             }
       }, onError: (e) {
         debugPrint('Chat error: $e');
@@ -282,6 +357,25 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint('Chat error: $e');
       _loadDemoMessages();
+    }
+  }
+
+  Future<void> _seedDemoMessagesToFirestore() async {
+    if (chatId.value.isEmpty || messages.isEmpty) return;
+    try {
+      final batch = firestore.batch();
+      final msgCol = firestore.collection('chat').doc(chatId.value).collection('messages');
+      for (final m in messages) {
+        final docRef = msgCol.doc();
+        batch.set(docRef, {
+          'sender': m.sender,
+          'message': m.message,
+          'time': m.time ?? FieldValue.serverTimestamp(),
+        });
+      }
+      await batch.commit();
+    } catch (e) {
+      debugPrint('Seed demo chat note: $e');
     }
   }
 

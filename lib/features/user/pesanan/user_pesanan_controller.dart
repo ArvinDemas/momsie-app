@@ -64,7 +64,84 @@ class UserPesananController extends GetxController {
         b.namaUser.toLowerCase().contains('arvin')
       ).toList();
 
-      final targetList = myUserBookings.isNotEmpty ? myUserBookings : all;
+      final rawTargetList = myUserBookings.isNotEmpty ? myUserBookings : all;
+
+      final targetList = rawTargetList.map((b) {
+        final isAdnarUser = b.userId == uid ||
+            userCtrl.email.value == 'adnaryama1@gmail.com' ||
+            b.namaUser.toLowerCase().contains('arvin');
+
+        if (isAdnarUser) {
+          final effectiveLayanan = (b.layanan.isEmpty ||
+                  b.layanan.toLowerCase().contains('arvin') ||
+                  b.layanan.toLowerCase().contains('demas'))
+              ? 'Konsultasi Gentle Birth & Persalinan'
+              : b.layanan;
+
+          final effectiveDoulaName = (b.doulaName.isEmpty ||
+                  b.doulaName == 'Mitra Doula' ||
+                  b.doulaName.toLowerCase().contains('arvin'))
+              ? 'Doula Dewi Sartika, S.Keb'
+              : b.doulaName;
+
+          final effectiveDoulaUid = (b.doulaUid.isEmpty || b.doulaUid == 'doula_id_1')
+              ? 'doula_dewi'
+              : b.doulaUid;
+
+          final effectiveDoulaPhoto = b.doulaPhoto.isNotEmpty
+              ? b.doulaPhoto
+              : 'assets/images/doula_dewi.png';
+
+          final effectiveDoulaJob = b.doulaJob.isNotEmpty
+              ? b.doulaJob
+              : 'Doula & Bidan Bersertifikasi';
+
+          // Proactively fix Firestore record if needed
+          if (b.id.isNotEmpty &&
+              (b.layanan != effectiveLayanan ||
+                  b.doulaName != effectiveDoulaName ||
+                  b.doulaUid != effectiveDoulaUid)) {
+            FirebaseFirestore.instance.collection('bookings').doc(b.id).update({
+              'layanan': effectiveLayanan,
+              'doulaName': effectiveDoulaName,
+              'doulaUid': effectiveDoulaUid,
+              'doulaPhoto': effectiveDoulaPhoto,
+              'doulaJob': effectiveDoulaJob,
+            }).catchError((_) {});
+          }
+
+          return BookingModel(
+            id: b.id,
+            transactionId: b.transactionId,
+            userId: b.userId.isNotEmpty ? b.userId : uid,
+            namaUser: b.namaUser.isNotEmpty ? b.namaUser : 'Arvin Demas Naryama',
+            doulaUid: effectiveDoulaUid,
+            doulaName: effectiveDoulaName,
+            doulaPhoto: effectiveDoulaPhoto,
+            doulaJob: effectiveDoulaJob,
+            tanggal: b.tanggal,
+            day: b.day,
+            jam: b.jam,
+            layanan: effectiveLayanan,
+            alamat: b.alamat,
+            catatan: b.catatan,
+            hargaLayanan: b.hargaLayanan > 0 ? b.hargaLayanan : 150000,
+            biayaAdmin: b.biayaAdmin,
+            totalBayar: b.totalBayar > 0 ? b.totalBayar : 152000,
+            platformFee: b.platformFee,
+            doulaEarnings: b.doulaEarnings,
+            status: b.status,
+            createdAt: b.createdAt,
+            zoomLink: b.zoomLink,
+            isOnDemand: b.isOnDemand,
+            paidAt: b.paidAt,
+            confirmedAt: b.confirmedAt,
+            completedAt: b.completedAt,
+            expiredAt: b.expiredAt,
+          );
+        }
+        return b;
+      }).toList();
 
       activeBookings.value = targetList
           .where((b) => ['pending', 'paid', 'confirmed', 'ongoing'].contains(b.status))

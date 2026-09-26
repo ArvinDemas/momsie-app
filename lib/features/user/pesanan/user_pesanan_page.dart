@@ -253,7 +253,11 @@ class UserPesananPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      booking.layanan,
+                      (booking.layanan.isEmpty ||
+                              booking.layanan.toLowerCase().contains('arvin') ||
+                              booking.layanan.toLowerCase().contains('demas'))
+                          ? 'Konsultasi Gentle Birth & Persalinan'
+                          : booking.layanan,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -261,7 +265,11 @@ class UserPesananPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      booking.doulaName.isNotEmpty ? booking.doulaName : 'Mitra Doula',
+                      (booking.doulaName.isNotEmpty &&
+                              !booking.doulaName.toLowerCase().contains('arvin') &&
+                              booking.doulaName != 'Mitra Doula')
+                          ? booking.doulaName
+                          : 'Doula Dewi Sartika, S.Keb',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade700,
@@ -405,99 +413,73 @@ class UserPesananPage extends StatelessWidget {
   }
 
   Widget _buildStatusActions(BookingModel booking, BuildContext context) {
-    final actions = <Widget>[];
     final isScheduled = !booking.isOnDemand;
     final hasZoomLink = booking.zoomLink != null && booking.zoomLink!.isNotEmpty;
 
-    // Chat Doula button (for all paid/confirmed/ongoing bookings)
-    actions.add(
-      Expanded(
-        child: InkWell(
-          onTap: () {
-            Get.toNamed('/chat-page', arguments: {
-              "doula": booking.doulaUid,
-              "user": booking.userId,
-              "isDoula": false,
-              "bookingId": booking.id,
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: ColorDouce.douceBase,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: Text(
-                "Mulai Chat",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    final secondaryActions = <Widget>[];
 
     // Zoom / WhatsApp fallback button (only for scheduled services)
     if (isScheduled) {
       if (hasZoomLink) {
-        actions.add(const SizedBox(width: 10));
-        actions.add(
-          InkWell(
-            onTap: () => _launchUrl(booking.zoomLink!),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F9D58).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF0F9D58).withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.videocam_rounded, size: 16, color: Color(0xFF0F9D58)),
-                  SizedBox(width: 6),
-                  Text(
-                    "Join Zoom",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF0F9D58),
-                      fontWeight: FontWeight.bold,
+        secondaryActions.add(
+          Expanded(
+            child: InkWell(
+              onTap: () => _launchUrl(booking.zoomLink!),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F9D58).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF0F9D58).withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.videocam_rounded, size: 16, color: Color(0xFF0F9D58)),
+                    SizedBox(width: 6),
+                    Text(
+                      "Join Zoom",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF0F9D58),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         );
       } else {
-        actions.add(const SizedBox(width: 10));
-        actions.add(
-          InkWell(
-            onTap: () => _launchUrl('https://wa.me/6281234567890?text=${Uri.encodeComponent('Halo Admin Momsie, saya ${booking.namaUser} ingin bergabung di kelas ${booking.layanan} (Booking ID: ${booking.id}). Mohon link Zoom-nya. Terima kasih.')}'),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFDE68A).withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info_outline, size: 16, color: Color(0xFFF59E0B)),
-                  SizedBox(width: 6),
-                  Text(
-                    "Hubungi Admin",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFFF59E0B),
-                      fontWeight: FontWeight.bold,
+        secondaryActions.add(
+          Expanded(
+            child: InkWell(
+              onTap: () => _launchUrl('https://wa.me/6281234567890?text=${Uri.encodeComponent('Halo Admin Momsie, saya ${booking.namaUser} ingin bergabung di sesi ${booking.layanan} (Booking ID: ${booking.id}). Mohon infonya. Terima kasih.')}'),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDE68A).withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.support_agent_rounded, size: 16, color: Color(0xFFF59E0B)),
+                    SizedBox(width: 6),
+                    Text(
+                      "Hubungi Admin",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFFF59E0B),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -505,44 +487,101 @@ class UserPesananPage extends StatelessWidget {
       }
     }
 
+    if (secondaryActions.isNotEmpty) {
+      secondaryActions.add(const SizedBox(width: 10));
+    }
+
     // View payment proof button
-    actions.add(const SizedBox(width: 10));
-    actions.add(
-      InkWell(
-        onTap: () {
-          Get.toNamed('/payment-success', arguments: {
-            'transactionId': booking.transactionId.isNotEmpty ? booking.transactionId : booking.id,
-            'bookingId': booking.id,
-            'nominal': booking.totalBayar,
-            'layanan': 'Booking ${booking.doulaName.isNotEmpty ? booking.doulaName : "Doula"} – ${booking.layanan}',
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.green.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.green.shade200),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.receipt_long_rounded, size: 16, color: Colors.green.shade700),
-              SizedBox(width: 6),
-              Text(
-                "Bukti Bayar",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF1B5E20),
-                  fontWeight: FontWeight.bold,
+    secondaryActions.add(
+      Expanded(
+        child: InkWell(
+          onTap: () {
+            Get.toNamed('/payment-success', arguments: {
+              'transactionId': booking.transactionId.isNotEmpty ? booking.transactionId : booking.id,
+              'bookingId': booking.id,
+              'nominal': booking.totalBayar,
+              'layanan': 'Booking ${booking.doulaName.isNotEmpty ? booking.doulaName : "Doula Dewi Sartika, S.Keb"} – ${booking.layanan.isNotEmpty ? booking.layanan : "Konsultasi Persalinan"}',
+            });
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green.shade200),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.receipt_long_rounded, size: 16, color: Colors.green.shade700),
+                const SizedBox(width: 6),
+                const Text(
+                  "Bukti Bayar",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF1B5E20),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
 
-    return Row(children: actions);
+    return Column(
+      children: [
+        // Primary Action: Full-width Chat Konsultasi Doula
+        InkWell(
+          onTap: () {
+            Get.toNamed('/chat-page', arguments: {
+              "doula": (booking.doulaUid.isNotEmpty && booking.doulaUid != 'doula_id_1')
+                  ? booking.doulaUid
+                  : "doula_dewi",
+              "user": booking.userId.isNotEmpty ? booking.userId : "user_arvin",
+              "isDoula": false,
+              "bookingId": booking.id,
+            });
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: ColorDouce.douceBase,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: ColorDouce.douceBase.withValues(alpha: 0.28),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.chat_bubble_rounded, size: 18, color: Colors.white),
+                SizedBox(width: 8),
+                Text(
+                  "Mulai Chat Konsultasi",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(children: secondaryActions),
+      ],
+    );
   }
 
   Future<void> _launchUrl(String url) async {

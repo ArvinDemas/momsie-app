@@ -438,7 +438,7 @@ class ChatPage extends StatelessWidget {
                               Icon(Icons.arrow_back_ios_new_rounded, color: ColorDouce.douceBase, size: 16),
                               const SizedBox(width: AppSpacing.xxs),
                               Text(
-                                '222',
+                                'Kembali',
                                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ColorDouce.douceBase),
                               ),
                             ],
@@ -460,7 +460,7 @@ class ChatPage extends StatelessWidget {
                               () => Text(
                                 isDoula
                                     ? (chatController.namaUser.value.isNotEmpty ? chatController.namaUser.value : 'Bunda Pelanggan')
-                                    : (chatController.namaDoula.value.isNotEmpty ? chatController.namaDoula.value : 'Anastasia Mawardi'),
+                                    : (chatController.namaDoula.value.isNotEmpty ? chatController.namaDoula.value : 'Doula Dewi Sartika, S.Keb'),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

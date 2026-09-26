@@ -427,11 +427,11 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           ),
           const SizedBox(height: 12),
         ],
-        if (b.status == 'paid' || b.status == 'confirmed') ...[
+        if (b.status == 'paid' || b.status == 'confirmed' || b.status == 'ongoing') ...[
           OutlinedButton(
             onPressed: () => Get.toNamed('/chat-page', arguments: {
-              'doula': b.doulaUid,
-              'user': b.userId,
+              'doula': (b.doulaUid.isNotEmpty && b.doulaUid != 'doula_id_1') ? b.doulaUid : 'doula_dewi',
+              'user': b.userId.isNotEmpty ? b.userId : 'user_arvin',
               'isDoula': false,
               'bookingId': b.id,
             }),
