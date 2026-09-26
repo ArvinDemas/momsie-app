@@ -1,0 +1,17 @@
+{
+  "availableModels": [
+    "default",
+    "opus",
+    "claude-fable-5",
+    "sonnet",
+    "haiku",
+    "claude-opus-4-6",
+    "claude-sonnet-5",
+    "claude-opus-5",
+    "claude-opus-4-7",
+    "claude-opus-4-8",
+    "claude-haiku-4-5",
+    "claude-adacode-2.5-flash",
+    "claude-adacode-3.0-flash"
+  ]
+}

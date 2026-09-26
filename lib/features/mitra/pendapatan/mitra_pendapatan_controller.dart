@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/util/model/withdrawal_model.dart';
+import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
 import 'package:douce/features/mitra/profil/setup_pin_page.dart';
 import 'package:douce/shared/util/service/pin_auth_service.dart';
 import 'package:douce/shared/util/service/withdraw_service.dart';
@@ -32,11 +33,51 @@ class MitraPendapatanController extends GetxController {
   StreamSubscription? _withdrawalSubscription;
   StreamSubscription? _bookingSubscription;
 
+  bool get isAnastasiaUser {
+    if (!Get.isRegistered<UserController>()) return false;
+    final userCtrl = Get.find<UserController>();
+    final email = userCtrl.email.value.toLowerCase();
+    final uid = userCtrl.uid.value.toLowerCase();
+    final username = userCtrl.username.value.toLowerCase();
+    final doulaUsername = userCtrl.doulaUsername.value.toLowerCase();
+    return email.contains('anastasia') ||
+        uid == 'doula_anastasia' ||
+        username.contains('anastasia') ||
+        doulaUsername.contains('anastasia') ||
+        (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
+  }
+
+  void applyAnastasiaDemo() {
+    saldoTersedia.value = 1042500;
+    totalPendapatan.value = 2550000;
+    completedBookings.value = MitraPekerjaanController.getAnastasiaDemoBookings()
+        .where((b) => b.status == 'completed')
+        .toList();
+  }
+
+  void _onUserChanged() {
+    if (isAnastasiaUser) {
+      applyAnastasiaDemo();
+    }
+    _listenSaldo();
+    _listenWithdrawals();
+    _listenCompletedBookings();
+  }
+
   @override
   void onInit() {
     super.onInit();
     _userController = Get.find<UserController>();
     _pinService = Get.find<PinAuthService>();
+
+    if (isAnastasiaUser) {
+      applyAnastasiaDemo();
+    }
+
+    ever(_userController.email, (_) => _onUserChanged());
+    ever(_userController.uid, (_) => _onUserChanged());
+    ever(_userController.doulaUsername, (_) => _onUserChanged());
+
     _listenSaldo();
     _listenWithdrawals();
     _listenCompletedBookings();
@@ -44,22 +85,37 @@ class MitraPendapatanController extends GetxController {
 
   /// Listen saldo dari dokumen mitra
   void _listenSaldo() {
+    _saldoSubscription?.cancel();
     _saldoSubscription = FirebaseFirestore.instance
         .collection('mitra')
         .doc(_userController.uid.value)
         .snapshots()
         .listen((doc) {
-          if (!doc.exists) return;
+          final isAna = isAnastasiaUser;
+          if (!doc.exists) {
+            if (isAna) {
+              if (saldoTersedia.value == 0) saldoTersedia.value = 1042500;
+              if (totalPendapatan.value == 0) totalPendapatan.value = 2550000;
+            }
+            return;
+          }
           final data = doc.data()!;
-          saldoTersedia.value = (data['saldo_tersedia'] ?? data['saldo_escrow'] ?? data['saldo'] ?? 0) as int;
-          totalPendapatan.value = (data['totalPendapatan'] ?? 0) as int;
+          final remoteSaldo = (data['saldo_tersedia'] ?? data['saldo_escrow'] ?? data['saldo'] ?? 0) as int;
+          final remoteTotal = (data['totalPendapatan'] ?? 0) as int;
+          saldoTersedia.value = remoteSaldo > 0 ? remoteSaldo : (isAna ? 1042500 : 0);
+          totalPendapatan.value = remoteTotal > 0 ? remoteTotal : (isAna ? 2550000 : 0);
         }, onError: (e) {
           debugPrint('Saldo stream error: $e');
+          if (isAnastasiaUser) {
+            if (saldoTersedia.value == 0) saldoTersedia.value = 1042500;
+            if (totalPendapatan.value == 0) totalPendapatan.value = 2550000;
+          }
         });
   }
 
   /// Listen withdrawals untuk doula ini
   void _listenWithdrawals() {
+    _withdrawalSubscription?.cancel();
     _withdrawalSubscription = _withdrawService.streamWithdrawalsByDoula(_userController.uid.value).listen((list) {
       withdrawals.value = list;
     }, onError: (e) {
@@ -69,6 +125,7 @@ class MitraPendapatanController extends GetxController {
 
   /// Listen completed bookings
   void _listenCompletedBookings() {
+    _bookingSubscription?.cancel();
     _bookingSubscription = FirebaseFirestore.instance
         .collection('bookings')
         .where('doulaUid', isEqualTo: _userController.uid.value)
@@ -77,11 +134,26 @@ class MitraPendapatanController extends GetxController {
         .limit(10)
         .snapshots()
         .listen((snapshot) {
-          completedBookings.value = snapshot.docs
+          final list = snapshot.docs
               .map((doc) => BookingModel.fromMap(doc.data(), id: doc.id))
               .toList();
+          if (isAnastasiaUser) {
+            final demos = MitraPekerjaanController.getAnastasiaDemoBookings()
+                .where((b) => b.status == 'completed')
+                .toList();
+            final Set<String> ids = demos.map((e) => e.id).toSet();
+            final extras = list.where((b) => !ids.contains(b.id)).toList();
+            completedBookings.value = [...demos, ...extras];
+          } else {
+            completedBookings.value = list;
+          }
         }, onError: (e) {
           debugPrint('Completed bookings stream error: $e');
+          if (isAnastasiaUser) {
+            completedBookings.value = MitraPekerjaanController.getAnastasiaDemoBookings()
+                .where((b) => b.status == 'completed')
+                .toList();
+          }
         });
   }
 

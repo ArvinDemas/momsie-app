@@ -1,3 +1,5 @@
+import 'package:douce/features/mitra/pekerjaan/mitra_pekerjaan_controller.dart';
+import 'package:douce/features/mitra/pendapatan/mitra_pendapatan_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/util/user_controller.dart';
@@ -71,6 +73,12 @@ class LoginController extends GetxController {
         doulaObj.jenisKelamin,
         '3404123456780001',
       );
+      if (Get.isRegistered<MitraPekerjaanController>()) {
+        Get.find<MitraPekerjaanController>().applyAnastasiaDemo();
+      }
+      if (Get.isRegistered<MitraPendapatanController>()) {
+        Get.find<MitraPendapatanController>().applyAnastasiaDemo();
+      }
       Get.offAllNamed(AppRoutes.mitra);
       return;
     }

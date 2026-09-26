@@ -43,10 +43,156 @@ class MitraPekerjaanController extends GetxController {
 
   StreamSubscription<QuerySnapshot>? _bookingsSub;
 
+  static List<BookingModel> getAnastasiaDemoBookings() {
+    final now = DateTime.now();
+    final todayStr = DateFormat('yyyy-MM-dd').format(now);
+    final tomorrowStr = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
+    final pastStr = DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 2)));
+
+    return [
+      // 1. Ongoing / Berjalan
+      BookingModel(
+        id: 'booking_demo_ana_1',
+        transactionId: 'TRX-MOMSIE-ANA-001',
+        userId: 'user_nadia',
+        namaUser: 'Bunda Nadia Salsabila',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        doulaPhoto: 'assets/images/blank-profile.png',
+        doulaJob: 'Bidan & Certified Doula',
+        tanggal: todayStr,
+        day: 'Hari ini',
+        jam: '10:00',
+        layanan: 'Pendampingan Persalinan & Pijat Trimester 3',
+        alamat: 'Jl. Kaliurang KM 7.5, Sleman, Yogyakarta',
+        catatan: 'Kehamilan 35 minggu. Mengalami nyeri punggung bawah dan kontraksi palsu, butuh relaksasi teknik napas.',
+        hargaLayanan: 450000,
+        biayaAdmin: 2000,
+        totalBayar: 452000,
+        platformFee: 67500,
+        doulaEarnings: 382500,
+        status: 'ongoing',
+        createdAt: now.subtract(const Duration(hours: 3)),
+      ),
+      // 2. Confirmed / Masuk
+      BookingModel(
+        id: 'booking_demo_ana_2',
+        transactionId: 'TRX-MOMSIE-ANA-002',
+        userId: 'user_clarissa',
+        namaUser: 'Bunda Clarissa Putri',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        doulaPhoto: 'assets/images/blank-profile.png',
+        doulaJob: 'Bidan & Certified Doula',
+        tanggal: tomorrowStr,
+        day: 'Besok',
+        jam: '14:00',
+        layanan: 'Konsultasi Persalinan Holistik & Gentle Birth',
+        alamat: 'Kec. Mlati, Kabupaten Sleman, DIY',
+        catatan: 'Anak pertama, ingin panduan gentle birth dan latihan afirmasi positif bersama suami.',
+        hargaLayanan: 350000,
+        biayaAdmin: 2000,
+        totalBayar: 352000,
+        platformFee: 52500,
+        doulaEarnings: 297500,
+        status: 'confirmed',
+        createdAt: now.subtract(const Duration(hours: 1)),
+      ),
+      // 3. Paid / Masuk
+      BookingModel(
+        id: 'booking_demo_ana_3',
+        transactionId: 'TRX-MOMSIE-ANA-003',
+        userId: 'user_sarah',
+        namaUser: 'Bunda Sarah Larasati',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        doulaPhoto: 'assets/images/blank-profile.png',
+        doulaJob: 'Bidan & Certified Doula',
+        tanggal: DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 2))),
+        day: 'Lusa',
+        jam: '16:00',
+        layanan: 'Kelas Edukasi Hypnobirthing Privat',
+        alamat: 'Jl. Gejayan No. 12, Sleman, Yogyakarta',
+        catatan: 'Ingin persiapan mental menghadapi persalinan normal.',
+        hargaLayanan: 400000,
+        biayaAdmin: 2000,
+        totalBayar: 402000,
+        platformFee: 60000,
+        doulaEarnings: 340000,
+        status: 'paid',
+        createdAt: now.subtract(const Duration(minutes: 30)),
+      ),
+      // 4. Completed / Selesai
+      BookingModel(
+        id: 'booking_demo_ana_4',
+        transactionId: 'TRX-MOMSIE-ANA-004',
+        userId: 'user_rina',
+        namaUser: 'Bunda Rina Anggraini',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        doulaPhoto: 'assets/images/blank-profile.png',
+        doulaJob: 'Bidan & Certified Doula',
+        tanggal: pastStr,
+        day: '2 hari lalu',
+        jam: '09:00',
+        layanan: 'Konseling Laktasi & Pijat Oksitosin Pasca Salin',
+        alamat: 'Bantul, Yogyakarta',
+        catatan: 'Pelekatan menyusui berhasil dengan baik, produksi ASI lancar.',
+        hargaLayanan: 300000,
+        biayaAdmin: 2000,
+        totalBayar: 302000,
+        platformFee: 45000,
+        doulaEarnings: 255000,
+        status: 'completed',
+        completedAt: now.subtract(const Duration(days: 2)),
+        createdAt: now.subtract(const Duration(days: 3)),
+      ),
+    ];
+  }
+
+  bool get isAnastasiaUser {
+    if (!Get.isRegistered<UserController>()) return false;
+    final userCtrl = Get.find<UserController>();
+    final email = userCtrl.email.value.toLowerCase();
+    final uid = userCtrl.uid.value.toLowerCase();
+    final username = userCtrl.username.value.toLowerCase();
+    final doulaUsername = userCtrl.doulaUsername.value.toLowerCase();
+    return email.contains('anastasia') ||
+        uid == 'doula_anastasia' ||
+        username.contains('anastasia') ||
+        doulaUsername.contains('anastasia') ||
+        (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
+  }
+
+  void applyAnastasiaDemo() {
+    final demos = getAnastasiaDemoBookings();
+    activeBookings.value = demos.where((b) => b.status == 'ongoing').toList();
+    pendingBookings.value = demos.where((b) => b.status == 'pending' || b.status == 'paid' || b.status == 'confirmed').toList();
+    completedBookings.value = demos.where((b) => b.status == 'completed').toList();
+    _syncSlotUtilization(demos);
+  }
+
+  void _onUserChanged() {
+    if (isAnastasiaUser) {
+      applyAnastasiaDemo();
+    }
+    _listenBookings();
+    _loadSlotUtilization();
+  }
+
   @override
   void onInit() {
     selectedTanggal.value = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _userCtrl = Get.find<UserController>();
+
+    if (isAnastasiaUser) {
+      applyAnastasiaDemo();
+    }
+
+    ever(_userCtrl.email, (_) => _onUserChanged());
+    ever(_userCtrl.uid, (_) => _onUserChanged());
+    ever(_userCtrl.doulaUsername, (_) => _onUserChanged());
+
     _listenBookings();
     _loadSlotUtilization();
     super.onInit();
@@ -59,12 +205,13 @@ class MitraPekerjaanController extends GetxController {
   }
 
   void _listenBookings() {
+    _bookingsSub?.cancel();
     final firestore = FirebaseFirestore.instance;
-    final doulaUid = _userCtrl.uid.value;
-
-    debugPrint('[MitraPekerjaanController] Listening bookings for doulaUid: $doulaUid');
 
     _bookingsSub = firestore.collection('bookings').snapshots().listen((snapshot) {
+      final doulaUid = _userCtrl.uid.value;
+      final isAna = isAnastasiaUser;
+
       final allDocs = snapshot.docs
           .map((doc) => BookingModel.fromMap(doc.data(), id: doc.id))
           .toList();
@@ -79,31 +226,60 @@ class MitraPekerjaanController extends GetxController {
         b.doulaUid == doulaUid ||
         doulaUid.isEmpty ||
         b.doulaName.toLowerCase().contains('arvin') ||
-        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+        b.doulaName.toLowerCase().contains('anastasia') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com') ||
+        (_userCtrl.email.value.toLowerCase().contains('anastasia'))
       ).toList();
-      pendingBookings.value = pendingMatched.isNotEmpty ? pendingMatched : pendingRaw;
 
       final activeRaw = allDocs.where((b) => b.status == 'ongoing').toList();
       final activeMatched = activeRaw.where((b) =>
         b.doulaUid == doulaUid ||
         b.doulaName.toLowerCase().contains('arvin') ||
-        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+        b.doulaName.toLowerCase().contains('anastasia') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com') ||
+        (_userCtrl.email.value.toLowerCase().contains('anastasia'))
       ).toList();
-      activeBookings.value = activeMatched.isNotEmpty ? activeMatched : activeRaw;
 
       final completedRaw = allDocs.where((b) => b.status == 'completed').toList();
       final completedMatched = completedRaw.where((b) =>
         b.doulaUid == doulaUid ||
         b.doulaName.toLowerCase().contains('arvin') ||
-        (_userCtrl.email.value == 'adnaryama1@gmail.com')
+        b.doulaName.toLowerCase().contains('anastasia') ||
+        (_userCtrl.email.value == 'adnaryama1@gmail.com') ||
+        (_userCtrl.email.value.toLowerCase().contains('anastasia'))
       ).toList();
-      completedBookings.value = completedMatched.isNotEmpty ? completedMatched : completedRaw;
 
-      _syncSlotUtilization(allDocs);
+      if (isAna) {
+        final demos = getAnastasiaDemoBookings();
+        final demoPending = demos.where((b) => b.status == 'pending' || b.status == 'paid' || b.status == 'confirmed').toList();
+        final demoActive = demos.where((b) => b.status == 'ongoing').toList();
+        final demoCompleted = demos.where((b) => b.status == 'completed').toList();
+
+        final Set<String> existingPendingIds = demoPending.map((e) => e.id).toSet();
+        final extraPending = pendingMatched.where((p) => !existingPendingIds.contains(p.id)).toList();
+        pendingBookings.value = [...demoPending, ...extraPending];
+
+        final Set<String> existingActiveIds = demoActive.map((e) => e.id).toSet();
+        final extraActive = activeMatched.where((a) => !existingActiveIds.contains(a.id)).toList();
+        activeBookings.value = [...demoActive, ...extraActive];
+
+        final Set<String> existingCompletedIds = demoCompleted.map((e) => e.id).toSet();
+        final extraCompleted = completedMatched.where((c) => !existingCompletedIds.contains(c.id)).toList();
+        completedBookings.value = [...demoCompleted, ...extraCompleted];
+      } else {
+        pendingBookings.value = pendingMatched.isNotEmpty ? pendingMatched : pendingRaw;
+        activeBookings.value = activeMatched.isNotEmpty ? activeMatched : activeRaw;
+        completedBookings.value = completedMatched.isNotEmpty ? completedMatched : completedRaw;
+      }
+
+      _syncSlotUtilization([...allDocs, ...(isAna ? getAnastasiaDemoBookings() : [])]);
 
       debugPrint('[MitraPekerjaanController] Updated bookings - Pending: ${pendingBookings.length}, Active: ${activeBookings.length}, Completed: ${completedBookings.length}');
     }, onError: (e) {
       debugPrint('[MitraPekerjaanController] Bookings stream error: $e');
+      if (isAnastasiaUser) {
+        applyAnastasiaDemo();
+      }
     });
   }
 
@@ -205,6 +381,16 @@ class MitraPekerjaanController extends GetxController {
 
   /// Start job — pindahkan dari pending ke ongoing
   Future<void> startJob(BookingModel booking) async {
+    if (booking.id.startsWith('booking_demo_')) {
+      pendingBookings.removeWhere((b) => b.id == booking.id);
+      activeBookings.removeWhere((b) => b.id == booking.id);
+      final updated = booking.copyWith(status: 'ongoing');
+      activeBookings.insert(0, updated);
+      Get.snackbar('Pekerjaan Dimulai', 'Status: Berjalan',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
     try {
       await FirebaseFirestore.instance
           .collection('bookings')
@@ -219,6 +405,16 @@ class MitraPekerjaanController extends GetxController {
 
   /// Claim job — ubah status dari pending ke confirmed
   Future<void> klaimPekerjaan(BookingModel booking) async {
+    if (booking.id.startsWith('booking_demo_')) {
+      final index = pendingBookings.indexWhere((b) => b.id == booking.id);
+      if (index >= 0) {
+        pendingBookings[index] = pendingBookings[index].copyWith(status: 'confirmed');
+      }
+      Get.snackbar('Pekerjaan Diklaim', 'Status: Dikonfirmasi',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
     try {
       await FirebaseFirestore.instance
           .collection('bookings')
@@ -233,8 +429,25 @@ class MitraPekerjaanController extends GetxController {
 
   /// Check Out — selesaikan job, tambahkan earnings ke saldo doula
   Future<void> checkOut(BookingModel booking) async {
-    final firestore = FirebaseFirestore.instance;
     final earnings = booking.doulaEarnings;
+
+    if (booking.id.startsWith('booking_demo_')) {
+      activeBookings.removeWhere((b) => b.id == booking.id);
+      final updated = booking.copyWith(
+        status: 'completed',
+        completedAt: DateTime.now(),
+      );
+      completedBookings.insert(0, updated);
+      Get.snackbar(
+        '✅ Check Out Berhasil',
+        'Pekerjaan selesai! Pendapatan Rp ${_formatRupiah(earnings)} masuk ke saldo',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+      return;
+    }
+
+    final firestore = FirebaseFirestore.instance;
 
     // Step 1: Update booking status -> completed (ini yang utama, harus berhasil)
     try {

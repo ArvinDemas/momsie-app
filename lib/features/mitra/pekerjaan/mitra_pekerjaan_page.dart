@@ -16,6 +16,12 @@ class MitraPekerjaanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MitraPekerjaanController controller = Get.find<MitraPekerjaanController>();
 
+    if (controller.isAnastasiaUser && controller.activeBookings.isEmpty && controller.pendingBookings.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.applyAnastasiaDemo();
+      });
+    }
+
     return BasePage(
       isDoula: true,
       childWidget: DefaultTabController(
@@ -531,41 +537,57 @@ class _PendingJobCard extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               // Tombol aksi utama
-              InkWell(
-                onTap: () {
-                  if (isConfirmed) {
-                    controller.startJob(current);
-                  } else {
-                    controller.klaimPekerjaan(current);
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isConfirmed ? Colors.orange.shade700 : ColorDouce.douceBase,
-                    borderRadius: BorderRadius.circular(10),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Get.toNamed('/chat-page', arguments: {
+                          'user': current.userId,
+                          'doula': current.doulaUid,
+                          'isDoula': true,
+                        });
+                      },
+                      icon: Icon(Icons.chat_bubble_outline_rounded, size: 16, color: ColorDouce.douceBase),
+                      label: Text('Chat Client', style: TextStyle(color: ColorDouce.douceBase, fontSize: 13, fontWeight: FontWeight.bold)),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: ColorDouce.douceBase),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (isConfirmed) {
+                          controller.startJob(current);
+                        } else {
+                          controller.klaimPekerjaan(current);
+                        }
+                      },
+                      icon: Icon(
                         isConfirmed ? Icons.play_arrow_rounded : Icons.assignment_turned_in_outlined,
                         color: Colors.white,
-                        size: 18,
+                        size: 16,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isConfirmed ? 'Mulai Kerja Sekarang' : 'Klaim Pekerjaan',
+                      label: Text(
+                        isConfirmed ? 'Mulai Kerja' : 'Klaim Kerja',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isConfirmed ? Colors.orange.shade700 : ColorDouce.douceBase,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -706,42 +728,56 @@ class _ActiveJobCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 14),
-            InkWell(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => ConfirmDialog(
-                    descText:
-                        'Apakah Anda yakin telah selesai memberikan pelayanan dan ingin melakukan Check Out?',
-                    onTap: () => controller.checkOut(pesanan),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Get.toNamed('/chat-page', arguments: {
+                        'user': pesanan.userId,
+                        'doula': pesanan.doulaUid,
+                        'isDoula': true,
+                      });
+                    },
+                    icon: Icon(Icons.chat_bubble_outline_rounded, size: 16, color: ColorDouce.douceBase),
+                    label: Text('Chat Client', style: TextStyle(color: ColorDouce.douceBase, fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: ColorDouce.douceBase),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade600,
-                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check_circle_outline,
-                          color: Colors.white, size: 18),
-                      SizedBox(width: 8),
-                      Text(
-                        "Check Out (Selesaikan Pekerjaan)",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => ConfirmDialog(
+                          descText:
+                              'Apakah Anda yakin telah selesai memberikan pelayanan dan ingin melakukan Check Out?',
+                          onTap: () => controller.checkOut(pesanan),
                         ),
+                      );
+                    },
+                    icon: const Icon(Icons.check_circle_outline, color: Colors.white, size: 16),
+                    label: const Text(
+                      'Check Out',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

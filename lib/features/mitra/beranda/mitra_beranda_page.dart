@@ -145,70 +145,282 @@ class MitraBerandaPage extends StatelessWidget {
 
           // List Pekerjaan Aktif & Confirmed
           Obx(() {
+            if (controller.isAnastasiaUser && controller.activeBookings.isEmpty && controller.pendingBookings.isEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                controller.applyAnastasiaDemo();
+              });
+            }
+
             final List<BookingModel> combinedJobs = [
               ...controller.activeBookings,
               ...controller.pendingBookings,
             ];
 
-            if (combinedJobs.isEmpty) {
-              return Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Icon(Icons.work_outline_rounded, size: 54, color: Colors.pink.shade100),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'Belum Ada Pekerjaan Aktif Hari Ini',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppSemanticColors.textDarkSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Pekerjaan baru yang dikonfirmasi oleh pengguna akan muncul di sini.',
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 18),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Get.find<MainMitraController>().onItemTapped(1);
-                      },
-                      icon: const Icon(Icons.search_rounded, size: 18),
-                      label: const Text('Lihat Daftar Pekerjaan Masuk'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorDouce.douceBase,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
             return Column(
-              children: combinedJobs.map((job) => jobCard(context, job, controller)).toList(),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (combinedJobs.isEmpty)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.work_outline_rounded, size: 54, color: Colors.pink.shade100),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Belum Ada Pekerjaan Aktif Hari Ini',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppSemanticColors.textDarkSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Pekerjaan baru yang dikonfirmasi oleh pengguna akan muncul di sini.',
+                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 18),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Get.find<MainMitraController>().onItemTapped(1);
+                          },
+                          icon: const Icon(Icons.search_rounded, size: 18),
+                          label: const Text('Lihat Daftar Pekerjaan Masuk'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorDouce.douceBase,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  ...combinedJobs.map((job) => jobCard(context, job, controller)),
+
+                const SizedBox(height: 24),
+                _buildCustomerChatSection(context),
+              ],
             );
           }),
 
           const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCustomerChatSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Obrolan Klien & Konsultasi',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppSemanticColors.textDarkSecondary,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.shade200),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    '2 Chat Aktif',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _chatClientTile(
+          nama: 'Bunda Nadia Salsabila',
+          layanan: 'Pendampingan Persalinan & Pijat Trimester 3',
+          pesanTerakhir: 'Alhamdulillah, terima kasih banyak Bidan. Nanti jam 10.00 saya tunggu di rumah...',
+          waktu: '10m lalu',
+          tag: 'Sedang Berjalan',
+          tagColor: Colors.orange,
+          userId: 'user_nadia',
+          doulaId: 'doula_anastasia',
+        ),
+        const SizedBox(height: 10),
+        _chatClientTile(
+          nama: 'Bunda Clarissa Putri',
+          layanan: 'Konsultasi Persalinan Holistik & Gentle Birth',
+          pesanTerakhir: 'Iya Bidan, besok jadwal konsultasi Gentle Birth jam 14.00 ya...',
+          waktu: '30m lalu',
+          tag: 'Dikonfirmasi',
+          tagColor: Colors.blue,
+          userId: 'user_clarissa',
+          doulaId: 'doula_anastasia',
+        ),
+      ],
+    );
+  }
+
+  Widget _chatClientTile({
+    required String nama,
+    required String layanan,
+    required String pesanTerakhir,
+    required String waktu,
+    required String tag,
+    required Color tagColor,
+    required String userId,
+    required String doulaId,
+  }) {
+    return InkWell(
+      onTap: () {
+        Get.toNamed('/chat-page', arguments: {
+          'user': userId,
+          'doula': doulaId,
+          'isDoula': true,
+        });
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: ColorDouce.veryLightPink,
+                  child: Icon(Icons.person, color: ColorDouce.douceBase, size: 28),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        nama,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppSemanticColors.textDarkSecondary,
+                        ),
+                      ),
+                      Text(
+                        waktu,
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    pesanTerakhir,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: tagColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      tag,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: tagColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.chat_bubble_rounded,
+                color: ColorDouce.douceBase,
+                size: 16,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
