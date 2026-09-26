@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/theme/design_system.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:flutter/material.dart';
 
 class AdService {
@@ -20,6 +21,11 @@ class AdService {
     required String title,
     required String description,
   }) async {
+    if (SubscriptionService.to.isPremium.value ||
+        SubscriptionService.to.isSubscribedUser()) {
+      return true; // Bypass rewarded ad: user adalah pelanggan premium!
+    }
+
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,

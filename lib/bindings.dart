@@ -8,6 +8,7 @@ import 'package:douce/features/splash/splash_controller.dart';
 import 'package:douce/features/user/beranda/user_beranda_controller.dart';
 import 'package:douce/features/user/kesehatan/user_kesehatan_controller.dart';
 import 'package:douce/features/user/obat/user_obat_controller.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:get/get.dart';
 
@@ -25,5 +26,6 @@ class AllBindings implements Bindings {
     Get.put<UserObatController>(UserObatController(), permanent: true);
     Get.put<MitraDashboardController>(MitraDashboardController(), permanent: true);
     Get.put<MitraPekerjaanController>(MitraPekerjaanController(), permanent: true);
+    Get.put<SubscriptionService>(SubscriptionService(), permanent: true);
   }
 }

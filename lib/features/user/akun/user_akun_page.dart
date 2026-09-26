@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/theme/design_system.dart';
 import 'package:douce/shared/theme/color.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:douce/shared/widget/avatar_picker_modal.dart';
 import 'package:douce/shared/widget/confrm_dialog.dart';
@@ -175,6 +176,43 @@ class UserAkunPage extends StatelessWidget {
               onTap: () => Get.toNamed('/user-data-diri'),
             ),
             _buildMenuItem(
+              icon: Icons.workspace_premium_rounded,
+              title: "Status Langganan:",
+              trailingObx: () {
+                final isPrem = SubscriptionService.to.isPremium.value ||
+                    SubscriptionService.to.isSubscribedUser();
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isPrem ? const Color(0xFF10B981).withValues(alpha: 0.15) : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isPrem ? const Color(0xFF10B981) : Colors.grey.shade300,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isPrem ? Icons.verified_rounded : Icons.star_border_rounded,
+                        size: 14,
+                        color: isPrem ? const Color(0xFF10B981) : Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isPrem ? "Premium Aktif ⭐" : "Gratis",
+                        style: TextStyle(
+                          color: isPrem ? const Color(0xFF10B981) : Colors.grey.shade700,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            _buildMenuItem(
               icon: Icons.cake_outlined,
               title: "Usia Bunda:",
               trailingObx: () => Text(
@@ -231,13 +269,34 @@ class UserAkunPage extends StatelessWidget {
             _buildSectionHeader("Privasi & Keamanan"),
             _buildMenuItem(
               icon: Icons.campaign_outlined,
-              title: "Iklan Terpersonalisasi",
-              trailingObx: () => Switch.adaptive(
-                value: userController.personalisedAds.value,
-                activeColor: ColorDouce.douceBase,
-                onChanged: (val) =>
-                    userController.updatePersonalisedAds(val),
-              ),
+              title: "Status Iklan Aplikasi:",
+              trailingObx: () {
+                final isPrem = SubscriptionService.to.isPremium.value ||
+                    SubscriptionService.to.isSubscribedUser();
+                if (isPrem) {
+                  return const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF10B981)),
+                      SizedBox(width: 4),
+                      Text(
+                        "Bebas Iklan",
+                        style: TextStyle(
+                          color: Color(0xFF10B981),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Switch.adaptive(
+                  value: userController.personalisedAds.value,
+                  activeColor: ColorDouce.douceBase,
+                  onChanged: (val) =>
+                      userController.updatePersonalisedAds(val),
+                );
+              },
             ),
             _buildMenuItem(
               icon: Icons.file_download_outlined,

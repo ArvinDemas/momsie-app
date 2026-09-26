@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:douce/shared/util/service/subscription_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -168,6 +169,10 @@ class UserController extends GetxController {
     this.uid.value = uid;
     this.image.value = image;
     this.isDoula.value = isDoula;
+
+    if (SubscriptionService.isWhitelistedEmail(email, username)) {
+      SubscriptionService.to.setPremium(true);
+    }
   }
 
   void setDoula(
