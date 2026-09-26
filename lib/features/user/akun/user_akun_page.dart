@@ -151,27 +151,27 @@ class UserAkunPage extends StatelessWidget {
             // Section 3: Detail Akun
             _buildSectionHeader("Detail Akun"),
             _buildMenuItem(
-              icon: Icons.person_outline,
-              title: "Nama Depan:",
-              trailingObx: () {
-                final names = userController.username.value.split(' ');
-                return Text(
-                  names.isNotEmpty ? names.first : "Bunda",
-                  style: const TextStyle(color: Colors.black54, fontSize: 14),
-                );
-              },
-              onTap: () => Get.toNamed('/user-data-diri'),
+              icon: Icons.badge_outlined,
+              title: "Nama Lengkap:",
+              trailingObx: () => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    userController.username.value.isNotEmpty
+                        ? userController.username.value
+                        : "Bunda",
+                    style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(Icons.edit_outlined, size: 16, color: ColorDouce.douceBase),
+                ],
+              ),
+              onTap: () => _showEditNameDialog(context, userController),
             ),
             _buildMenuItem(
-              icon: Icons.person_outline,
-              title: "Nama Belakang:",
-              trailingObx: () {
-                final names = userController.username.value.split(' ');
-                return Text(
-                  names.length > 1 ? names.sublist(1).join(' ') : "-",
-                  style: const TextStyle(color: Colors.black54, fontSize: 14),
-                );
-              },
+              icon: Icons.edit_note_outlined,
+              title: "Edit Detail Profil",
+              trailing: const Icon(Icons.chevron_right, color: Colors.grey),
               onTap: () => Get.toNamed('/user-data-diri'),
             ),
             _buildMenuItem(
@@ -354,14 +354,29 @@ class UserAkunPage extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                Obx(
-                  () => Text(
-                    userController.username.value.isNotEmpty
-                        ? userController.username.value
-                        : "Bunda",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppSemanticColors.textSecondary,
+                InkWell(
+                  onTap: () => _showEditNameDialog(context, userController),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Obx(
+                          () => Text(
+                            userController.username.value.isNotEmpty
+                                ? userController.username.value
+                                : "Bunda",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppSemanticColors.textDarkSecondary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(Icons.edit_outlined, size: 14, color: ColorDouce.douceBase),
+                      ],
                     ),
                   ),
                 ),
@@ -678,6 +693,85 @@ class UserAkunPage extends StatelessWidget {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  // Edit User Name Dialog
+  void _showEditNameDialog(BuildContext context, UserController userController) {
+    final txtCtrl = TextEditingController(text: userController.username.value);
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: ColorDouce.douceBase.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.edit_note_rounded, color: ColorDouce.douceBase, size: 24),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              "Ubah Nama",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Masukkan nama lengkap baru Anda:",
+              style: TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: txtCtrl,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                hintText: "Nama Lengkap...",
+                prefixIcon: Icon(Icons.person_outline, color: ColorDouce.douceBase),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: ColorDouce.douceBase, width: 2),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final newName = txtCtrl.text.trim();
+              if (newName.isNotEmpty) {
+                await userController.updateUsername(newName);
+                Get.back();
+                Get.snackbar(
+                  'Nama Diperbarui',
+                  'Nama profil berhasil diubah menjadi $newName',
+                  snackPosition: SnackPosition.TOP,
+                  backgroundColor: const Color(0xFF10B981),
+                  colorText: Colors.white,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorDouce.douceBase,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Simpan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

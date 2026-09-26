@@ -15,30 +15,58 @@ class MitraDataDiriController extends GetxController {
   final RxString downloadUrl = ''.obs;
   final Rx<File?> currentImage = Rx<File?>(null);
 
+  @override
+  void onInit() {
+    super.onInit();
+    final userController = Get.find<UserController>();
+    nameController.text = userController.doulaUsername.value.isNotEmpty
+        ? userController.doulaUsername.value
+        : userController.username.value;
+    nikController.text = userController.doulaNIK.value;
+    alamatController.text = userController.doulaAlamat.value;
+    biografiController.text = userController.doulaBiografi.value;
+  }
+
   Future<void> updateDoula() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseStorage storage = FirebaseStorage.instance;
     UserController userController = Get.find<UserController>();
 
     if (currentImage.value != null) {
-      var uploadTask = await storage
-          .ref('mitra/${userController.uid.value}/profile.jpg')
-          .putFile(currentImage.value!);
+      try {
+        var uploadTask = await storage
+            .ref('mitra/${userController.uid.value}/profile.jpg')
+            .putFile(currentImage.value!);
 
-      downloadUrl.value = await uploadTask.ref.getDownloadURL();
+        downloadUrl.value = await uploadTask.ref.getDownloadURL();
+      } catch (e) {
+        debugPrint('Error uploading mitra profile image: $e');
+      }
     }
 
-    await firestore.collection('mitra').doc(userController.uid.value).update({
-      'name': nameController.value.text,
-      'alamat': alamatController.value.text,
-      'biografi': biografiController.value.text,
-      'image': downloadUrl.value.isEmpty
-          ? userController.doulaImage.value
-          : downloadUrl.value,
-    });
+    final newName = nameController.value.text.trim();
+    if (newName.isNotEmpty) {
+      await userController.updateUsername(newName);
+    }
+
+    final targetUid = userController.uid.value;
+    if (targetUid.isNotEmpty) {
+      try {
+        await firestore.collection('mitra').doc(targetUid).set({
+          'name': newName,
+          'alamat': alamatController.value.text,
+          'biografi': biografiController.value.text,
+          'image': downloadUrl.value.isEmpty
+              ? userController.doulaImage.value
+              : downloadUrl.value,
+        }, SetOptions(merge: true));
+      } catch (e) {
+        debugPrint('Error saving mitra to firestore: $e');
+      }
+    }
 
     userController.updateMitra(
-      nameController.value.text,
+      newName,
       alamatController.value.text,
       biografiController.value.text,
       downloadUrl.value.isEmpty
@@ -47,6 +75,13 @@ class MitraDataDiriController extends GetxController {
     );
 
     Get.back();
+    Get.snackbar(
+      'Profil Berhasil Disimpan',
+      'Data diri mitra berhasil diperbarui',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF10B981),
+      colorText: Colors.white,
+    );
   }
 
   @override

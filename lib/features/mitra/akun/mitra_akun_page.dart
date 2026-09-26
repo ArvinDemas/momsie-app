@@ -30,24 +30,38 @@ class MitraAkunPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  Obx(
-                    () {
-                      String name = userController.doulaUsername.value;
-                      if (name.isEmpty) {
-                        name = userController.username.value;
-                      }
-                      if (name.isEmpty) {
-                        name = 'Mitra Doula';
-                      }
-                      return Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppSemanticColors.textDarkSecondary,
-                        ),
-                      );
-                    },
+                  InkWell(
+                    onTap: () => Get.toNamed("/mitra-data-diri"),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Obx(
+                            () {
+                              String name = userController.doulaUsername.value;
+                              if (name.isEmpty) {
+                                name = userController.username.value;
+                              }
+                              if (name.isEmpty) {
+                                name = 'Mitra Doula';
+                              }
+                              return Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppSemanticColors.textDarkSecondary,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.edit_outlined, size: 20, color: ColorDouce.douceBase),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Obx(

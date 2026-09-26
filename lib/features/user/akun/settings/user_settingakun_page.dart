@@ -19,9 +19,6 @@ class UserSettingAkunPage extends StatelessWidget {
     final UserSettingAkunController controller =
         Get.put(UserSettingAkunController());
 
-    controller.nameController.text = userController.username.value;
-    controller.emailController.text = userController.email.value;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -141,33 +138,53 @@ class UserSettingAkunController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
+  @override
+  void onInit() {
+    super.onInit();
+    final userController = Get.find<UserController>();
+    nameController.text = userController.username.value;
+    emailController.text = userController.email.value;
+  }
+
   Future<void> updateUser() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseStorage storage = FirebaseStorage.instance;
     UserController userController = Get.find<UserController>();
 
     if (currentImage.value != null) {
-      var uploadTask = await storage
-          .ref('user/${userController.uid.value}/profile.jpg')
-          .putFile(currentImage.value!);
+      try {
+        var uploadTask = await storage
+            .ref('user/${userController.uid.value}/profile.jpg')
+            .putFile(currentImage.value!);
 
-      downloadUrl.value = await uploadTask.ref.getDownloadURL();
+        downloadUrl.value = await uploadTask.ref.getDownloadURL();
+      } catch (e) {
+        debugPrint('Error uploading image: $e');
+      }
     }
 
-    await firestore.collection('user').doc(userController.uid.value).update({
-      'username': nameController.value.text,
-      'image': downloadUrl.value,
-    });
+    final newName = nameController.value.text.trim();
+    if (newName.isNotEmpty) {
+      await userController.updateUsername(newName);
+    }
 
-    userController.updateUser(
-      nameController.value.text,
-      userController.isDoula.value,
-      downloadUrl.value.isEmpty
-          ? userController.image.value
-          : downloadUrl.value,
-    );
+    if (downloadUrl.value.isNotEmpty) {
+      userController.image.value = downloadUrl.value;
+      if (userController.uid.value.isNotEmpty) {
+        await firestore.collection('user').doc(userController.uid.value).set({
+          'image': downloadUrl.value,
+        }, SetOptions(merge: true));
+      }
+    }
 
     Get.back();
+    Get.snackbar(
+      'Profil Diperbarui',
+      'Data profil Anda berhasil disimpan',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF10B981),
+      colorText: Colors.white,
+    );
   }
 
   Future<void> pickImage() async {

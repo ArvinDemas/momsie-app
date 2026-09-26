@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -196,5 +199,51 @@ class UserController extends GetxController {
     doulaAlamat.value = alamat;
     doulaBiografi.value = biografi;
     doulaImage.value = image;
+  }
+
+  Future<void> updateUsername(String newName) async {
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty) return;
+    username.value = trimmed;
+    doulaUsername.value = trimmed;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', trimmed);
+      await prefs.setString('user_name', trimmed);
+      await prefs.setString('doula_name', trimmed);
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error saving username to prefs: $e');
+    }
+
+    try {
+      final curUser = FirebaseAuth.instance.currentUser;
+      if (curUser != null) {
+        await curUser.updateDisplayName(trimmed);
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error updating Firebase display name: $e');
+    }
+
+    final targetUid = uid.value.isNotEmpty ? uid.value : (FirebaseAuth.instance.currentUser?.uid ?? '');
+    if (targetUid.isNotEmpty) {
+      try {
+        await FirebaseFirestore.instance.collection('user').doc(targetUid).set({
+          'username': trimmed,
+          'name': trimmed,
+        }, SetOptions(merge: true));
+      } catch (e) {
+        if (kDebugMode) debugPrint('Error updating user doc: $e');
+      }
+
+      try {
+        await FirebaseFirestore.instance.collection('mitra').doc(targetUid).set({
+          'name': trimmed,
+          'username': trimmed,
+        }, SetOptions(merge: true));
+      } catch (e) {
+        if (kDebugMode) debugPrint('Error updating mitra doc: $e');
+      }
+    }
   }
 }

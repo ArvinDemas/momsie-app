@@ -15,12 +15,6 @@ class MitraDataDiriPage extends StatelessWidget {
     final MitraDataDiriController controller =
         Get.put(MitraDataDiriController());
 
-    controller.nameController.text = userController.doulaUsername.value;
-    controller.nikController.text = userController.doulaNIK.value;
-    controller.alamatController.text = userController.doulaAlamat.value;
-    controller.biografiController.text =
-        userController.doulaBiografi.value;
-
     return Scaffold(
       body: Stack(
         children: [
