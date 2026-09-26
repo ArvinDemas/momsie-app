@@ -49,6 +49,9 @@ class LoginController extends GetxController {
       'anastasia.doula@momsie.id',
       'dewi.doula@momsie.id',
       'laily.doula@momsie.id',
+      'erny.mintarsih@momsie.id',
+      'agustin.meganingtyas@momsie.id',
+      'karisma.maharani@momsie.id',
     ];
 
     if (testDoulaEmails.contains(trimmedEmail.toLowerCase())) {

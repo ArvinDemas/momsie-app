@@ -34,6 +34,42 @@ class DummyData {
               'Bidan Sarjana Terapan Kebidanan, Certified Clinical Hypnotherapist (CHt) & Certified Hypnobirthing Practitioner (CHBr). Menguasai manajemen nyeri persalinan non-farmakologis, induksi alami relaksasi, kelas hypnobirthing, konseling laktasi, dan pendampingan pasca melahirkan.',
         ),
         DoulaModel(
+          uid: 'doula_erny',
+          email: 'erny.mintarsih@momsie.id',
+          image: 'assets/images/erny_mintarsih.jpg',
+          name: 'Erny Mintarsih, A.Md. Farm.',
+          job: 'Praktisi Herbal & Doula',
+          alamat: 'Daerah Istimewa Yogyakarta',
+          jenisKelamin: 'Perempuan',
+          sertifikasi: 'Doula Certified',
+          biografi:
+              'Ahli Madya Farmasi dan Doula Certified holistik. Menguasai manajemen perawatan alami masa kehamilan, ramuan herbal aman pasca melahirkan, terapi relaksasi, dan edukasi nutrisi ibu menyusui.',
+        ),
+        DoulaModel(
+          uid: 'doula_agustin',
+          email: 'agustin.meganingtyas@momsie.id',
+          image: 'assets/images/agustin_meganingtyas.jpg',
+          name: 'Agustin Meganingtyas, A.Md. Ft',
+          job: 'Fisioterapis & Doula',
+          alamat: 'Daerah Istimewa Yogyakarta',
+          jenisKelamin: 'Perempuan',
+          sertifikasi: 'Doula Certified',
+          biografi:
+              'Ahli Madya Fisioterapi dan Doula Certified spesialis fisioterapi prenatal dan postnatal. Membantu mengatasi nyeri punggung dan panggul kehamilan, optimalisasi posisi janin (pelvic mapping), senam pemulihan diastasis recti, dan mobilisasi persalinan aktif.',
+        ),
+        DoulaModel(
+          uid: 'doula_karisma',
+          email: 'karisma.maharani@momsie.id',
+          image: 'assets/images/karisma_maharani.jpg',
+          name: 'Karisma Maharani Putri, S.Keb',
+          job: 'Bidan & Doula',
+          alamat: 'Daerah Istimewa Yogyakarta',
+          jenisKelamin: 'Perempuan',
+          sertifikasi: 'Doula Certified',
+          biografi:
+              'Bidan Sarjana Kebidanan dan Doula pendamping persalinan profesional. Berpengalaman dalam pemantauan kesejahteraan ibu dan janin, teknik pernapasan gentle birth, pemijatan endorphin massage, dan pendampingan laktasi menyusui.',
+        ),
+        DoulaModel(
           uid: 'doula_anastasia',
           email: 'anastasia.doula@momsie.id',
           image: '',

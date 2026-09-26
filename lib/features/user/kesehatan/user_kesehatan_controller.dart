@@ -27,6 +27,10 @@ class UserKesehatanController extends GetxController {
     final name = d.name.toLowerCase();
     if (name.contains('dewi riana')) return 0;
     if (name.contains('laily')) return 1;
+    if (name.contains('erny')) return 2;
+    if (name.contains('agustin')) return 3;
+    if (name.contains('karisma')) return 4;
+    if (name.contains('anastasia')) return 5;
     if (name.contains('arvin')) return 9999;
     return 100;
   }
