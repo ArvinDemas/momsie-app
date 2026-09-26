@@ -47,9 +47,38 @@ class MitraPendapatanController extends GetxController {
         (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
   }
 
+  static List<WithdrawalModel> getAnastasiaDemoWithdrawals() {
+    final now = DateTime.now();
+    return [
+      WithdrawalModel(
+        id: 'wd_demo_ana_1',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        nominal: 1000000,
+        bank: 'BCA',
+        noRekening: '8820129381',
+        atasNama: 'Anastasia Mawardi',
+        status: 'done',
+        createdAt: now.subtract(const Duration(days: 4, hours: 2)),
+      ),
+      WithdrawalModel(
+        id: 'wd_demo_ana_2',
+        doulaUid: 'doula_anastasia',
+        doulaName: 'Anastasia Mawardi',
+        nominal: 500000,
+        bank: 'BCA',
+        noRekening: '8820129381',
+        atasNama: 'Anastasia Mawardi',
+        status: 'done',
+        createdAt: now.subtract(const Duration(days: 12, hours: 5)),
+      ),
+    ];
+  }
+
   void applyAnastasiaDemo() {
     saldoTersedia.value = 1042500;
     totalPendapatan.value = 2550000;
+    withdrawals.value = getAnastasiaDemoWithdrawals();
     completedBookings.value = MitraPekerjaanController.getAnastasiaDemoBookings()
         .where((b) => b.status == 'completed')
         .toList();
@@ -117,9 +146,19 @@ class MitraPendapatanController extends GetxController {
   void _listenWithdrawals() {
     _withdrawalSubscription?.cancel();
     _withdrawalSubscription = _withdrawService.streamWithdrawalsByDoula(_userController.uid.value).listen((list) {
-      withdrawals.value = list;
+      if (isAnastasiaUser) {
+        final demos = getAnastasiaDemoWithdrawals();
+        final Set<String> ids = demos.map((e) => e.id).toSet();
+        final extras = list.where((w) => !ids.contains(w.id)).toList();
+        withdrawals.value = [...demos, ...extras];
+      } else {
+        withdrawals.value = list;
+      }
     }, onError: (e) {
       debugPrint('Withdrawals stream error: $e');
+      if (isAnastasiaUser) {
+        withdrawals.value = getAnastasiaDemoWithdrawals();
+      }
     });
   }
 
@@ -201,10 +240,29 @@ class MitraPendapatanController extends GetxController {
       final uid = _userController.uid.value;
       final doulaRef = FirebaseFirestore.instance.collection('mitra').doc(uid);
 
+      if (isAnastasiaUser) {
+        final newWithdrawal = WithdrawalModel(
+          id: 'wd_${DateTime.now().millisecondsSinceEpoch}',
+          doulaUid: 'doula_anastasia',
+          doulaName: _userController.doulaUsername.value.isNotEmpty ? _userController.doulaUsername.value : 'Anastasia Mawardi',
+          nominal: nominal,
+          bank: bank,
+          noRekening: noRekening,
+          atasNama: atasNama,
+          status: 'pending',
+          createdAt: DateTime.now(),
+        );
+        withdrawals.insert(0, newWithdrawal);
+        saldoTersedia.value = (saldoTersedia.value - nominal).clamp(0, 999999999);
+      }
+
       // Gunakan transaksi atomik agar saldo dan withdrawal tidak bisa race condition
       await FirebaseFirestore.instance.runTransaction((tx) async {
         final mitraSnap = await tx.get(doulaRef);
-        if (!mitraSnap.exists) throw Exception('Data mitra tidak ditemukan');
+        if (!mitraSnap.exists) {
+          if (isAnastasiaUser) return;
+          throw Exception('Data mitra tidak ditemukan');
+        }
 
         final currentBalance = (mitraSnap.data()!['saldo_tersedia'] ??
             mitraSnap.data()!['saldo_escrow'] ??
@@ -239,6 +297,13 @@ class MitraPendapatanController extends GetxController {
         Get.snackbar('Berhasil', 'Permintaan penarikan dana dikirim');
       }
     } catch (e) {
+      if (isAnastasiaUser) {
+        if (Get.context != null && Get.context!.mounted) {
+          Get.back();
+          Get.snackbar('Berhasil', 'Permintaan penarikan dana dikirim');
+        }
+        return;
+      }
       String msg = 'Terjadi kesalahan. Silakan coba lagi.';
       if (e is FirebaseAuthException) {
         switch (e.code) {

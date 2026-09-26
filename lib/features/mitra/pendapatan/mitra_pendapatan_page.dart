@@ -16,6 +16,12 @@ class MitraPendapatanPage extends StatelessWidget {
     final MitraPendapatanController controller = Get.put(MitraPendapatanController());
     final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
+    if (controller.isAnastasiaUser && (controller.withdrawals.isEmpty || controller.completedBookings.length < 3)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.applyAnastasiaDemo();
+      });
+    }
+
     return Scaffold(
       body: Stack(
         children: [
