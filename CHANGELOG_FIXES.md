@@ -1,3 +1,22 @@
+### Fix #24 — ChatPage: WhatsApp iOS Redesign (taste-skill)
+Tanggal: 2026-09-26
+File: lib/features/user/chat/chat_page.dart (redesain total), lib/features/user/chat/chat_model.dart, lib/features/user/chat/chat_controller.dart
+Masalah: ChatPage belum sesuai desain referensi WhatsApp iOS dengan tema pink custom. Bubble tanpa tail, doodle wallpaper pink (seharusnya putih transparan), header layout kurang presisi, bottom bar icon kurang sesuai referensi.
+Akar: Implementasi sebelumnya menggunakan pendekatan widget standar tanpa memperhatikan detail estetika WhatsApp iOS yang spesifik.
+Fix:
+- **WhatsAppDoodlePainter**: Ubah warna dari pink transparan ke putih transparan (alpha 0.38 stroke, 0.22 fill) agar sesuai referensi
+- **Bubble tail**: Tambah RightTailClipper & LeftTailClipper (CustomClipper) untuk ekor meruncing di pojok bubble
+- **Header**: Back button dalam pill container terpisah + avatar + info kontak + video/voice call buttons
+- **Bottom bar**: Input pill dengan keyboard icon, camera button terpisah, mic/send button melingkar dengan tap animation (0.92x via TweenAnimationBuilder)
+- **Quoted reply**: Box dengan border kiri teal 3.5px + label "Anda • Momsie P2MW" bold
+- **Color system**: Semua color menggunakan AppSemanticColors tokens, tidak ada hardcoded
+- **Spacing**: Semua padding/margin menggunakan AppSpacing scale (xxs-xs-xl-xxxl)
+- **Model update**: Tambah field `replyQuote` di ChatModel, parse dari Firestore
+Verifikasi: flutter analyze 0 errors di chat feature; flutter test 49/49 PASS.
+Pelajaran: Untuk UI chat messaging, tail bubble dan doodle wallpaper adalah elemen kunci yang membedakan WhatsApp-style. CustomClipper lebih reliable daripada CustomPainter untuk shape modification.
+Log Keyword: chat-whatsapp-redesign, taste-skill, bubble-tail, doodle-wallpaper, quote-reply, 49-tests-pass
+Deploy: PENDING
+
 ### Fix #23 — Smart Merge & Dedup RS/TokoBayi + Smart Image Fallback (Local Asset Resolution)
 Tanggal: 2026-09-18
 File: lib/features/user/beranda/user_beranda_controller.dart, lib/features/user/eksplor/user_eksplor_controller.dart, lib/shared/widget/rumah_sakit_container.dart, lib/shared/widget/tokobayi_container.dart

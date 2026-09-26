@@ -267,7 +267,8 @@ class ChatController extends GetxController {
               messages.value = event.docs
                   .map((e) => ChatModel(
                     sender: e['sender'],
-                    message: e['message'],
+                    message: e['message'] as String? ?? '',
+                    replyQuote: e['replyQuote'] as String?,
                     time: e['time'] as Timestamp?,
                   ))
                   .toList();

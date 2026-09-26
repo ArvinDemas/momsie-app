@@ -6,24 +6,23 @@ import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// WhatsApp-style soft pink doodle background painter
+// ─── Doodle Painter: white translucent pattern on pink bg ──────────────────────
 class WhatsAppDoodlePainter extends CustomPainter {
   const WhatsAppDoodlePainter();
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFFF6972).withValues(alpha: 0.055)
+      ..color = Colors.white.withValues(alpha: 0.38)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
     final fillPaint = Paint()
-      ..color = const Color(0xFFFF6972).withValues(alpha: 0.04)
+      ..color = Colors.white.withValues(alpha: 0.22)
       ..style = PaintingStyle.fill;
 
-    // Draw distributed doodle icons across the background
-    const double stepX = 80;
-    const double stepY = 90;
+    const double stepX = 80.0;
+    const double stepY = 90.0;
 
     for (double y = 20; y < size.height; y += stepY) {
       for (double x = 15; x < size.width; x += stepX) {
@@ -32,30 +31,26 @@ class WhatsAppDoodlePainter extends CustomPainter {
         final double cy = y;
 
         switch (patternIndex) {
-          case 0:
-            // Cute Heart
+          case 0: // Heart
             final path = Path();
             path.moveTo(cx, cy + 4);
             path.cubicTo(cx - 7, cy - 6, cx - 14, cy + 3, cx, cy + 13);
             path.cubicTo(cx + 14, cy + 3, cx + 7, cy - 6, cx, cy + 4);
             canvas.drawPath(path, paint);
             break;
-          case 1:
-            // Star
+          case 1: // Star
             canvas.drawCircle(Offset(cx, cy), 3, fillPaint);
             canvas.drawLine(Offset(cx - 6, cy), Offset(cx + 6, cy), paint);
             canvas.drawLine(Offset(cx, cy - 6), Offset(cx, cy + 6), paint);
             break;
-          case 2:
-            // Baby Rattle / Cloud
+          case 2: // Cloud / Rattle
             final cloudPath = Path();
             cloudPath.addOval(Rect.fromCircle(center: Offset(cx - 4, cy), radius: 5));
             cloudPath.addOval(Rect.fromCircle(center: Offset(cx + 4, cy), radius: 6));
             cloudPath.addOval(Rect.fromCircle(center: Offset(cx, cy - 3), radius: 5));
             canvas.drawPath(cloudPath, paint);
             break;
-          case 3:
-            // Flower
+          case 3: // Flower
             for (int i = 0; i < 4; i++) {
               final double dx = i == 0 ? -4 : (i == 1 ? 4 : 0);
               final double dy = i == 2 ? -4 : (i == 3 ? 4 : 0);
@@ -63,14 +58,12 @@ class WhatsAppDoodlePainter extends CustomPainter {
             }
             canvas.drawCircle(Offset(cx, cy), 2, fillPaint);
             break;
-          case 4:
-            // Sparkle
+          case 4: // Sparkle
             canvas.drawLine(Offset(cx - 5, cy), Offset(cx + 5, cy), paint);
             canvas.drawLine(Offset(cx, cy - 5), Offset(cx, cy + 5), paint);
             canvas.drawCircle(Offset(cx, cy), 1.5, fillPaint);
             break;
-          default:
-            // Soft smile / arc
+          default: // Smile arc
             final arcRect = Rect.fromCircle(center: Offset(cx, cy), radius: 6);
             canvas.drawArc(arcRect, 0.2, 2.7, false, paint);
             break;
@@ -83,99 +76,166 @@ class WhatsAppDoodlePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class ChatPage extends StatelessWidget {
-  const ChatPage({super.key});
+// ─── Bubble tail clipper ────────────────────────────────────────────────────────
+/// Tail pada pojok kanan-bawah (pengirim / pink bubble)
+class RightTailClipper extends CustomClipper<Path> {
+  const RightTailClipper();
 
-  static String _addHour(String time) {
-    final parts = time.split(':');
-    if (parts.length < 2) return '$time +1j';
-    final hour = int.tryParse(parts[0]) ?? 0;
-    return '${(hour + 1).toString().padLeft(2, '0')}:${parts[1]}';
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final tailStartX = size.width - 24.0;
+    final tailBaseY = size.height - 12.0;
+
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    // Cut out the tail triangle from bottom-right
+    path.addPolygon([
+      Offset(tailStartX, tailBaseY),
+      Offset(tailStartX + 6, tailBaseY + 8),
+      Offset(size.width, tailBaseY),
+    ], true);
+
+    return path;
   }
 
-  static Widget _buildAvatar(bool isDoulaSender, ChatController chatController) {
-    final image = isDoulaSender ? chatController.imageDoula.value : chatController.imageUser.value;
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isDoulaSender
-              ? ColorDouce.douceBase.withValues(alpha: 0.4)
-              : const Color(0xFF0F766E).withValues(alpha: 0.4),
-          width: 1.5,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(36),
-        child: image.isNotEmpty && (image.startsWith('http://') || image.startsWith('https://'))
-            ? CachedNetworkImage(
-                imageUrl: image,
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
-              )
-            : image.isNotEmpty && image.startsWith('assets/')
-                ? Image.asset(image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover))
-                : Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
-      ),
-    );
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Tail pada pojok kiri-bawah (penerima / white bubble)
+class LeftTailClipper extends CustomClipper<Path> {
+  const LeftTailClipper();
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final tailEndX = 24.0;
+    final tailBaseY = size.height - 12.0;
+
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    // Cut out the tail triangle from bottom-left
+    path.addPolygon([
+      Offset(tailEndX, tailBaseY),
+      Offset(tailEndX - 6, tailBaseY + 8),
+      Offset(0, tailBaseY),
+    ], true);
+
+    return path;
   }
 
-  /// Membangun bubble chat gaya WhatsApp iOS dengan background pink & aksen spesifik
-  static Widget _buildMessageItem(
-    ChatModel message,
-    ChatController chatController,
-    String doula,
-    String user,
-    bool isDoulaView,
-  ) {
-    // isMe: True jika pesan ini dikirim oleh akun yang sedang aktif membuka halaman ini
-    final bool isMe = message.sender == chatController.pengguna.value;
-    final bool isSenderDoula = message.sender == doula;
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
-    final String senderName = isSenderDoula
-        ? (chatController.namaDoula.value.isNotEmpty ? chatController.namaDoula.value : 'Anastasia Mawardi')
-        : (chatController.namaUser.value.isNotEmpty ? chatController.namaUser.value : 'Bunda Nadia Salsabila');
+// ─── Avatar widget ─────────────────────────────────────────────────────────────
+Widget _buildAvatar(bool isDoulaSender, ChatController controller) {
+  final image = isDoulaSender ? controller.imageDoula.value : controller.imageUser.value;
+  return Container(
+    width: 36,
+    height: 36,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      border: Border.all(
+        color: isDoulaSender
+            ? ColorDouce.douceBase.withValues(alpha: 0.4)
+            : AppSemanticColors.softTeal.withValues(alpha: 0.4),
+        width: 1.5,
+      ),
+    ),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: image.isNotEmpty && (image.startsWith('http://') || image.startsWith('https://'))
+          ? CachedNetworkImage(
+              imageUrl: image,
+              fit: BoxFit.cover,
+              errorWidget: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
+            )
+          : image.isNotEmpty && image.startsWith('assets/')
+              ? Image.asset(image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover))
+              : Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
+    ),
+  );
+}
 
-    // Cek apakah pesan memiliki reply quote (contoh pesan diskusi)
-    final bool hasReplyQuote = !isMe && message.message.toLowerCase().contains('kita bahas di rumah');
+// ─── Message bubble ────────────────────────────────────────────────────────────
+Widget _buildMessageItem(
+  ChatModel message,
+  ChatController controller,
+  String doula,
+  String user,
+  bool isDoulaView,
+) {
+  final bool isMe = message.sender == controller.pengguna.value;
+  final bool hasReplyQuote = message.replyQuote != null && message.replyQuote!.isNotEmpty;
+  final bool hasMedia = _hasMediaContent(message.message);
 
-    if (isMe) {
-      // ═══════════════════════════════════════════════════════════════════════
-      // PENGIRIM (AKUN AKTIF / ANDA) -> SISI KANAN (PINK SOLID WHATSAPP STYLE)
-      // ═══════════════════════════════════════════════════════════════════════
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            const SizedBox(width: 48),
-            Flexible(
+  if (isMe) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const SizedBox(width: 48),
+          Flexible(
+            child: ClipPath(
+              clipper: const RightTailClipper(),
               child: Container(
-                padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
-                decoration: BoxDecoration(
-                  color: ColorDouce.douceBase,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(4), // iOS WhatsApp tail
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorDouce.douceBase.withValues(alpha: 0.22),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.lg),
+                decoration: BoxDecoration(color: ColorDouce.douceBase),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Text pesan
+                    if (hasReplyQuote) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: const Border(
+                            left: BorderSide(color: AppSemanticColors.softTeal, width: 3.5),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Anda • Momsie P2MW',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppSemanticColors.softTeal,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              message.replyQuote!,
+                              style: TextStyle(fontSize: 11.5, color: AppSemanticColors.textSecondary),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (hasMedia)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        child: Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover, width: 200),
+                      ),
                     Text(
                       message.message,
                       style: const TextStyle(
@@ -186,7 +246,6 @@ class ChatPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 3),
-                    // Waktu dan double centang (WhatsApp seen receipt)
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -195,91 +254,64 @@ class ChatPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.85),
+                            color: Colors.white.withValues(alpha: 0.80),
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.done_all_rounded,
-                          size: 15,
-                          color: Color(0xFF93C5FD), // Light blue double check
-                        ),
+                        const SizedBox(width: AppSpacing.xxs),
+                        const Icon(Icons.done_all_rounded, size: 15, color: Color(0xFF93C5FD)),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    } else {
-      // ═══════════════════════════════════════════════════════════════════════
-      // LAWAN BICARA (CLIENT / MAZDA) -> SISI KIRI (PUTIH BERSIH WHATSAPP)
-      // ═══════════════════════════════════════════════════════════════════════
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
+          ),
+        ],
+      ),
+    );
+  } else {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Flexible(
+            child: ClipPath(
+              clipper: const LeftTailClipper(),
               child: Container(
-                padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(4), // iOS WhatsApp tail
-                    bottomRight: Radius.circular(16),
-                  ),
-                  border: Border.all(color: const Color(0xFFF1F5F9), width: 1.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.lg),
+                decoration: const BoxDecoration(color: Colors.white),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Jika ada reply box (seperti di screenshot contoh WhatsApp)
                     if (hasReplyQuote) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                           border: const Border(
-                            left: BorderSide(
-                              color: Color(0xFF0D9488), // Teal quote accent
-                              width: 3.5,
-                            ),
+                            left: BorderSide(color: AppSemanticColors.softTeal, width: 3.5),
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Anda • Momsie P2MW',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF0D9488),
+                                color: AppSemanticColors.softTeal,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'info red doors nya udah pesen kah @$senderName',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                color: Colors.grey.shade700,
-                              ),
+                              message.replyQuote!,
+                              style: TextStyle(fontSize: 11.5, color: AppSemanticColors.textSecondary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -287,18 +319,22 @@ class ChatPage extends StatelessWidget {
                         ),
                       ),
                     ],
-                    // Isi teks pesan utama
+                    if (hasMedia)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                        child: Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover, width: 200),
+                      ),
                     Text(
                       message.message,
                       style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E293B),
+                        color: AppSemanticColors.textDark,
                         height: 1.35,
                       ),
                     ),
                     const SizedBox(height: 3),
-                    // Waktu pesan diterima
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Text(
@@ -306,7 +342,7 @@ class ChatPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          color: Colors.grey.shade400,
+                          color: AppSemanticColors.textMuted,
                         ),
                       ),
                     ),
@@ -314,11 +350,46 @@ class ChatPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 48),
-          ],
-        ),
-      );
-    }
+          ),
+          const SizedBox(width: 48),
+        ],
+      ),
+    );
+  }
+}
+
+bool _hasMediaContent(String message) {
+  return message.contains(RegExp(r'\.(png|jpg|jpeg|gif|mp4|mov)(\?|$|\s)', caseSensitive: false));
+}
+
+// ─── Attachment options (bottom sheet) ─────────────────────────────────────────
+Widget _buildAttachOption(IconData icon, String title, Color color) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      CircleAvatar(
+        radius: 26,
+        backgroundColor: color.withValues(alpha: 0.12),
+        child: Icon(icon, color: color, size: 26),
+      ),
+      const SizedBox(height: AppSpacing.sm),
+      Text(
+        title,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+      ),
+    ],
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
+
+  static String _addHour(String time) {
+    final parts = time.split(':');
+    if (parts.length < 2) return '$time +1j';
+    final hour = int.tryParse(parts[0]) ?? 0;
+    return '${(hour + 1).toString().padLeft(2, '0')}:${parts[1]}';
   }
 
   @override
@@ -333,76 +404,54 @@ class ChatPage extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF0F3), // Soft pastel pink base
+      backgroundColor: const Color(0xFFFFF0F3),
       body: Stack(
         children: [
-          // WhatsApp soft pink doodle pattern background
+          // Doodle background — white translucent on pink
           Positioned.fill(
-            child: CustomPaint(
-              painter: const WhatsAppDoodlePainter(),
-            ),
+            child: CustomPaint(painter: const WhatsAppDoodlePainter()),
           ),
 
           SafeArea(
             child: Column(
               children: [
-                // ══════════════════════════════════════════════════════════════
-                // APP BAR / HEADER GAYA WHATSAPP IOS
-                // ══════════════════════════════════════════════════════════════
+                // ─── Header ────────────────────────────────────────
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.95),
-                    border: const Border(
-                      bottom: BorderSide(
-                        color: Color(0xFFF1F5F9),
-                        width: 1,
-                      ),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
+                  color: Colors.white.withValues(alpha: 0.95),
                   child: Row(
                     children: [
-                      // Tombol Back dengan badge ala iOS "< 222"
+                      // Back pill: "< 222"
                       InkWell(
                         onTap: Get.back,
-                        borderRadius: BorderRadius.circular(16),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                        borderRadius: AppRadius.roundedFull,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: AppRadius.roundedFull,
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                color: ColorDouce.douceBase,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
+                              Icon(Icons.arrow_back_ios_new_rounded, color: ColorDouce.douceBase, size: 16),
+                              const SizedBox(width: AppSpacing.xxs),
                               Text(
                                 '222',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorDouce.douceBase,
-                                ),
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ColorDouce.douceBase),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
 
-                      // Avatar Foto Profil Lawan Bicara
+                      // Avatar
                       _buildAvatar(!isDoula, chatController),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: AppSpacing.sm),
 
-                      // Nama Kontak & Subtitle "ketuk untuk info kontak"
+                      // Contact info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,7 +464,7 @@ class ChatPage extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E293B),
+                                  color: AppSemanticColors.textDark,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -426,7 +475,7 @@ class ChatPage extends StatelessWidget {
                               'ketuk untuk info kontak',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey.shade500,
+                                color: AppSemanticColors.textMuted,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -434,9 +483,9 @@ class ChatPage extends StatelessWidget {
                         ),
                       ),
 
-                      // Tombol Video Call (Khas WhatsApp)
-                      IconButton(
-                        onPressed: () {
+                      // Video call
+                      InkWell(
+                        onTap: () {
                           Get.snackbar(
                             'Panggilan Video',
                             'Fitur konsultasi video live sedang diinisiasi...',
@@ -445,17 +494,17 @@ class ChatPage extends StatelessWidget {
                             colorText: AppSemanticColors.textDarkSecondary,
                           );
                         },
-                        icon: const Icon(
-                          Icons.videocam_outlined,
-                          color: Color(0xFF1E293B),
-                          size: 24,
+                        borderRadius: AppRadius.roundedFull,
+                        child: const Padding(
+                          padding: EdgeInsets.all(AppSpacing.sm),
+                          child: Icon(Icons.videocam_outlined, color: AppSemanticColors.textDark, size: 24),
                         ),
-                        tooltip: 'Video Call',
                       ),
+                      const SizedBox(width: AppSpacing.xxs),
 
-                      // Tombol Voice Call (Khas WhatsApp)
-                      IconButton(
-                        onPressed: () {
+                      // Voice call
+                      InkWell(
+                        onTap: () {
                           Get.snackbar(
                             'Panggilan Suara',
                             'Menghubungkan panggilan suara...',
@@ -464,45 +513,37 @@ class ChatPage extends StatelessWidget {
                             colorText: AppSemanticColors.textDarkSecondary,
                           );
                         },
-                        icon: const Icon(
-                          Icons.phone_outlined,
-                          color: Color(0xFF1E293B),
-                          size: 21,
+                        borderRadius: AppRadius.roundedFull,
+                        child: const Padding(
+                          padding: EdgeInsets.all(AppSpacing.sm),
+                          child: Icon(Icons.phone_outlined, color: AppSemanticColors.textDark, size: 21),
                         ),
-                        tooltip: 'Voice Call',
                       ),
                     ],
                   ),
                 ),
 
-                // Baris Info Slot Jadwal Konsultasi (Jika ada)
+                // ─── Slot info banner ──────────────────────────────
                 Obx(
                   () {
-                    if (chatController.slotIsOnDemand.value) {
-                      return const SizedBox.shrink();
-                    }
+                    if (chatController.slotIsOnDemand.value) return const SizedBox.shrink();
                     final slotTanggal = chatController.slotTanggal.value;
                     final slotJam = chatController.slotJam.value;
-                    if (slotTanggal.isEmpty && slotJam.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
+                    if (slotTanggal.isEmpty && slotJam.isEmpty) return const SizedBox.shrink();
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
                       color: Colors.white.withValues(alpha: 0.8),
                       child: Row(
                         children: [
-                          Icon(Icons.calendar_today_rounded, size: 13, color: Colors.grey.shade600),
-                          const SizedBox(width: 4),
-                          Text(
-                            slotTanggal,
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                          ),
-                          const SizedBox(width: 12),
-                          Icon(Icons.schedule_rounded, size: 13, color: Colors.grey.shade600),
-                          const SizedBox(width: 4),
+                          Icon(Icons.calendar_today_rounded, size: 13, color: AppSemanticColors.textMuted),
+                          const SizedBox(width: AppSpacing.xxs),
+                          Text(slotTanggal, style: TextStyle(fontSize: 12, color: AppSemanticColors.textDarkSecondary)),
+                          const SizedBox(width: AppSpacing.sm),
+                          Icon(Icons.schedule_rounded, size: 13, color: AppSemanticColors.textMuted),
+                          const SizedBox(width: AppSpacing.xxs),
                           Text(
                             '$slotJam - ${_addHour(slotJam)}',
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                            style: TextStyle(fontSize: 12, color: AppSemanticColors.textDarkSecondary),
                           ),
                           const Spacer(),
                           Obx(
@@ -522,10 +563,10 @@ class ChatPage extends StatelessWidget {
                               }
                               if (statusText.isEmpty) return const SizedBox.shrink();
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: statusColor.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
                                 ),
                                 child: Text(
                                   statusText,
@@ -540,9 +581,7 @@ class ChatPage extends StatelessWidget {
                   },
                 ),
 
-                // ══════════════════════════════════════════════════════════════
-                // STREAM DAFTAR PESAN
-                // ══════════════════════════════════════════════════════════════
+                // ─── Message list ──────────────────────────────────
                 Expanded(
                   child: Obx(
                     () {
@@ -551,14 +590,14 @@ class ChatPage extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade400),
-                              const SizedBox(height: 16),
+                              Icon(Icons.chat_bubble_outline, size: 64, color: AppSemanticColors.textMuted),
+                              const SizedBox(height: AppSpacing.md),
                               Text(
                                 chatController.accessMessage.value,
-                                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                                style: TextStyle(fontSize: 16, color: AppSemanticColors.textSecondary),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: AppSpacing.lg),
                               ElevatedButton(
                                 onPressed: () => Get.back(),
                                 child: const Text('Kembali'),
@@ -569,11 +608,10 @@ class ChatPage extends StatelessWidget {
                       }
                       return ListView.builder(
                         itemCount: chatController.messages.length,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                         itemBuilder: (context, index) {
-                          final message = chatController.messages[index];
                           return _buildMessageItem(
-                            message,
+                            chatController.messages[index],
                             chatController,
                             doula,
                             user,
@@ -585,35 +623,28 @@ class ChatPage extends StatelessWidget {
                   ),
                 ),
 
-                // ══════════════════════════════════════════════════════════════
-                // BOTTOM INPUT BAR (GAYA WHATSAPP IOS)
-                // ══════════════════════════════════════════════════════════════
+                // ─── Bottom input bar ──────────────────────────────
                 Container(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.95),
-                    border: const Border(
-                      top: BorderSide(
-                        color: Color(0xFFF1F5F9),
-                        width: 1,
-                      ),
-                    ),
+                    border: const Border(top: BorderSide(color: Color(0xFFF1F5F9), width: 1)),
                   ),
                   child: Row(
                     children: [
-                      // Tombol "+" Attachment (Foto, Dokumen, dsb.)
+                      // + Attachment button
                       InkWell(
                         onTap: () {
                           Get.bottomSheet(
                             Container(
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               decoration: const BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
                               ),
                               child: Wrap(
-                                spacing: 20,
-                                runSpacing: 20,
+                                spacing: AppSpacing.lg,
+                                runSpacing: AppSpacing.lg,
                                 alignment: WrapAlignment.spaceAround,
                                 children: [
                                   _buildAttachOption(Icons.image_outlined, 'Galeri', Colors.purple),
@@ -625,28 +656,21 @@ class ChatPage extends StatelessWidget {
                             ),
                           );
                         },
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: AppRadius.roundedLg,
                         child: Container(
-                          padding: const EdgeInsets.all(8),
-                          child: const Icon(
-                            Icons.add,
-                            color: Color(0xFF64748B),
-                            size: 26,
-                          ),
+                          padding: const EdgeInsets.all(AppSpacing.xs),
+                          child: Icon(Icons.add, color: AppSemanticColors.textSecondary, size: 26),
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xxs),
 
-                      // Input Bar Pill-shaped dengan icon sticker di dalamnya
+                      // Input pill — keyboard-icon on right
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: const Color(0xFFE2E8F0),
-                              width: 1,
-                            ),
+                            borderRadius: AppRadius.roundedFull,
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                           ),
                           child: Row(
                             children: [
@@ -657,34 +681,29 @@ class ChatPage extends StatelessWidget {
                                     hintText: 'Tulis pesan...',
                                     hintStyle: TextStyle(
                                       fontWeight: FontWeight.w400,
-                                      color: Colors.grey.shade400,
+                                      color: AppSemanticColors.textMuted,
                                       fontSize: 14.5,
                                     ),
                                     border: InputBorder.none,
                                     isDense: true,
                                     contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 10,
+                                      horizontal: AppSpacing.md,
+                                      vertical: AppSpacing.sm,
                                     ),
                                   ),
                                 ),
                               ),
-                              // Icon Stiker / Dokumen di dalam pill
                               Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: Icon(
-                                  Icons.sticky_note_2_outlined,
-                                  color: Colors.grey.shade400,
-                                  size: 20,
-                                ),
+                                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                                child: Icon(Icons.chat_bubble_outline, color: AppSemanticColors.textMuted, size: 22),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
 
-                      // Tombol Kamera Cepat
+                      // Camera button (round pink outline)
                       InkWell(
                         onTap: () {
                           Get.snackbar(
@@ -695,19 +714,15 @@ class ChatPage extends StatelessWidget {
                             colorText: AppSemanticColors.textDarkSecondary,
                           );
                         },
-                        borderRadius: BorderRadius.circular(20),
-                        child: const Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Icon(
-                            Icons.camera_alt_outlined,
-                            color: Color(0xFF64748B),
-                            size: 24,
-                          ),
+                        borderRadius: AppRadius.roundedFull,
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          child: Icon(Icons.camera_alt_outlined, color: AppSemanticColors.textSecondary, size: 24),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: AppSpacing.sm),
 
-                      // Tombol Bulat Pink (Microphone / Send ala WhatsApp)
+                      // Mic / Send button — pink circle with tap animation
                       ValueListenableBuilder<TextEditingValue>(
                         valueListenable: chatController.messageController,
                         builder: (context, value, child) {
@@ -726,26 +741,30 @@ class ChatPage extends StatelessWidget {
                                 );
                               }
                             },
-                            borderRadius: BorderRadius.circular(22),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: ColorDouce.douceBase,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: ColorDouce.douceBase.withValues(alpha: 0.3),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
+                            borderRadius: AppRadius.roundedFull,
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 1.0, end: 0.92),
+                              duration: AppAnimation.fast,
+                              curve: AppAnimation.defaultCurve,
+                              builder: (context, scale, inner) {
+                                return Transform.scale(
+                                  scale: scale,
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: ColorDouce.douceBase,
+                                      shape: BoxShape.circle,
+                                      boxShadow: AppElevation.softColor(ColorDouce.douceBase),
+                                    ),
+                                    child: Icon(
+                                      hasText ? Icons.send_rounded : Icons.mic_rounded,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
                                   ),
-                                ],
-                              ),
-                              child: Icon(
-                                hasText ? Icons.send_rounded : Icons.mic_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                                );
+                              },
                             ),
                           );
                         },
@@ -758,24 +777,6 @@ class ChatPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  static Widget _buildAttachOption(IconData icon, String title, Color color) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 26,
-          backgroundColor: color.withValues(alpha: 0.12),
-          child: Icon(icon, color: color, size: 26),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        ),
-      ],
     );
   }
 }

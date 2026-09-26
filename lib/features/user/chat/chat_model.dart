@@ -3,12 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatModel {
   final String sender;
   final String message;
+  final String? replyQuote;
   /// Disimpan sebagai Firestore Timestamp; ditampilkan sebagai h:mm.
   final Timestamp? time;
 
   ChatModel({
     required this.sender,
     required this.message,
+    this.replyQuote,
     this.time,
   });
 
