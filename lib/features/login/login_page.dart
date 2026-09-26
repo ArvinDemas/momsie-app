@@ -238,7 +238,137 @@ class LoginPage extends StatelessWidget {
                           ),
                         );
                       }),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 10),
+
+                      // Quick Demo Account Selector
+                      Obx(() {
+                        final isDoula = loginController.isDoulaLogin.value;
+                        if (isDoula) {
+                          return Container(
+                            margin: const EdgeInsets.only(top: 2, bottom: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.touch_app_outlined, size: 14, color: ColorDouce.douceBase),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "Pilih Cepat Akun Doula Demo:",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Row(
+                                    children: [
+                                      _demoChip(
+                                        name: "Dewi Riana",
+                                        email: "dewi.doula@momsie.id",
+                                        image: "assets/images/dewi_riana.jpg",
+                                        controller: loginController,
+                                      ),
+                                      _demoChip(
+                                        name: "Laily Artha",
+                                        email: "laily.doula@momsie.id",
+                                        image: "assets/images/laily_artha.jpg",
+                                        controller: loginController,
+                                      ),
+                                      _demoChip(
+                                        name: "Erny Mintarsih",
+                                        email: "erny.mintarsih@momsie.id",
+                                        image: "assets/images/erny_mintarsih.jpg",
+                                        controller: loginController,
+                                      ),
+                                      _demoChip(
+                                        name: "Agustin M.",
+                                        email: "agustin.meganingtyas@momsie.id",
+                                        image: "assets/images/agustin_meganingtyas.jpg",
+                                        controller: loginController,
+                                      ),
+                                      _demoChip(
+                                        name: "Karisma M.",
+                                        email: "karisma.maharani@momsie.id",
+                                        image: "assets/images/karisma_maharani.jpg",
+                                        controller: loginController,
+                                      ),
+                                      _demoChip(
+                                        name: "Anastasia M.",
+                                        email: "anastasia.doula@momsie.id",
+                                        image: "assets/images/blank-profile.png",
+                                        controller: loginController,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          final isSelected = loginController.selectedDemoEmail.value == "test@momsie.id";
+                          return Container(
+                            margin: const EdgeInsets.only(top: 2, bottom: 8),
+                            child: Row(
+                              children: [
+                                Icon(Icons.touch_app_outlined, size: 14, color: ColorDouce.douceBase),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Pilih Cepat Demo:",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                InkWell(
+                                  onTap: () {
+                                    loginController.selectedDemoEmail.value = "test@momsie.id";
+                                    loginController.emailController.text = "test@momsie.id";
+                                    loginController.passwordController.text = "momsie123";
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? ColorDouce.douceBase : ColorDouce.douceBase.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: ColorDouce.douceBase.withValues(alpha: 0.4)),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.pregnant_woman_rounded,
+                                          size: 14,
+                                          color: isSelected ? Colors.white : ColorDouce.douceBase,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "Bunda Test (Ibu Hamil)",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: isSelected ? Colors.white : ColorDouce.douceBase,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }),
+                      const SizedBox(height: 10),
                       InkWell(
                         onTap: () {
                           loginController.tryLogin(
@@ -375,7 +505,80 @@ class LoginPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+  }
+
+  Widget _demoChip({
+    required String name,
+    required String email,
+    required String image,
+    required LoginController controller,
+  }) {
+    return Obx(() {
+      final isSelected = controller.selectedDemoEmail.value == email;
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: InkWell(
+          onTap: () {
+            controller.selectedDemoEmail.value = email;
+            controller.emailController.text = email;
+            controller.passwordController.text = "momsie123";
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: isSelected ? ColorDouce.douceBase : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? ColorDouce.douceBase : Colors.grey.shade300,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: image.startsWith('assets/')
+                      ? Image.asset(
+                          image,
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.person,
+                            size: 16,
+                            color: isSelected ? Colors.white : Colors.grey,
+                          ),
+                        )
+                      : Icon(
+                          Icons.person,
+                          size: 16,
+                          color: isSelected ? Colors.white : Colors.grey,
+                        ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

@@ -43,11 +43,21 @@ class MitraPekerjaanController extends GetxController {
 
   StreamSubscription<QuerySnapshot>? _bookingsSub;
 
-  static List<BookingModel> getAnastasiaDemoBookings() {
+  static List<BookingModel> getAnastasiaDemoBookings([
+    String? dUid,
+    String? dName,
+    String? dPhoto,
+    String? dJob,
+  ]) {
     final now = DateTime.now();
     final todayStr = DateFormat('yyyy-MM-dd').format(now);
     final tomorrowStr = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     final pastStr = DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 2)));
+
+    final targetUid = dUid ?? 'doula_anastasia';
+    final targetName = dName ?? 'Anastasia Mawardi';
+    final targetPhoto = (dPhoto != null && dPhoto.isNotEmpty) ? dPhoto : 'assets/images/blank-profile.png';
+    final targetJob = dJob ?? 'Bidan & Certified Doula';
 
     return [
       // 1. Ongoing / Berjalan
@@ -56,10 +66,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-001',
         userId: 'user_nadia',
         namaUser: 'Bunda Nadia Salsabila',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: todayStr,
         day: 'Hari ini',
         jam: '10:00',
@@ -80,10 +90,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-002',
         userId: 'user_clarissa',
         namaUser: 'Bunda Clarissa Putri',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: tomorrowStr,
         day: 'Besok',
         jam: '14:00',
@@ -104,10 +114,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-003',
         userId: 'user_sarah',
         namaUser: 'Bunda Sarah Larasati',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 2))),
         day: 'Lusa',
         jam: '16:00',
@@ -128,10 +138,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-004',
         userId: 'user_rina',
         namaUser: 'Bunda Rina Anggraini',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: pastStr,
         day: '2 hari lalu',
         jam: '09:00',
@@ -153,10 +163,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-005',
         userId: 'user_jessica',
         namaUser: 'Bunda Jessica Wijaya',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 6))),
         day: '6 hari lalu',
         jam: '13:30',
@@ -178,10 +188,10 @@ class MitraPekerjaanController extends GetxController {
         transactionId: 'TRX-MOMSIE-ANA-006',
         userId: 'user_maya',
         namaUser: 'Bunda Maya Lestari',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
-        doulaPhoto: 'assets/images/blank-profile.png',
-        doulaJob: 'Bidan & Certified Doula',
+        doulaUid: targetUid,
+        doulaName: targetName,
+        doulaPhoto: targetPhoto,
+        doulaJob: targetJob,
         tanggal: DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 10))),
         day: '10 hari lalu',
         jam: '10:00',
@@ -207,15 +217,32 @@ class MitraPekerjaanController extends GetxController {
     final uid = userCtrl.uid.value.toLowerCase();
     final username = userCtrl.username.value.toLowerCase();
     final doulaUsername = userCtrl.doulaUsername.value.toLowerCase();
-    return email.contains('anastasia') ||
-        uid == 'doula_anastasia' ||
-        username.contains('anastasia') ||
-        doulaUsername.contains('anastasia') ||
-        (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
+    final isKnownDemo = email.contains('anastasia') ||
+        email.contains('dewi') ||
+        email.contains('laily') ||
+        email.contains('erny') ||
+        email.contains('agustin') ||
+        email.contains('karisma') ||
+        uid.startsWith('doula_');
+    return isKnownDemo || (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
   }
 
-  void applyAnastasiaDemo() {
-    final demos = getAnastasiaDemoBookings();
+  void applyAnastasiaDemo([DoulaModel? customDoula]) {
+    String? dUid = customDoula?.uid;
+    String? dName = customDoula?.name;
+    String? dPhoto = customDoula?.image;
+    String? dJob = customDoula?.job;
+
+    if (dUid == null && Get.isRegistered<UserController>()) {
+      final userCtrl = Get.find<UserController>();
+      if (userCtrl.isDoula.value) {
+        dUid = userCtrl.uid.value;
+        dName = userCtrl.doulaUsername.value.isNotEmpty ? userCtrl.doulaUsername.value : userCtrl.username.value;
+        dPhoto = userCtrl.image.value;
+      }
+    }
+
+    final demos = getAnastasiaDemoBookings(dUid, dName, dPhoto, dJob);
     activeBookings.value = demos.where((b) => b.status == 'ongoing').toList();
     pendingBookings.value = demos.where((b) => b.status == 'pending' || b.status == 'paid' || b.status == 'confirmed').toList();
     completedBookings.value = demos.where((b) => b.status == 'completed').toList();

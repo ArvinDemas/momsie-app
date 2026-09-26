@@ -80,18 +80,7 @@ class BookingDoulaPage extends StatelessWidget {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(14),
-                            child: CachedNetworkImage(
-                              imageUrl: doula.image,
-                              width: 52,
-                              height: 52,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => Container(
-                                width: 52,
-                                height: 52,
-                                color: Colors.pink.shade50,
-                                child: Icon(Icons.person, color: ColorDouce.douceBase),
-                              ),
-                            ),
+                            child: _buildDoulaPhoto(doula.image, size: 52),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -221,10 +210,11 @@ class BookingDoulaPage extends StatelessWidget {
                   // Dynamic Calendar Grid View
                   Obx(() {
                     if (controller.isOnDemand) return const SizedBox();
+                    final selectedDate = controller.selectedDate.value;
                     if (controller.viewMode.value == 'mingguan') {
-                      return _buildWeekView(controller);
+                      return _buildWeekView(controller, selectedDate);
                     }
-                    return _buildMonthGridView(controller);
+                    return _buildMonthGridView(controller, selectedDate);
                   }),
 
                   const SizedBox(height: 24),
@@ -395,32 +385,32 @@ class BookingDoulaPage extends StatelessWidget {
                   }),
 
                   // Next Step Submit Button
-                  ElevatedButton(
-                    onPressed: controller.canProceed ? () {
-                      if (controller.isOnDemand) {
-                        // On-demand: skip slot, go directly to confirmation
-                        Get.toNamed("/confirm-booking");
-                      } else {
-                        Get.toNamed("/confirm-booking");
-                      }
-                    } : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorDouce.douceBase,
-                      minimumSize: const Size(double.infinity, 52),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  Obx(() {
+                    final canProceed = controller.canProceed;
+                    return ElevatedButton(
+                      onPressed: canProceed
+                          ? () {
+                              Get.toNamed("/confirm-booking");
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: canProceed ? ColorDouce.douceBase : Colors.grey.shade400,
+                        minimumSize: const Size(double.infinity, 52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: canProceed ? 4 : 0,
                       ),
-                      elevation: 4,
-                    ),
-                    child: const Text(
-                      "Lanjutkan ke Konfirmasi",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      child: const Text(
+                        "Lanjutkan ke Konfirmasi",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
 
                   const SizedBox(height: 30),
                 ],
@@ -461,7 +451,7 @@ class BookingDoulaPage extends StatelessWidget {
   }
 
   /// Interactive Month Grid View (Google Calendar Style)
-  Widget _buildMonthGridView(BookingDoulaController controller) {
+  Widget _buildMonthGridView(BookingDoulaController controller, DateTime selectedDate) {
     final monthDate = controller.focusedMonth.value;
     final firstDayOfMonth = DateTime(monthDate.year, monthDate.month, 1);
     final daysInMonth = DateTime(monthDate.year, monthDate.month + 1, 0).day;
@@ -470,6 +460,7 @@ class BookingDoulaPage extends StatelessWidget {
     final List<String> dayHeaders = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
     return Container(
+      key: ValueKey('month_grid_${monthDate.year}_${monthDate.month}_${selectedDate.year}_${selectedDate.month}_${selectedDate.day}'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -497,6 +488,7 @@ class BookingDoulaPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           GridView.builder(
+            key: ValueKey('grid_builder_${monthDate.year}_${monthDate.month}_${selectedDate.day}'),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -512,9 +504,9 @@ class BookingDoulaPage extends StatelessWidget {
               }
               final dayNum = index - leadingEmptyDays + 1;
               final thisDate = DateTime(monthDate.year, monthDate.month, dayNum);
-              final isSelected = controller.selectedDate.value.year == thisDate.year &&
-                  controller.selectedDate.value.month == thisDate.month &&
-                  controller.selectedDate.value.day == thisDate.day;
+              final isSelected = selectedDate.year == thisDate.year &&
+                  selectedDate.month == thisDate.month &&
+                  selectedDate.day == thisDate.day;
 
               return InkWell(
                 onTap: () => controller.onDateSelected(thisDate),
@@ -549,21 +541,21 @@ class BookingDoulaPage extends StatelessWidget {
   }
 
   /// Horizontal Week Strip View
-  Widget _buildWeekView(BookingDoulaController controller) {
-    final selDate = controller.selectedDate.value;
-    final monday = selDate.subtract(Duration(days: selDate.weekday - 1));
+  Widget _buildWeekView(BookingDoulaController controller, DateTime selectedDate) {
+    final monday = selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
     final weekDates = List.generate(7, (i) => monday.add(Duration(days: i)));
 
     return SizedBox(
+      key: ValueKey('week_strip_${selectedDate.year}_${selectedDate.month}_${selectedDate.day}'),
       height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 7,
         itemBuilder: (_, i) {
           final date = weekDates[i];
-          final isSel = controller.selectedDate.value.year == date.year &&
-              controller.selectedDate.value.month == date.month &&
-              controller.selectedDate.value.day == date.day;
+          final isSel = selectedDate.year == date.year &&
+              selectedDate.month == date.month &&
+              selectedDate.day == date.day;
 
           return InkWell(
             onTap: () => controller.onDateSelected(date),
@@ -677,7 +669,9 @@ class BookingDoulaPage extends StatelessWidget {
     BookingDoulaController controller,
     int harga,
   ) {
-    final isSelected = controller.selectedLayanan.value == title;
+    final isSelected = controller.selectedLayanan.value == title ||
+        BookingDoulaController.normalizeLayananKey(controller.selectedLayanan.value) ==
+            BookingDoulaController.normalizeLayananKey(title);
     return InkWell(
       onTap: () {
         controller.setSelectedLayanan(title);
@@ -747,6 +741,51 @@ class BookingDoulaPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDoulaPhoto(String imagePath, {double size = 52}) {
+    if (imagePath.trim().isEmpty) {
+      return Container(
+        width: size,
+        height: size,
+        color: Colors.pink.shade50,
+        child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+      );
+    }
+    if (imagePath.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: Colors.pink.shade50,
+          child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+        ),
+      );
+    }
+    if (imagePath.startsWith('assets/')) {
+      return Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: Colors.pink.shade50,
+          child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+        ),
+      );
+    }
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.pink.shade50,
+      child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
     );
   }
 }

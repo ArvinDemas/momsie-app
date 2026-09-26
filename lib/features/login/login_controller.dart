@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginController extends GetxController {
   RxBool showPassword = false.obs;
   RxBool isDoulaLogin = false.obs;
+  final RxString selectedDemoEmail = ''.obs;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -41,6 +42,9 @@ class LoginController extends GetxController {
         'assets/images/blank-profile.png',
         false, // isDoula
       );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_logged_in', true);
+      await prefs.setBool('is_doula', false);
       Get.offAllNamed(AppRoutes.user);
       return;
     }
@@ -55,7 +59,9 @@ class LoginController extends GetxController {
     ];
 
     if (testDoulaEmails.contains(trimmedEmail.toLowerCase())) {
-      final UserController userController = Get.find<UserController>();
+      final UserController userController = Get.isRegistered<UserController>()
+          ? Get.find<UserController>()
+          : Get.put(UserController(), permanent: true);
       final doulaObj = DummyData.doulas.firstWhere(
         (d) => d.email.toLowerCase() == trimmedEmail.toLowerCase(),
         orElse: () => DummyData.doulas.first,
@@ -76,8 +82,16 @@ class LoginController extends GetxController {
         doulaObj.jenisKelamin,
         '3404123456780001',
       );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_logged_in', true);
+      await prefs.setBool('is_doula', true);
+      await prefs.setString('doula_email', trimmedEmail);
+      await prefs.setString('doula_name', doulaObj.name);
+      await prefs.setString('doula_uid', doulaObj.uid);
+      await prefs.setString('doula_image', doulaObj.image);
+
       if (Get.isRegistered<MitraPekerjaanController>()) {
-        Get.find<MitraPekerjaanController>().applyAnastasiaDemo();
+        Get.find<MitraPekerjaanController>().applyAnastasiaDemo(doulaObj);
       }
       if (Get.isRegistered<MitraPendapatanController>()) {
         Get.find<MitraPendapatanController>().applyAnastasiaDemo();

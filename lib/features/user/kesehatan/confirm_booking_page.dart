@@ -134,18 +134,7 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16),
-                          child: CachedNetworkImage(
-                            imageUrl: doula.image,
-                            width: 64,
-                            height: 64,
-                            fit: BoxFit.cover,
-                            errorWidget: (_, __, ___) => Container(
-                              width: 64,
-                              height: 64,
-                              color: Colors.pink.shade50,
-                              child: Icon(Icons.person, color: ColorDouce.douceBase),
-                            ),
-                          ),
+                          child: _buildDoulaPhoto(doula.image, size: 64),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -471,6 +460,51 @@ class _ConfirmBookingPageState extends State<ConfirmBookingPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildDoulaPhoto(String imagePath, {double size = 64}) {
+    if (imagePath.trim().isEmpty) {
+      return Container(
+        width: size,
+        height: size,
+        color: Colors.pink.shade50,
+        child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+      );
+    }
+    if (imagePath.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: Colors.pink.shade50,
+          child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+        ),
+      );
+    }
+    if (imagePath.startsWith('assets/')) {
+      return Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: Colors.pink.shade50,
+          child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
+        ),
+      );
+    }
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.pink.shade50,
+      child: Icon(Icons.person, color: ColorDouce.douceBase, size: size * 0.5),
     );
   }
 }

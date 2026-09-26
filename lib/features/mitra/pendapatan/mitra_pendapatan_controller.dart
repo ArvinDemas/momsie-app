@@ -40,35 +40,40 @@ class MitraPendapatanController extends GetxController {
     final uid = userCtrl.uid.value.toLowerCase();
     final username = userCtrl.username.value.toLowerCase();
     final doulaUsername = userCtrl.doulaUsername.value.toLowerCase();
-    return email.contains('anastasia') ||
-        uid == 'doula_anastasia' ||
-        username.contains('anastasia') ||
-        doulaUsername.contains('anastasia') ||
-        (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
+    final isKnownDemo = email.contains('anastasia') ||
+        email.contains('dewi') ||
+        email.contains('laily') ||
+        email.contains('erny') ||
+        email.contains('agustin') ||
+        email.contains('karisma') ||
+        uid.startsWith('doula_');
+    return isKnownDemo || (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
   }
 
-  static List<WithdrawalModel> getAnastasiaDemoWithdrawals() {
+  static List<WithdrawalModel> getAnastasiaDemoWithdrawals([String? dUid, String? dName]) {
     final now = DateTime.now();
+    final targetUid = dUid ?? 'doula_anastasia';
+    final targetName = dName ?? 'Anastasia Mawardi';
     return [
       WithdrawalModel(
         id: 'wd_demo_ana_1',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
+        doulaUid: targetUid,
+        doulaName: targetName,
         nominal: 1000000,
         bank: 'BCA',
         noRekening: '8820129381',
-        atasNama: 'Anastasia Mawardi',
+        atasNama: targetName,
         status: 'done',
         createdAt: now.subtract(const Duration(days: 4, hours: 2)),
       ),
       WithdrawalModel(
         id: 'wd_demo_ana_2',
-        doulaUid: 'doula_anastasia',
-        doulaName: 'Anastasia Mawardi',
+        doulaUid: targetUid,
+        doulaName: targetName,
         nominal: 500000,
         bank: 'BCA',
         noRekening: '8820129381',
-        atasNama: 'Anastasia Mawardi',
+        atasNama: targetName,
         status: 'done',
         createdAt: now.subtract(const Duration(days: 12, hours: 5)),
       ),
@@ -76,10 +81,17 @@ class MitraPendapatanController extends GetxController {
   }
 
   void applyAnastasiaDemo() {
+    String? dUid;
+    String? dName;
+    if (Get.isRegistered<UserController>()) {
+      final userCtrl = Get.find<UserController>();
+      dUid = userCtrl.uid.value;
+      dName = userCtrl.doulaUsername.value.isNotEmpty ? userCtrl.doulaUsername.value : userCtrl.username.value;
+    }
     saldoTersedia.value = 1042500;
     totalPendapatan.value = 2550000;
-    withdrawals.value = getAnastasiaDemoWithdrawals();
-    completedBookings.value = MitraPekerjaanController.getAnastasiaDemoBookings()
+    withdrawals.value = getAnastasiaDemoWithdrawals(dUid, dName);
+    completedBookings.value = MitraPekerjaanController.getAnastasiaDemoBookings(dUid, dName)
         .where((b) => b.status == 'completed')
         .toList();
   }
