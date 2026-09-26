@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/util/model/booking_slot_model.dart';
+import 'package:douce/shared/util/model/doula_model.dart';
 import 'package:douce/shared/util/service/booking_slot_service.dart';
 import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/foundation.dart';

@@ -505,6 +505,7 @@ class LoginPage extends StatelessWidget {
           ],
         ),
       ),
+    );
   }
 
   Widget _demoChip({

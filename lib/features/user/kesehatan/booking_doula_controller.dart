@@ -1,3 +1,4 @@
+import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
 import 'package:douce/shared/util/model/booking_slot_model.dart';
 import 'package:douce/shared/util/model/doula_model.dart';
