@@ -211,38 +211,53 @@ class ChatController extends GetxController {
       messages.value = [
         ChatModel(
           sender: user,
-          message: 'Halo Doula Dewi, selamat siang. Saya Arvin, suami dari Nadia. Kami ingin konsultasi terkait persiapan persalinan trimester ketiga.',
-          time: Timestamp.fromDate(now.subtract(const Duration(hours: 2, minutes: 15))),
+          message: 'Halo Doula, selamat siang. Mau update perkembangan setelah sesi konsultasi kita kemarin 🌸',
+          time: Timestamp.fromDate(now.subtract(const Duration(days: 1, hours: 4))),
         ),
         ChatModel(
           sender: doula,
-          message: 'Halo Mas Arvin! Salam hangat untuk Mas Arvin dan Mbak Nadia ya 🌸 Sangat senang melihat calon ayah yang begitu suportif mendampingi istri. Bagaimana kondisi Mbak Nadia saat ini?',
-          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 55))),
+          message: 'Halo Bunda! Salam hangat ya 💖 Senang sekali mendengar kabarnya. Bagaimana perkembangannya setelah mencoba arahan kemarin?',
+          time: Timestamp.fromDate(now.subtract(const Duration(days: 1, hours: 3, minutes: 40))),
         ),
         ChatModel(
           sender: user,
-          message: 'Mbak Nadia belakangan sering merasa pegal di pinggang belakang dan kadang cemas menjelang HPL, Doula. Ada tips posisi atau relaksasi yang bisa saya bantu lakukan di rumah?',
-          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 35))),
+          message: 'Alhamdulillah setelah rutin coba latihan pernapasan perut dan kompres hangat di pinggang yang Doula sarankan, rasa tegang dan pegal di pinggang bawah sudah jauh lebih berkurang. Kontraksi palsu semalam juga lebih tenang dan tidak panik.',
+          time: Timestamp.fromDate(now.subtract(const Duration(days: 1, hours: 3, minutes: 15))),
         ),
         ChatModel(
           sender: doula,
-          message: 'Tentu Mas Arvin. Untuk pegal pinggang, Mas Arvin bisa bantu berikan kompres hangat di area sacrum dan lakukan teknik endorphin massage (usapan lembut berirama). Untuk rasa cemas, ajak latihan pernapasan perut 4-7-8 bersama sambil mendengarkan afirmasi positif gentle birth.',
-          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 10))),
+          message: 'Alhamdulillah, kabar baik sekali Bunda! Artinya tubuh Bunda merespons teknik relaksasi dengan sangat baik. Tetap jaga hidrasi dan jangan lupa afirmasi positifnya ya ✨',
+          time: Timestamp.fromDate(now.subtract(const Duration(days: 1, hours: 2, minutes: 50))),
         ),
         ChatModel(
           sender: user,
-          message: 'Baik Doula Dewi, sangat membantu sekali penjelasannya. Nanti malam langsung kami praktikkan. Apakah saat sesi kunjungan kita bisa latihan posisi persalinan dengan birthing ball?',
-          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 40))),
+          message: 'Iya Doula. Pagi ini gerakan si kecil terasa makin aktif dan posisinya mulai terasa makin turun ke arah panggul.',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 3, minutes: 30))),
         ),
         ChatModel(
           sender: doula,
-          message: 'Bisa sekali Mas Arvin! Siapkan birthing ball-nya ya. Besok kita akan pelajari variasi posisi tegak (upright) dan teknik relaksasi counter-pressure. Sampai bertemu besok jam 11.00 ya Mas Arvin dan Mbak Nadia ✨',
-          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 25))),
+          message: 'Masya Allah, itu tanda alami bahwa si kecil semakin siap mencari jalan lahir Bunda 🌸 Apakah masih ada keluhan saat berjalan atau bergerak?',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 3, minutes: 5))),
         ),
         ChatModel(
           sender: user,
-          message: 'Terima kasih banyak atas arahannya Doula Dewi, sampai bertemu besok! 🙏',
-          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 10))),
+          message: 'Hanya sedikit sensasi berat di panggul bawah saat berdiri lama Doula. Untuk sesi pendampingan hari ini apakah kita tetap fokus latihan posisi tegak dan birthing ball?',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 2, minutes: 10))),
+        ),
+        ChatModel(
+          sender: doula,
+          message: 'Iya betul Bunda. Nanti saat sesi kita akan optimalkan latihan posisi panggul terbuka (open pelvis) dengan birthing ball dan teknik counter-pressure agar tetap nyaman menjelang persalinan. Perlengkapan sudah saya siapkan.',
+          time: Timestamp.fromDate(now.subtract(const Duration(hours: 1, minutes: 30))),
+        ),
+        ChatModel(
+          sender: user,
+          message: 'Baik Doula, birthing ball dan ruangan sudah kami siapkan di rumah. Terima kasih banyak atas bimbingannya selama ini, sampai bertemu nanti ya Doula 🙏',
+          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 45))),
+        ),
+        ChatModel(
+          sender: doula,
+          message: 'Sama-sama Bunda. Istirahat yang cukup dulu ya, sampai bertemu nanti di rumah Bunda ✨🌸',
+          time: Timestamp.fromDate(now.subtract(const Duration(minutes: 20))),
         ),
       ];
     } else if (user == 'user_clarissa') {
@@ -338,7 +353,16 @@ class ChatController extends GetxController {
                   ))
                   .toList();
 
-              if (isDewiDemo && loaded.length < 3) {
+              final hasOldNames = loaded.any((m) {
+                final lower = m.message.toLowerCase();
+                return lower.contains('arvin') ||
+                    lower.contains('nadia') ||
+                    lower.contains('clarissa') ||
+                    lower.contains('anastasia') ||
+                    lower.contains('dewi');
+              });
+
+              if (isDewiDemo && (loaded.length < 5 || hasOldNames)) {
                 _loadDemoMessages();
                 _seedDemoMessagesToFirestore();
               } else {
@@ -363,8 +387,12 @@ class ChatController extends GetxController {
   Future<void> _seedDemoMessagesToFirestore() async {
     if (chatId.value.isEmpty || messages.isEmpty) return;
     try {
-      final batch = firestore.batch();
       final msgCol = firestore.collection('chat').doc(chatId.value).collection('messages');
+      final existing = await msgCol.get();
+      final batch = firestore.batch();
+      for (final doc in existing.docs) {
+        batch.delete(doc.reference);
+      }
       for (final m in messages) {
         final docRef = msgCol.doc();
         batch.set(docRef, {
