@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:douce/shared/util/user_controller.dart';
+import 'package:douce/shared/widget/payment_sheet.dart';
 
 /// Halaman detail & tracking status pesanan doula.
 class BookingDetailPage extends StatefulWidget {
@@ -403,6 +404,31 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         const SizedBox(height: 24),
 
         // Action buttons based on status
+        if (b.status == 'pending') ...[
+          ElevatedButton(
+            onPressed: () {
+              showPaymentSheet(
+                context,
+                jenisLayanan: 'doula',
+                deskripsi: 'Booking Doula – ${b.layanan}',
+                nominal: b.totalBayar,
+                booking: b,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorDouce.douceBase,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Bayar Sekarang',
+              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         if (['paid', 'confirmed', 'ongoing', 'completed'].contains(b.status)) ...[
           ElevatedButton.icon(
             onPressed: () {

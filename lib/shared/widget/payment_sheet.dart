@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:douce/app/app_routes.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/util/model/booking_model.dart';
+import 'package:douce/shared/util/service/booking_slot_service.dart';
 import 'package:douce/shared/util/service/midtrans_service.dart';
 import 'package:douce/shared/util/service/payment_service.dart';
 import 'package:douce/shared/util/service/subscription_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -105,11 +106,19 @@ class _PaymentSheetState extends State<PaymentSheet> {
       if (!mounted) return;
 
       // Midtrans Snap — one and only payment method
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final String customerEmail = (currentUser?.email != null && currentUser!.email!.isNotEmpty)
+          ? currentUser.email!
+          : 'momsiereborn@gmail.com';
+      final String customerName = widget.booking?.namaUser.isNotEmpty == true
+          ? widget.booking!.namaUser
+          : (currentUser?.displayName?.isNotEmpty == true ? currentUser!.displayName! : 'Bunda Momsie');
+
       final snapRes = await MidtransService().createSnapTransaction(
         orderId: txId,
         grossAmount: widget.nominal,
-        customerName: widget.booking?.namaUser ?? 'Bunda Momsie',
-        customerEmail: 'user@momsie.id',
+        customerName: customerName,
+        customerEmail: customerEmail,
         itemDetails: widget.deskripsi,
       );
 
@@ -162,10 +171,19 @@ class _PaymentSheetState extends State<PaymentSheet> {
         return;
       }
 
+      // Roll back slot reservation jika booking baru dan Snap gagal dibuat
+      if (bookingId != null && widget.booking != null && widget.booking!.id.isEmpty) {
+        await BookingSlotService().decrementBookedCount(
+          doulaId: widget.booking!.doulaUid,
+          tanggal: widget.booking!.tanggal,
+          time: widget.booking!.jam,
+        );
+      }
+
       // Fallback: jika Snap token gagal dibuat
       Get.snackbar(
         'Error',
-        'Gagal memulai pembayaran. Silakan coba lagi.',
+        'Gagal memulai pembayaran Midtrans. Silakan periksa koneksi atau coba lagi.',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red.shade800,
         colorText: Colors.white,

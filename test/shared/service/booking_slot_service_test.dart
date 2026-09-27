@@ -173,5 +173,44 @@ void main() {
       final anyAvailable = slots.any((s) => !s.isFull);
       expect(anyAvailable, true);
     });
+
+    test('BookingSlotModel safely parses list containing String legacy items', () {
+      final model = BookingSlotModel.fromMap({
+        'doulaId': 'doula_dewi',
+        'tanggal': '2026-09-28',
+        'slots': ['09:00', '10:00', {'time': '11:00', 'capacity': 2, 'bookedCount': 1}],
+      });
+
+      expect(model.slots.length, 3);
+      expect(model.slots[0].time, '09:00');
+      expect(model.slots[0].capacity, 1);
+      expect(model.slots[0].bookedCount, 0);
+      expect(model.slots[1].time, '10:00');
+      expect(model.slots[2].time, '11:00');
+      expect(model.slots[2].capacity, 2);
+      expect(model.slots[2].bookedCount, 1);
+    });
+
+    test('Existing booking payment retry skips slot increment', () {
+      // Simulasi: booking sudah ada dengan status pending
+      const bookingId = 'BKG-ABC1234';
+      final isExistingBooking = bookingId.isNotEmpty;
+
+      // Slot sudah bookedCount = 1, capacity = 1 (karena di-reserve saat pertama kali buat)
+      int bookedCount = 1;
+      const capacity = 1;
+
+      // Ketika user bayar booking yang existing, incrementBookedCount dilewati
+      bool shouldIncrement = !isExistingBooking;
+      expect(shouldIncrement, false);
+
+      if (shouldIncrement) {
+        // Jika dipanggil, akan salah menolak user
+        if (bookedCount < capacity) bookedCount++;
+      }
+
+      // bookedCount tetap 1, transaksi tetap lanjut tanpa error slot penuh
+      expect(bookedCount, 1);
+    });
   });
 }

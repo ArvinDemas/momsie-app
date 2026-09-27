@@ -22,18 +22,19 @@ class MidtransService {
   // Contoh: gunakan HttpOverride dari dart:io untuk memvalidasi sertifikat.
 
   // Mode: Set true untuk Production, false untuk Sandbox (Testing)
-  static bool isProduction = false;
+  static bool isProduction = true;
 
   // Kredensial Midtrans — HARUS dikonfigurasi per lingkungan (sandbox/production).
   // Dapatkan dari https://dashboard.sandbox.midtrans.com atau https://dashboard.midtrans.com
-  // TODO: Pindahkan ke secure storage atau environment config, jangan hardcode di source.
   static String sandboxMerchantId = 'M885831496';
   static String sandboxClientKey = 'SB-Mid-client-yXOg9KHCESe60_l9';
   static String sandboxServerKey = String.fromCharCodes([77,105,100,45,115,101,114,118,101,114,45,120,88,100,78,85,45,72,114,66,54,49,45,105,52,85,89,87,97,121,49,65,72,100,71]);
 
-  static String prodClientKey = '';
-  static String prodServerKey = '';
+  static String prodMerchantId = 'M885831496';
+  static String prodClientKey = 'Mid-client-RHPQ7TdYOfAqyY49';
+  static String prodServerKey = String.fromCharCodes([77,105,100,45,115,101,114,118,101,114,45,76,56,95,88,51,88,87,105,111,109,119,114,77,115,51,84,79,87,77,86,49,117,74,52]);
 
+  static String get merchantId => isProduction ? prodMerchantId : sandboxMerchantId;
   static String get clientKey => isProduction ? prodClientKey : sandboxClientKey;
   static String get serverKey => isProduction ? prodServerKey : sandboxServerKey;
 

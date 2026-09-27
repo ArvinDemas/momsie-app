@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dokumen Legal NDA & Panduan Defense Transaksi - Momsie</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,400&display=swap');
+
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    font-size: 11pt;
+    background: #ffffff;
+  }
+
+  .page-container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Header Kop Surat */
+  .letterhead {
+    border-bottom: 3px double #0f172a;
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .letterhead-content {
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  .letterhead-title {
+    font-family: 'Lora', serif;
+    font-size: 16pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    text-transform: uppercase;
+  }
+
+  .letterhead-sub {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #0284c7;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .letterhead-desc {
+    font-size: 8.5pt;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  /* Section Title */
+  .doc-title-box {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+    padding: 14px 18px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .doc-title {
+    font-size: 13pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .doc-subtitle {
+    font-size: 9pt;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* Badge and Callout */
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+  }
+
+  .badge-success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+  }
+
+  .badge-warning {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+  }
+
+  .badge-info {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 12pt;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+    border-bottom: 1.5px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3 {
+    font-size: 10.5pt;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #1e293b;
+  }
+
+  p {
+    margin-bottom: 8px;
+    font-size: 9.5pt;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin-left: 18px;
+    margin-bottom: 10px;
+    font-size: 9.5pt;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* Table styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px 0;
+    font-size: 9pt;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  /* Callout boxes */
+  .callout {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 9pt;
+    border-left: 4px solid;
+  }
+
+  .callout-law {
+    background: #f0fdf4;
+    border-left-color: #22c55e;
+    color: #14532d;
+  }
+
+  .callout-security {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+    color: #7f1d1d;
+  }
+
+  .callout-defense {
+    background: #f0f9ff;
+    border-left-color: #0284c7;
+    color: #0c4a6e;
+  }
+
+  .script-box {
+    background: #fafaf9;
+    border: 1px solid #d6d3d1;
+    border-left: 4px solid #f59e0b;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0 14px 0;
+    font-family: 'Lora', serif;
+    font-size: 9pt;
+    font-style: italic;
+    color: #292524;
+    line-height: 1.55;
+  }
+
+  .script-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    color: #b45309;
+    margin-bottom: 4px;
+  }
+
+  /* Signature Block */
+  .signature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .sig-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px 14px;
+    background: #fafafa;
+    text-align: center;
+  }
+
+  .sig-role {
+    font-weight: 700;
+    font-size: 9pt;
+    color: #0f172a;
+    margin-bottom: 50px;
+  }
+
+  .sig-name {
+    font-weight: 700;
+    font-size: 9.5pt;
+    color: #0f172a;
+    border-bottom: 1px solid #0f172a;
+    display: inline-block;
+    min-width: 180px;
+    padding-bottom: 2px;
+  }
+
+  .sig-sub {
+    font-size: 8pt;
+    color: #64748b;
+    margin-top: 3px;
+  }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 24px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 7.5pt;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-container">
+
+  <!-- ==================== HALAMAN 1 ==================== -->
+  <div class="letterhead">
+    <div class="letterhead-content">
+      <div class="letterhead-title">MOMSIE INDONESIA</div>
+      <div class="letterhead-sub">Program Pembinaan Mahasiswa Wirausaha (P2MW) 2026</div>
+      <div class="letterhead-desc">Platform Layanan Digital Pendampingan Maternal & Integrasi Layanan Doula Mandiri</div>
+    </div>
+  </div>
+
+  <div class="doc-title-box">
+    <div class="doc-title">PERNYATAAN KERAHASIAAN INFORMASI & PROTOKOL VALIDASI TRAKSI (NDA)</div>
+    <div class="doc-subtitle">Nomor Dokumen: MOMSIE/LEGAL/NDA-P2MW/2026/09 &bull; Standar Kepatuhan UU PDP No. 27/2022 & PCI-DSS</div>
+  </div>
+
+  <div class="callout callout-law">
+    <strong>Landasan Hukum Kepatuhan:</strong> Dokumen ini disusun untuk menjamin transparansi pencapaian omzet/traksi bisnis dalam proses evaluasi, monitoring, dan penjurian P2MW/KMI Expo, tanpa melanggar ketentuan <strong>UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta standar keamanan transaksi pembayaran digital <strong>Payment Card Industry Data Security Standard (PCI-DSS)</strong>.
+  </div>
+
+  <h2>1. DEFINISI & IDENTIFIKASI INFORMASI RAHASIA</h2>
+  <p>Dalam penyelenggaraan layanan platform <strong>Momsie</strong> dan proses audit validasi traksi pasar, seluruh pihak mengakui bahwa kategori data berikut merupakan <em>Confidential Information (Informasi Rahasia)</em> yang dilindungi undang-undang:</p>
+  <ul>
+    <li><strong>Data Rekam Medis & Kesehatan Maternal:</strong> Meliputi usia kehamilan, riwayat obstetri, keluhan fisik, preferensi persalinan, dan catatan konsultasi chat antara Bunda dan Doula/Bidan. Berdasarkan Pasal 4 ayat (2) UU PDP, data ini merupakan <em>Data Pribadi yang Bersifat Spesifik (Sensitif)</em>.</li>
+    <li><strong>Data Identitas Pribadi (Personally Identifiable Information - PII):</strong> Meliputi nama lengkap ibu, nomor kontak WhatsApp/telepon, alamat rumah untuk layanan homecare/offline, dan foto profil.</li>
+    <li><strong>Kredensial Keamanan Sistem Finansial (API Keys):</strong> Meliputi <em>Server Key Midtrans Production</em> (<code>Mid-server-***</code>), <em>Client Key</em>, <em>Merchant Secret</em>, token akses basis data Firestore, dan nomor rekening penampung internal.</li>
+    <li><strong>Perjanjian Kerja Sama & Bagi Hasil Doula:</strong> Formula komisi mitra doula, tarif kesepakatan, dan histori pendapatan tenaga kesehatan independen.</li>
+  </ul>
+
+  <h2>2. BATASAN AKSES & PROTOKOL PENGUNGKAPAN KEPADA DEWAN JURI</h2>
+  <p>Untuk memvalidasi keaslian transaksi finansial (*real transaction vs dummy/fictitious data*) tanpa melanggar regulasi privasi dan keamanan finansial, platform Momsie memberlakukan <strong>Matriks Akses Penjurian</strong> sebagai berikut:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Area / Data</th>
+        <th style="width: 15%;">Status</th>
+        <th style="width: 60%;">Protokol Pengungkapan & Batasan Hukum</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Midtrans: Menu Transactions</strong></td>
+        <td><span class="badge badge-success">DIPERBOLEHKAN</span></td>
+        <td>Dapat ditampilkan langsung. Menunjukkan kolom <em>Order ID (TRX-xxx)</em>, waktu/tanggal, nominal rupiah (Gross Amount), metode (QRIS/VA), dan status <strong>Settlement</strong> (dana nyata masuk).</td>
+      </tr>
+      <tr>
+        <td><strong>Midtrans: Access Keys & Settings</strong></td>
+        <td><span class="badge badge-danger">DILARANG KERAS</span></td>
+        <td><strong>Kerahasiaan Mutlak.</strong> Berisi <em>Server Key Production</em>. Pembocoran Server Key memungkinkan pihak luar melakukan pemalsuan transaksi, *fraud chargeback*, dan manipulasi saldo merchant.</td>
+      </tr>
+      <tr>
+        <td><strong>Data Pribadi Pasien / Konsumen</strong></td>
+        <td><span class="badge badge-warning">DI-MASKING</span></td>
+        <td>Email dan nomor HP disamarkan (contoh: <code>adna****@gmail.com</code>). Nama pasien ditampilkan secara anonim (contoh: <code>Bunda A*****</code>) sesuai kewajiban Pasal 16 & 28 UU PDP.</td>
+      </tr>
+      <tr>
+        <td><strong>Rekening Koran / Mutasi Bank</strong></td>
+        <td><span class="badge badge-success">DIPERBOLEHKAN</span></td>
+        <td>Dapat ditampilkan dengan menyamarkan digit tengah nomor rekening. Menunjukkan transfer pencairan (*payout/disbursement*) resmi dari PT Midtrans ke rekening tim Momsie.</td>
+      </tr>
+      <tr>
+        <td><strong>Isi Chat Konsultasi Medis</strong></td>
+        <td><span class="badge badge-danger">DILARANG KERAS</span></td>
+        <td>Dilindungi etika kerahasiaan tenaga kesehatan (bidan/doula) dan UU PDP. Dewan juri dapat melihat bukti ada aktivitas konsultasi (jumlah sesi / frekuensi), tetapi dilarang membaca rincian keluhan obstetri pasien.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Dokumen Legal Momsie &bull; Program Pembinaan Mahasiswa Wirausaha (P2MW) 2026</span>
+    <span>Halaman 1 dari 3</span>
+  </div>
+
+  <!-- ==================== HALAMAN 2 ==================== -->
+  <div class="page-break"></div>
+
+  <div class="letterhead">
+    <div class="letterhead-content">
+      <div class="letterhead-title">MOMSIE INDONESIA</div>
+      <div class="letterhead-sub">Panduan Defense Operasional & Script Komunikasi Penjurian</div>
+    </div>
+  </div>
+
+  <h2>3. SCRIPT KOMUNIKASI TAKTIS DI DEPAN DEWAN JURI</h2>
+  <p>Apabila Dewan Juri meminta akses verifikasi traksi atau meminta membuka dashboard sistem, tim penyaji <strong>diwajibkan menggunakan formula respon profesional berikut</strong> untuk mempertahankan (*defend*) integritas sistem:</p>
+
+  <div class="script-box">
+    <div class="script-title">Skenario 1: Juri meminta membuka Dashboard Midtrans secara langsung</div>
+    "Mohon izin Bapak/Ibu Dewan Juri yang kami hormati. Untuk membuktikan transparansi dan validitas traksi bisnis Momsie, kami sangat terbuka memperlihatkan dashboard resmi Midtrans Production kami pada tab <strong>Transactions</strong>.<br><br>
+    Di sini dapat kita lihat bersama bahwa status pesanan adalah <strong>Settlement</strong> (dana nyata telah terverifikasi masuk oleh bank/e-wallet), lengkap dengan Order ID resmi dan cap waktu transaksi.<br><br>
+    Namun, demi kepatuhan terhadap regulasi keamanan data finansial <strong>PCI-DSS (Payment Card Industry Data Security Standard)</strong> dan kebijakan kemitraan Midtrans Merchant, kami tidak diperkenankan membuka tab <strong>Settings & Access Keys</strong> guna menjaga kerahasiaan <em>Production Server Key</em> kami. Hal ini merupakan standar operasional keamanan industri enterprise yang kami terapkan sejak dini."
+  </div>
+
+  <div class="script-box">
+    <div class="script-title">Skenario 2: Juri ingin melihat identitas pembeli / isi konsultasi chat</div>
+    "Sebagai platform kesehatan maternal, Momsie tunduk sepenuhnya pada <strong>Undang-Undang No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta etika kerahasiaan pendampingan persalinan.<br><br>
+    Riwayat kehamilan dan data kontak ibu hamil diklasifikasikan sebagai data spesifik yang wajib dilindungi. Oleh karena itu, bukti transaksi yang kami sajikan telah melalui proses <em>data anonymization/redaction</em> (misalnya: email <code>adna****@gmail.com</code>). Kami dapat membuktikan keabsahan traksi melalui <strong>Order ID yang dapat dicocokkan dengan log settlement Midtrans</strong> dan mutasi perbankan resmi tanpa mengekspos privasi pasien kami."
+  </div>
+
+  <div class="script-box">
+    <div class="script-title">Skenario 3: Juri menanyakan apakah transaksi ini asli atau sekadar simulasi tim sendiri</div>
+    "Semua transaksi yang kami bukukan tercatat di lingkungan <strong>Production Midtrans</strong> (bukan sandbox/simulator testing). Setiap transaksi diproses melalui metode pembayaran berizin Bank Indonesia (QRIS / Virtual Account / GoPay) dengan pemotongan biaya MDR (*Merchant Discount Rate*) riil dan masuk ke rekening penampung operasional.<br><br>
+    Untuk memperkuat validitas traksi tersebut, kami telah menyiapkan <strong>Surat Pengesahan Rekapitulasi Keuangan</strong> yang disaksikan dan ditandatangani oleh Dosen Pembimbing P2MW kami."
+  </div>
+
+  <h2>4. FORMAT RESMI REKAPITULASI TRANSAKSI TERAKREDITASI (REDACTED LEDGER)</h2>
+  <p>Laporan berikut merupakan contoh format resmi yang sah diserahkan kepada panitia dan dewan juri sebagai lampiran keuangan resmi:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Order ID</th>
+        <th>Waktu Transaksi</th>
+        <th>Layanan</th>
+        <th>Pelanggan (Masked)</th>
+        <th>Nominal (IDR)</th>
+        <th>Channel</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><code>TRX-172744-9B21</code></td>
+        <td>2026-09-27 19:42</td>
+        <td>Konsultasi Doula Online</td>
+        <td>Bunda Adn*** (adn****@gmail.com)</td>
+        <td>Rp 32.000</td>
+        <td>GoPay / QRIS</td>
+        <td><span class="badge badge-success">Settlement</span></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><code>TRX-172739-1E44</code></td>
+        <td>2026-09-26 14:15</td>
+        <td>Kelas Online Prenatal</td>
+        <td>Bunda Di*** (dian****@yahoo.com)</td>
+        <td>Rp 101.000</td>
+        <td>BCA VA</td>
+        <td><span class="badge badge-success">Settlement</span></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><code>TRX-172728-7C89</code></td>
+        <td>2026-09-25 10:30</td>
+        <td>Prenatal Yoga Guided</td>
+        <td>Bunda Sit*** (siti****@gmail.com)</td>
+        <td>Rp 77.000</td>
+        <td>ShopeePay</td>
+        <td><span class="badge badge-success">Settlement</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Dokumen Legal Momsie &bull; Program Pembinaan Mahasiswa Wirausaha (P2MW) 2026</span>
+    <span>Halaman 2 dari 3</span>
+  </div>
+
+  <!-- ==================== HALAMAN 3 ==================== -->
+  <div class="page-break"></div>
+
+  <div class="letterhead">
+    <div class="letterhead-content">
+      <div class="letterhead-title">MOMSIE INDONESIA</div>
+      <div class="letterhead-sub">Pernyataan Komitmen & Lembar Pengesahan Tim Pengembang</div>
+    </div>
+  </div>
+
+  <h2>5. LEMBAR PERNYATAAN INTEGRITAS & KERAHASIAAN DATA</h2>
+  <p>Bertandatangan di bawah ini, tim pengembang dan pembina usaha platform <strong>Momsie</strong> menyatakan dengan sebenarnya bahwa:</p>
+  <ol>
+    <li>Seluruh data transaksi yang dilaporkan dalam laporan kemajuan dan dokumen presentasi P2MW adalah <strong>riil dan dapat dipertanggungjawabkan keabsahan finansialnya</strong> melalui riwayat mutasi perbankan dan dashboard Midtrans Production Merchant ID <code>M885831496</code>.</li>
+    <li>Penolakan pengungkapan kredensial <em>Server Key</em> dan penyamaran data identitas pribadi pelanggan didasarkan semata-mata pada <strong>kewajiban kepatuhan hukum UU Perlindungan Data Pribadi No. 27 Tahun 2022 dan standar PCI-DSS</strong>, serta bukan merupakan bentuk penghalangan evaluasi atau penyembunyian fakta traksi.</li>
+    <li>Apabila dewan juri atau reviewer kementerian membutuhkan pembuktian audit mendalam secara tertutup (*closed-door audit*), tim bersedia menunjukkan bukti settlement mutasi rekening resmi institusi perbankan.</li>
+  </ol>
+
+  <div class="avoid-break">
+    <div class="signature-grid">
+      <div class="sig-card">
+        <div class="sig-role">Ketua Tim Pengembang Momsie<br>(P2MW 2026)</div>
+        <div class="sig-name">Moch. Arvin Adnaryama</div>
+        <div class="sig-sub">NIM. / Ketua Pengusul Usaha</div>
+      </div>
+
+      <div class="sig-card">
+        <div class="sig-role">Dosen Pembimbing Usaha<br>(Pendamping P2MW)</div>
+        <div class="sig-name">...................................................</div>
+        <div class="sig-sub">NIDN. / Dosen Pembina Lapangan</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; text-align: center;">
+      <div class="sig-card" style="max-width: 380px; margin: 0 auto;">
+        <div class="sig-role">Mengetahui / Mengesahkan:<br>Pengelola Kewirausahaan / Inkubator Kampus</div>
+        <div class="sig-name">...................................................</div>
+        <div class="sig-sub">Pengelola P2MW Perguruan Tinggi</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-defense" style="margin-top: 30px;">
+    <strong>Tips Praktis Saat Live Judging:</strong>
+    <ul style="margin-top: 6px; margin-bottom: 0;">
+      <li>Cetak dokumen PDF ini sebanyak 2-3 rangkap dan simpan di map presentasi fisik kamu.</li>
+      <li>Buka tab <em>Transactions</em> Midtrans terlebih dahulu di laptop sebelum sesi presentasi dimulai, dan <strong>pastikan tab Settings / Access Keys telah ditutup</strong>.</li>
+      <li>Jika juri tetap bersikeras, sodorkan dokumen bertanda tangan ini dengan senyum santun dan tawarkan melihat mutasi rekening resmi.</li>
+    </ul>
+  </div>
+
+  <div class="doc-footer">
+    <span>Dokumen Legal Momsie &bull; Hak Cipta &copy; 2026 Tim P2MW Momsie Reborn. All Rights Reserved.</span>
+    <span>Halaman 3 dari 3</span>
+  </div>
+
+</div>
+
+</body>
+</html>

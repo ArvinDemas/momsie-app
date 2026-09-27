@@ -61,6 +61,28 @@ class BookingSlotService {
         .set(slot.toMap(), SetOptions(merge: true)));
   }
 
+  /// Helper untuk normalisasi slot dari Firestore (mendukung Map dan String legacy)
+  static Map<String, dynamic> _normalizeSlot(dynamic s) {
+    if (s is Map) {
+      return {
+        'time': s['time']?.toString() ?? '',
+        'capacity': (s['capacity'] as num?)?.toInt() ?? 1,
+        'bookedCount': (s['bookedCount'] as num?)?.toInt() ?? 0,
+      };
+    } else if (s is String) {
+      return {
+        'time': s,
+        'capacity': 1,
+        'bookedCount': 0,
+      };
+    }
+    return {
+      'time': '',
+      'capacity': 1,
+      'bookedCount': 0,
+    };
+  }
+
   /// Buat slot baru untuk tanggal tertentu
   Future<void> createSlot({
     required String doulaId,
@@ -74,21 +96,19 @@ class BookingSlotService {
     await _retry(() async {
       await _firestore.runTransaction((tx) async {
         final snapshot = await tx.get(slotRef);
-        List<dynamic> slots = snapshot.exists
+        final slotsRaw = snapshot.exists
             ? List<dynamic>.from(snapshot.data()!['slots'] ?? [])
             : [];
+        final slots = slotsRaw.map(_normalizeSlot).toList();
 
         // Check slot already exists
-        final existingIndex = slots.indexWhere(
-          (s) => (s as Map<String, dynamic>)['time'] == time,
-        );
+        final existingIndex = slots.indexWhere((s) => s['time'] == time);
 
         if (existingIndex >= 0) {
-          // Update existing slot
           slots[existingIndex] = {
             'time': time,
             'capacity': capacity,
-            'bookedCount': 0,
+            'bookedCount': slots[existingIndex]['bookedCount'] ?? 0,
           };
         } else {
           slots.add({
@@ -97,6 +117,7 @@ class BookingSlotService {
             'bookedCount': 0,
           });
         }
+        slots.sort((a, b) => (a['time'] as String).compareTo(b['time'] as String));
 
         tx.set(slotRef, {
           'doulaId': doulaId,
@@ -124,13 +145,12 @@ class BookingSlotService {
         if (!snapshot.exists) return;
 
         final slotsRaw = List<dynamic>.from(snapshot.data()!['slots'] ?? []);
-        final index = slotsRaw.indexWhere(
-          (s) => (s as Map<String, dynamic>)['time'] == time,
-        );
+        final slots = slotsRaw.map(_normalizeSlot).toList();
+        final index = slots.indexWhere((s) => s['time'] == time);
 
         if (index >= 0) {
-          slotsRaw[index]['capacity'] = newCapacity;
-          tx.update(slotRef, {'slots': slotsRaw});
+          slots[index]['capacity'] = newCapacity;
+          tx.update(slotRef, {'slots': slots});
         }
       });
     });
@@ -152,16 +172,17 @@ class BookingSlotService {
           if (!snapshot.exists) return false;
 
           final slotsRaw = List<dynamic>.from(snapshot.data()!['slots'] ?? []);
-          final slotToDelete = slotsRaw.firstWhere(
-            (s) => (s as Map<String, dynamic>)['time'] == time,
-            orElse: () => null,
+          final slots = slotsRaw.map(_normalizeSlot).toList();
+          final slotToDelete = slots.firstWhere(
+            (s) => s['time'] == time,
+            orElse: () => <String, dynamic>{},
           );
 
-          if (slotToDelete == null) return false;
-          if ((slotToDelete as Map<String, dynamic>)['bookedCount'] > 0) return false;
+          if (slotToDelete.isEmpty) return false;
+          if ((slotToDelete['bookedCount'] as int? ?? 0) > 0) return false;
 
-          slotsRaw.remove(slotToDelete);
-          tx.update(slotRef, {'slots': slotsRaw});
+          slots.removeWhere((s) => s['time'] == time);
+          tx.update(slotRef, {'slots': slots});
           return true;
         });
       });
@@ -185,25 +206,59 @@ class BookingSlotService {
       await _retry(() async {
         await _firestore.runTransaction((tx) async {
           final snapshot = await tx.get(slotRef);
-          if (!snapshot.exists) throw Exception('Slot document not found');
+          if (!snapshot.exists) {
+            // Auto-inisialisasi slot document jika belum ada di Firestore
+            const defaultTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '19:00'];
+            final List<Map<String, dynamic>> initialSlots = defaultTimes.map((t) => {
+              'time': t,
+              'capacity': 1,
+              'bookedCount': t == time ? 1 : 0,
+            }).toList();
+
+            if (!defaultTimes.contains(time)) {
+              initialSlots.add({
+                'time': time,
+                'capacity': 1,
+                'bookedCount': 1,
+              });
+            }
+            initialSlots.sort((a, b) => (a['time'] as String).compareTo(b['time'] as String));
+
+            tx.set(slotRef, {
+              'doulaId': doulaId,
+              'tanggal': tanggal,
+              'slots': initialSlots,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+            return;
+          }
 
           final slotsRaw = List<dynamic>.from(snapshot.data()!['slots'] ?? []);
-          final index = slotsRaw.indexWhere(
-            (s) => (s as Map<String, dynamic>)['time'] == time,
-          );
+          final slots = slotsRaw.map(_normalizeSlot).toList();
+          final index = slots.indexWhere((s) => s['time'] == time);
 
-          if (index < 0) throw Exception('Slot not found');
+          if (index < 0) {
+            // Slot waktu belum tercatat, tambahkan dengan bookedCount = 1
+            slots.add({
+              'time': time,
+              'capacity': 1,
+              'bookedCount': 1,
+            });
+            slots.sort((a, b) => (a['time'] as String).compareTo(b['time'] as String));
+            tx.update(slotRef, {'slots': slots});
+            return;
+          }
 
-          final slot = slotsRaw[index] as Map<String, dynamic>;
-          final bookedCount = (slot['bookedCount'] as int?) ?? 0;
-          final capacity = (slot['capacity'] as int?) ?? 1;
+          final slot = slots[index];
+          final bookedCount = slot['bookedCount'] as int;
+          final capacity = slot['capacity'] as int;
 
           if (bookedCount >= capacity) {
             throw Exception('Slot is full');
           }
 
-          slotsRaw[index]['bookedCount'] = bookedCount + 1;
-          tx.update(slotRef, {'slots': slotsRaw});
+          slots[index]['bookedCount'] = bookedCount + 1;
+          tx.update(slotRef, {'slots': slots});
         });
       });
       return true;
@@ -229,15 +284,13 @@ class BookingSlotService {
           if (!snapshot.exists) return;
 
           final slotsRaw = List<dynamic>.from(snapshot.data()!['slots'] ?? []);
-          final index = slotsRaw.indexWhere(
-            (s) => (s as Map<String, dynamic>)['time'] == time,
-          );
+          final slots = slotsRaw.map(_normalizeSlot).toList();
+          final index = slots.indexWhere((s) => s['time'] == time);
 
           if (index >= 0) {
-            final current = (slotsRaw[index] as Map<String, dynamic>)['bookedCount'] ?? 0;
-            final currentInt = (current as int? ?? 0);
-            slotsRaw[index]['bookedCount'] = currentInt > 0 ? currentInt - 1 : 0;
-            tx.update(slotRef, {'slots': slotsRaw});
+            final current = slots[index]['bookedCount'] as int;
+            slots[index]['bookedCount'] = current > 0 ? current - 1 : 0;
+            tx.update(slotRef, {'slots': slots});
           }
         });
       });
@@ -261,7 +314,8 @@ class BookingSlotService {
             .where('status', whereIn: ['confirmed', 'ongoing', 'completed'])
             .get());
         booked[tgl] = snapshot.docs
-            .map((doc) => doc['jam'] as String)
+            .map((doc) => doc.data()['jam']?.toString() ?? '')
+            .where((j) => j.isNotEmpty)
             .toList();
       }
     } catch (e) {

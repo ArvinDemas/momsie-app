@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>LEGAL & REGULATORY COMPLIANCE NOTICE - DATA PRIVACY & PAYMENT GATEWAY SECURITY</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  @page {
+    size: A4;
+    margin: 16mm 16mm 16mm 16mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #0f172a;
+    line-height: 1.55;
+    font-size: 9.5pt;
+    background: #ffffff;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Header Formal Korporasi */
+  .corp-header {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .corp-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 17pt;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #0f172a;
+  }
+
+  .corp-tagline {
+    font-size: 8pt;
+    font-weight: 600;
+    color: #475569;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .corp-meta {
+    text-align: right;
+    font-size: 7.5pt;
+    color: #64748b;
+    line-height: 1.4;
+  }
+
+  .corp-meta strong {
+    color: #0f172a;
+  }
+
+  /* Title Block */
+  .title-block {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .doc-classification {
+    font-size: 7pt;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #38bdf8;
+    margin-bottom: 3px;
+  }
+
+  .doc-title {
+    font-size: 11.5pt;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .doc-subtitle {
+    font-size: 8pt;
+    color: #cbd5e1;
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  /* Notice Banner */
+  .notice-banner {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-left: 4px solid #0284c7;
+    padding: 9px 12px;
+    margin-bottom: 14px;
+    font-size: 8.5pt;
+    color: #1e293b;
+    text-align: justify;
+  }
+
+  h2 {
+    font-size: 10pt;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  p {
+    font-size: 8.5pt;
+    text-align: justify;
+    margin-bottom: 7px;
+    color: #334155;
+  }
+
+  ul, ol {
+    margin-left: 16px;
+    margin-bottom: 8px;
+    font-size: 8.5pt;
+    color: #334155;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  strong {
+    color: #0f172a;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 12px 0;
+    font-size: 8pt;
+  }
+
+  th, td {
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 7.5pt;
+    letter-spacing: 0.3px;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 7pt;
+    font-weight: 700;
+    border-radius: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge-allowed {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+  }
+
+  .badge-restricted {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  .badge-masked {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+
+  /* Legal Clauses */
+  .clause-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+
+  .clause-title {
+    font-weight: 700;
+    font-size: 8.5pt;
+    color: #0f172a;
+    margin-bottom: 3px;
+  }
+
+  .clause-ref {
+    font-size: 7.5pt;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  /* Script Box */
+  .defense-quote {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 3px solid #0f172a;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 8.2pt;
+    line-height: 1.5;
+    color: #1e293b;
+  }
+
+  .quote-label {
+    font-weight: 800;
+    font-size: 7.5pt;
+    color: #0284c7;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  /* Footer */
+  .page-footer {
+    margin-top: 14px;
+    padding-top: 6px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 7pt;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== HALAMAN 1 ==================== -->
+<div class="corp-header">
+  <div>
+    <div class="corp-brand">MOMSIE PLATFORM</div>
+    <div class="corp-tagline">Maternal Care & Certified Doula Digital Ecosystem</div>
+  </div>
+  <div class="corp-meta">
+    Dokumen ID: <strong>MMS-LGL-2026-COMP-01</strong><br>
+    Merchant ID: <strong>M885831496 (Midtrans Production)</strong><br>
+    Klasifikasi: <strong>RESTRICTED / REGULATORY COMPLIANCE</strong>
+  </div>
+</div>
+
+<div class="title-block">
+  <div class="doc-classification">LEGAL COMPLIANCE NOTICE & DATA DISCLOSURE PROTOCOL</div>
+  <div class="doc-title">KEPATUHAN REGULASI PELINDUNGAN DATA PRIBADI & KEAMANAN SISTEM PEMBAYARAN ELEKTRONIK</div>
+  <div class="doc-subtitle">Dasar Hukum: UU No. 27/2022 (UU PDP), PBI No. 23/6/PBI/2021, Standar PCI-DSS, & Ketentuan Merchant PT Midtrans</div>
+</div>
+
+<div class="notice-banner">
+  <strong>TUJUAN DOKUMEN:</strong> Dokumen kepatuhan resmi ini diterbitkan untuk menjamin akuntabilitas pembuktian transaksi dan omzet platform kepada Tim Evaluator, Dewan Juri Investasi/Kompetisi, dan Auditor Independen, dengan tetap mematuhi batasan hukum ketat perundang-undangan nasional Republik Indonesia mengenai kerahasiaan data kesehatan konsumen dan standar keamanan payment gateway.
+</div>
+
+<h2>1. DASAR HUKUM PERLINDUNGAN DATA & KEAMANAN TRANSAKSI</h2>
+
+<div class="clause-box">
+  <div class="clause-title">A. UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</div>
+  <div class="clause-ref">Pasal 4 ayat (2) huruf e, Pasal 16, Pasal 36, Pasal 65 ayat (2), dan Pasal 67 ayat (2)</div>
+  <p>
+    1. <strong>Klasifikasi Data Spesifik:</strong> Data kehamilan, rekam pendampingan medis persalinan, dan riwayat kesehatan maternal dalam platform Momsie diklasifikasikan sebagai <em>Data Pribadi yang Bersifat Spesifik</em> (Pasal 4 ayat 2 huruf e).<br>
+    2. <strong>Kewajiban Kerahasiaan Mutlak:</strong> Pengendali Data Pribadi wajib menjaga kerahasiaan dan integritas data spesifik (Pasal 36).<br>
+    3. <strong>Sanksi Pidana Pembocoran:</strong> Setiap pihak yang dengan sengaja dan melawan hukum mengungkapkan data pribadi yang bukan miliknya diancam pidana penjara paling lama <strong>4 (empat) tahun</strong> dan/atau denda paling banyak <strong>Rp 4.000.000.000,-</strong> (Pasal 67 ayat 2).
+  </p>
+</div>
+
+<div class="clause-box">
+  <div class="clause-title">B. Peraturan Bank Indonesia (PBI) No. 23/6/PBI/2021 & Standar PCI-DSS</div>
+  <div class="clause-ref">Ketentuan Penyelenggaraan Jasa Pembayaran (PJP) & Payment Card Industry Data Security Standard</div>
+  <p>
+    1. <strong>Pengamanan API Key:</strong> Pengguna sistem payment gateway (Merchant) berkewajiban menerapkan perlindungan kriptografi pada kunci otentikasi (<em>Server Key / Secret Key</em>).<br>
+    2. <strong>Larangan Pembocoran Server Key:</strong> Pengungkapan <em>Server Key</em> kepada pihak luar membuka kerentanan <em>man-in-the-middle</em>, manipulasi status notifikasi webhook, dan risiko *chargeback fraud*. Hal ini dilarang keras berdasarkan regulasi keamanan sistem pembayaran digital.
+  </p>
+</div>
+
+<div class="clause-box">
+  <div class="clause-title">C. Perjanjian Merchant PT Midtrans (GoTo Financial)</div>
+  <div class="clause-ref">Midtrans Merchant Terms of Use - Security and Confidentiality Obligations (Merchant ID: M885831496)</div>
+  <p>
+    Merchant terikat secara hukum untuk menjaga kerahasiaan kredensial API. Pembocoran kredensial produksi dapat menyebabkan terminasi sepihak akun merchant serta pembekuan saldo settlement oleh pihak penyedia jasa pembayaran.
+  </p>
+</div>
+
+<div class="page-footer">
+  <span>LEGAL NOTICE &bull; MOMSIE INDONESIA &bull; MERCHANT ID: M885831496</span>
+  <span>Halaman 1 dari 2</span>
+</div>
+
+<!-- ==================== HALAMAN 2 ==================== -->
+<div class="page-break"></div>
+
+<div class="corp-header">
+  <div>
+    <div class="corp-brand">MOMSIE PLATFORM</div>
+    <div class="corp-tagline">Protokol Verifikasi Audit & Due Diligence</div>
+  </div>
+  <div class="corp-meta">
+    Merchant ID: <strong>M885831496</strong><br>
+    Environment: <strong>Production (Live API)</strong>
+  </div>
+</div>
+
+<h2>2. PROTOKOL PENGUNGKAPAN DATA TRANSAKSI KEPADA DEWAN JURI & AUDITOR</h2>
+<p>Dalam proses *due diligence* atau penjurian, pembuktian keabsahan traksi keuangan dilakukan sesuai matriks kepatuhan berikut:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 28%;">Komponen Sistem</th>
+      <th style="width: 17%;">Status Akses</th>
+      <th style="width: 55%;">Instrumen Pembuktian Sah & Batasan Hukum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Daftar Transaksi Midtrans<br>(Menu: Transactions)</strong></td>
+      <td><span class="badge badge-allowed">DAPAT DIAUDIT</span></td>
+      <td><strong>Tampilan Resmi Live:</strong> Menampilkan Order ID (<code>TRX-***</code>), timestamp, nominal (Gross Amount), channel pembayaran (QRIS, GoPay, VA), dan status <strong>Settlement</strong>. Membuktikan uang nyata masuk.</td>
+    </tr>
+    <tr>
+      <td><strong>Laporan Resmi Settlement<br>(Export Official Report)</strong></td>
+      <td><span class="badge badge-allowed">DOKUMEN RESMI</span></td>
+      <td>Laporan PDF/CSV resmi yang diunduh langsung dari sistem Midtrans dengan header PT Midtrans, memuat rincian MDR, PPN, dan net payout ke merchant.</td>
+    </tr>
+    <tr>
+      <td><strong>Mutasi Rekening Bank<br>(Bank Account Statement)</strong></td>
+      <td><span class="badge badge-allowed">VALIDASI REKONSILIASI</span></td>
+      <td>Dapat ditunjukkan dengan menyamarkan digit tengah nomor rekening. Membuktikan transfer berkala dari <em>PT Midtrans / PT Veritrans Indonesia</em> ke rekening operasional tim.</td>
+    </tr>
+    <tr>
+      <td><strong>Kredensial Server Key<br>(Menu: Access Keys)</strong></td>
+      <td><span class="badge badge-restricted">DILARANG KERAS</span></td>
+      <td><strong>Kerahasiaan Sistem Tertinggi (PCI-DSS & BI):</strong> Tidak boleh ditampilkan ke proyektor/layar publik demi mencegah eksploitasi API dan manipulasi akun merchant.</td>
+    </tr>
+    <tr>
+      <td><strong>Identitas Pelanggan (PII)<br>& Rekam Medis Maternal</strong></td>
+      <td><span class="badge badge-masked">WAJIB DISAMARKAN</span></td>
+      <td>Sesuai Pasal 16 & 28 UU PDP, identitas ibu hamil (nama lengkap, WhatsApp, riwayat obstetri) wajib disamarkan (contoh: <code>adna****@gmail.com</code>). Keaslian diverifikasi melalui Order ID Midtrans.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. VERBATIM DEFENSE STATEMENT UNTUK SESI PENJURIAN STARTUP</h2>
+<p>Pernyataan verbal resmi yang digunakan tim founder ketika diminta membuka dashboard atau data transaksi mentah:</p>
+
+<div class="defense-quote">
+  <div class="quote-label">1. Pertahanan Akses Dashboard Midtrans:</div>
+  "Untuk membuktikan traksi pasar secara transparan, kami dengan terbuka menampilkan tab <strong>Transactions</strong> pada dashboard Midtrans Production kami. Di sini tertera status <strong>Settlement</strong> (pembayaran riil telah diverifikasi bank/e-wallet) beserta Order ID resmi. Namun, sesuai klausul kepatuhan standar <strong>PCI-DSS</strong> dan Perjanjian Merchant Midtrans, kami tidak membuka tab <strong>Access Keys</strong> demi menjaga kerahasiaan <em>Server Key Production</em> dari potensi kebocoran kredensial."
+</div>
+
+<div class="defense-quote">
+  <div class="quote-label">2. Pertahanan Privasi Data Medis & Kontak Pasien:</div>
+  "Berdasarkan <strong>Pasal 4 ayat (2) UU PDP No. 27 Tahun 2022</strong>, riwayat kesehatan maternal dan kontak ibu hamil diklasifikasikan sebagai <em>Data Pribadi Spesifik</em> dengan konsekuensi pidana apabila diungkapkan tanpa persetujuan subjek data. Oleh karena itu, laporan traksi kami sajikan dengan <strong>penyamaran PII (Data Masking)</strong>, di mana keabsahannya dapat diverifikasi silang (*cross-reconciled*) secara 1:1 melalui Order ID di log Midtrans dan mutasi perbankan resmi."
+</div>
+
+<div class="defense-quote">
+  <div class="quote-label">3. Validitas Transaksi Riil vs Transaksi Dummy:</div>
+  "Seluruh transaksi diproses pada lingkungan <strong>Production Midtrans (Merchant ID: M885831496)</strong> menggunakan kanal berizin Bank Indonesia dengan potongan biaya transaksi MDR riil, bukan simulasi sandbox. Rekonsiliasi tiga arah (*three-way reconciliation*) antara Order ID sistem, settlement Midtrans, dan mutasi perbankan membuktikan integritas traksi finansial kami."
+</div>
+
+<div class="page-footer">
+  <span>LEGAL NOTICE &bull; MOMSIE INDONESIA &bull; MERCHANT ID: M885831496 &bull; DOKUMEN SAH KEPATUHAN AUDIT</span>
+  <span>Halaman 2 dari 2</span>
+</div>
+
+</body>
+</html>

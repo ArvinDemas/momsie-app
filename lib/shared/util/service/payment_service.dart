@@ -66,8 +66,9 @@ class PaymentService {
     required String metodePembayaran,
   }) async {
     final user = _auth.currentUser;
-    final String txId = 'TRX-${const Uuid().v4().substring(0, 8).toUpperCase()}';
-    final String bookingId = 'BKG-${const Uuid().v4().substring(0, 8).toUpperCase()}';
+    final String txId = 'TRX-${DateTime.now().millisecondsSinceEpoch}-${const Uuid().v4().substring(0, 4).toUpperCase()}';
+    final bool isExistingBooking = booking.id.isNotEmpty;
+    final String bookingId = isExistingBooking ? booking.id : 'BKG-${const Uuid().v4().substring(0, 8).toUpperCase()}';
 
     // Hitung split payment
     final split = PaymentService.calculateSplit(booking.hargaLayanan);
@@ -90,8 +91,8 @@ class PaymentService {
     final finalBooking = BookingModel(
       id: bookingId,
       transactionId: txId,
-      userId: user?.uid ?? 'guest',
-      namaUser: user?.displayName ?? user?.email ?? 'Pengguna',
+      userId: user?.uid ?? (booking.userId.isNotEmpty ? booking.userId : 'guest'),
+      namaUser: user?.displayName ?? (booking.namaUser.isNotEmpty ? booking.namaUser : 'Pengguna'),
       doulaUid: booking.doulaUid,
       doulaName: booking.doulaName,
       doulaPhoto: booking.doulaPhoto,
@@ -112,8 +113,8 @@ class PaymentService {
     );
 
     bool hasReserved = false;
-    // Atomic slot reservation for scheduled bookings
-    if (booking.doulaUid.isNotEmpty && booking.tanggal.isNotEmpty && booking.jam.isNotEmpty) {
+    // Atomic slot reservation for scheduled bookings (hanya untuk booking baru yang belum pernah reserve slot)
+    if (!isExistingBooking && booking.doulaUid.isNotEmpty && booking.tanggal.isNotEmpty && booking.jam.isNotEmpty) {
       final reserved = await BookingSlotService().incrementBookedCount(
         doulaId: booking.doulaUid,
         tanggal: booking.tanggal,
@@ -128,7 +129,14 @@ class PaymentService {
     try {
       final batch = _db.batch();
       batch.set(_db.collection(_collection).doc(txId), transaksi.toMap());
-      batch.set(_db.collection('bookings').doc(bookingId), finalBooking.toMap());
+      if (isExistingBooking) {
+        batch.update(_db.collection('bookings').doc(bookingId), {
+          'transactionId': txId,
+          'status': 'pending',
+        });
+      } else {
+        batch.set(_db.collection('bookings').doc(bookingId), finalBooking.toMap());
+      }
       await batch.commit();
     } catch (e) {
       if (hasReserved) {
