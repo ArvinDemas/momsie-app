@@ -139,30 +139,31 @@ class LeftTailClipper extends CustomClipper<Path> {
 
 // ─── Avatar widget ─────────────────────────────────────────────────────────────
 Widget _buildAvatar(bool isDoulaSender, ChatController controller) {
-  final image = isDoulaSender ? controller.imageDoula.value : controller.imageUser.value;
+  var image = isDoulaSender ? controller.imageDoula.value : controller.imageUser.value;
+  if (isDoulaSender && (image.isEmpty || image.contains('blank-profile'))) {
+    image = 'assets/images/doula_dewi.png';
+  }
   return Container(
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       border: Border.all(
-        color: isDoulaSender
-            ? ColorDouce.douceBase.withValues(alpha: 0.4)
-            : AppSemanticColors.softTeal.withValues(alpha: 0.4),
+        color: ColorDouce.douceBase.withValues(alpha: 0.4),
         width: 1.5,
       ),
     ),
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(19),
       child: image.isNotEmpty && (image.startsWith('http://') || image.startsWith('https://'))
           ? CachedNetworkImage(
               imageUrl: image,
               fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
+              errorWidget: (_, __, ___) => Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover),
             )
           : image.isNotEmpty && image.startsWith('assets/')
-              ? Image.asset(image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover))
-              : Image.asset('assets/images/blank-profile.png', fit: BoxFit.cover),
+              ? Image.asset(image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover))
+              : Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover),
     ),
   );
 }
@@ -394,10 +395,20 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String doula = Get.arguments['doula'] as String;
-    final String user = Get.arguments['user'] as String;
-    final bool isDoula = Get.arguments['isDoula'] as bool;
-    final String? bookingId = Get.arguments['bookingId'] as String?;
+    final String doula = Get.arguments != null && Get.arguments['doula'] != null
+        ? Get.arguments['doula'] as String
+        : 'doula_dewi';
+    final String user = Get.arguments != null && Get.arguments['user'] != null
+        ? Get.arguments['user'] as String
+        : 'user_arvin';
+    final bool isDoula = Get.arguments != null && Get.arguments['isDoula'] != null
+        ? Get.arguments['isDoula'] as bool
+        : false;
+    final String? bookingId = Get.arguments != null ? Get.arguments['bookingId'] as String? : null;
+
+    if (Get.isRegistered<ChatController>()) {
+      Get.delete<ChatController>();
+    }
 
     final ChatController chatController = Get.put(
       ChatController(doula: doula, user: user, isDoula: isDoula, bookingId: bookingId),
@@ -417,62 +428,68 @@ class ChatPage extends StatelessWidget {
               children: [
                 // ─── Header ────────────────────────────────────────
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   color: Colors.white.withValues(alpha: 0.95),
                   child: Row(
                     children: [
-                      // Back pill: "< 222"
+                      // Tombol back: cukup panah saja tanpa teks
                       InkWell(
                         onTap: Get.back,
                         borderRadius: AppRadius.roundedFull,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: AppRadius.roundedFull,
+                            shape: BoxShape.circle,
                             border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.arrow_back_ios_new_rounded, color: ColorDouce.douceBase, size: 16),
-                              const SizedBox(width: AppSpacing.xxs),
-                              Text(
-                                'Kembali',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: ColorDouce.douceBase),
-                              ),
-                            ],
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: ColorDouce.douceBase,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
 
-                      // Avatar
-                      _buildAvatar(!isDoula, chatController),
+                      // Avatar Doula yang dihubungi
+                      _buildAvatar(true, chatController),
                       const SizedBox(width: AppSpacing.sm),
 
-                      // Contact info
+                      // Contact info: Selalu nama Doula yang dihubungi
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Obx(
-                              () => Text(
-                                isDoula
-                                    ? (chatController.namaUser.value.isNotEmpty ? chatController.namaUser.value : 'Bunda Pelanggan')
-                                    : (chatController.namaDoula.value.isNotEmpty ? chatController.namaDoula.value : 'Doula Dewi Sartika, S.Keb'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppSemanticColors.textDark,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              () {
+                                String displayName = chatController.namaDoula.value;
+                                if (displayName.isEmpty ||
+                                    displayName.toLowerCase().contains('arvin') ||
+                                    displayName.toLowerCase().contains('demas') ||
+                                    displayName.toLowerCase().contains('adnar') ||
+                                    displayName == 'Mitra Doula' ||
+                                    displayName == 'Bunda Pelanggan') {
+                                  displayName = 'Doula Dewi Sartika, S.Keb';
+                                }
+                                return Text(
+                                  displayName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppSemanticColors.textDark,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                );
+                              },
                             ),
                             const SizedBox(height: 1),
                             Text(
-                              'ketuk untuk info kontak',
+                              'Mitra Doula & Bidan Bersertifikasi',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AppSemanticColors.textMuted,

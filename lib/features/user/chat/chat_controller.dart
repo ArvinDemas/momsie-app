@@ -150,16 +150,23 @@ class ChatController extends GetxController {
     try {
       final value = await firestore.collection('mitra').doc(doula).get();
       if (value.exists) {
-        imageDoula.value = value['image'] ?? '';
-        namaDoula.value = value['name'] ?? '';
+        final fetchedName = (value['name'] as String? ?? '').trim();
+        if (fetchedName.isNotEmpty &&
+            !fetchedName.toLowerCase().contains('arvin') &&
+            !fetchedName.toLowerCase().contains('demas') &&
+            !fetchedName.toLowerCase().contains('adnar')) {
+          namaDoula.value = fetchedName;
+          imageDoula.value = value['image'] ?? '';
+        }
       }
     } catch (_) {}
 
-    if (namaDoula.value.isEmpty) {
-      if (doula.toLowerCase().contains('dewi') || doula == 'doula_dewi') {
-        namaDoula.value = 'Doula Dewi Sartika, S.Keb';
-        imageDoula.value = 'assets/images/doula_dewi.png';
-      } else if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
+    if (namaDoula.value.isEmpty ||
+        namaDoula.value.toLowerCase().contains('arvin') ||
+        namaDoula.value.toLowerCase().contains('demas') ||
+        namaDoula.value.toLowerCase().contains('adnar') ||
+        namaDoula.value == 'Mitra Doula') {
+      if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
         namaDoula.value = 'Anastasia Mawardi';
         imageDoula.value = 'assets/images/blank-profile.png';
       } else {
