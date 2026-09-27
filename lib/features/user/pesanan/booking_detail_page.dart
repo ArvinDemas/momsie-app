@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:douce/shared/util/user_controller.dart';
 
 /// Halaman detail & tracking status pesanan doula.
 class BookingDetailPage extends StatefulWidget {
@@ -429,12 +430,23 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
         ],
         if (b.status == 'paid' || b.status == 'confirmed' || b.status == 'ongoing') ...[
           OutlinedButton(
-            onPressed: () => Get.toNamed('/chat-page', arguments: {
-              'doula': (b.doulaUid.isNotEmpty && b.doulaUid != 'doula_id_1') ? b.doulaUid : 'doula_dewi',
-              'user': b.userId.isNotEmpty ? b.userId : 'user_arvin',
-              'isDoula': false,
-              'bookingId': b.id,
-            }),
+            onPressed: () {
+              final userCtrl = Get.isRegistered<UserController>() ? Get.find<UserController>() : null;
+              final String myUid = userCtrl?.uid.value ?? '';
+              final String effectiveDoula = (b.doulaUid.isNotEmpty &&
+                      b.doulaUid != 'doula_id_1' &&
+                      b.doulaUid != myUid &&
+                      b.doulaUid != b.userId &&
+                      !b.doulaUid.toLowerCase().contains('arvin'))
+                  ? b.doulaUid
+                  : 'doula_dewi';
+              Get.toNamed('/chat-page', arguments: {
+                'doula': effectiveDoula,
+                'user': b.userId.isNotEmpty ? b.userId : (myUid.isNotEmpty ? myUid : 'user_arvin'),
+                'isDoula': false,
+                'bookingId': b.id,
+              });
+            },
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
               side: BorderSide(color: ColorDouce.douceBase),

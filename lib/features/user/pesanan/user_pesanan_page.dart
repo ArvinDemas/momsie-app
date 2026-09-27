@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:douce/shared/widget/themed_background.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:douce/shared/util/user_controller.dart';
 
 class UserPesananPage extends StatelessWidget {
   const UserPesananPage({super.key});
@@ -536,11 +537,19 @@ class UserPesananPage extends StatelessWidget {
         // Primary Action: Full-width Chat Konsultasi Doula
         InkWell(
           onTap: () {
+            final userCtrl = Get.isRegistered<UserController>() ? Get.find<UserController>() : null;
+            final String myUid = userCtrl?.uid.value ?? '';
+            final String effectiveDoula = (booking.doulaUid.isNotEmpty &&
+                    booking.doulaUid != 'doula_id_1' &&
+                    booking.doulaUid != myUid &&
+                    booking.doulaUid != booking.userId &&
+                    !booking.doulaUid.toLowerCase().contains('arvin'))
+                ? booking.doulaUid
+                : "doula_dewi";
+
             Get.toNamed('/chat-page', arguments: {
-              "doula": (booking.doulaUid.isNotEmpty && booking.doulaUid != 'doula_id_1')
-                  ? booking.doulaUid
-                  : "doula_dewi",
-              "user": booking.userId.isNotEmpty ? booking.userId : "user_arvin",
+              "doula": effectiveDoula,
+              "user": booking.userId.isNotEmpty ? booking.userId : (myUid.isNotEmpty ? myUid : "user_arvin"),
               "isDoula": false,
               "bookingId": booking.id,
             });

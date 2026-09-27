@@ -139,33 +139,55 @@ class LeftTailClipper extends CustomClipper<Path> {
 
 // ─── Avatar widget ─────────────────────────────────────────────────────────────
 Widget _buildAvatar(bool isDoulaSender, ChatController controller) {
-  var image = isDoulaSender ? controller.imageDoula.value : controller.imageUser.value;
-  if (isDoulaSender && (image.isEmpty || image.contains('blank-profile'))) {
-    image = 'assets/images/doula_dewi.png';
-  }
-  return Container(
-    width: 38,
-    height: 38,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      border: Border.all(
-        color: ColorDouce.douceBase.withValues(alpha: 0.4),
-        width: 1.5,
+  return Obx(() {
+    var image = isDoulaSender ? controller.imageDoula.value : controller.imageUser.value;
+    if (isDoulaSender &&
+        (image.isEmpty ||
+            image.contains('blank-profile') ||
+            image.contains('doula_dewi.png'))) {
+      image = 'assets/images/dewi_riana.jpg';
+    }
+
+    Widget imgWidget;
+    if (image.isNotEmpty && (image.startsWith('http://') || image.startsWith('https://'))) {
+      imgWidget = CachedNetworkImage(
+        imageUrl: image,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => Image.asset(
+          isDoulaSender ? 'assets/images/dewi_riana.jpg' : 'assets/images/blank-profile.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      final assetPath = image.isNotEmpty && image.startsWith('assets/') && !image.contains('doula_dewi.png')
+          ? image
+          : (isDoulaSender ? 'assets/images/dewi_riana.jpg' : 'assets/images/blank-profile.png');
+      imgWidget = Image.asset(
+        assetPath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          isDoulaSender ? 'assets/images/dewi_riana.jpg' : 'assets/images/blank-profile.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: ColorDouce.douceBase.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
       ),
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(19),
-      child: image.isNotEmpty && (image.startsWith('http://') || image.startsWith('https://'))
-          ? CachedNetworkImage(
-              imageUrl: image,
-              fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover),
-            )
-          : image.isNotEmpty && image.startsWith('assets/')
-              ? Image.asset(image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover))
-              : Image.asset('assets/images/doula_dewi.png', fit: BoxFit.cover),
-    ),
-  );
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: imgWidget,
+      ),
+    );
+  });
 }
 
 // ─── Message bubble ────────────────────────────────────────────────────────────
@@ -395,16 +417,26 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String doula = Get.arguments != null && Get.arguments['doula'] != null
+    String doula = Get.arguments != null && Get.arguments['doula'] != null
         ? Get.arguments['doula'] as String
         : 'doula_dewi';
-    final String user = Get.arguments != null && Get.arguments['user'] != null
+    String user = Get.arguments != null && Get.arguments['user'] != null
         ? Get.arguments['user'] as String
         : 'user_arvin';
     final bool isDoula = Get.arguments != null && Get.arguments['isDoula'] != null
         ? Get.arguments['isDoula'] as bool
         : false;
     final String? bookingId = Get.arguments != null ? Get.arguments['bookingId'] as String? : null;
+
+    if (!isDoula) {
+      if (doula.isEmpty ||
+          doula == user ||
+          doula == 'doula_id_1' ||
+          doula.toLowerCase().contains('arvin') ||
+          doula.toLowerCase().contains('adnar')) {
+        doula = 'doula_dewi';
+      }
+    }
 
     if (Get.isRegistered<ChatController>()) {
       Get.delete<ChatController>();
@@ -455,18 +487,32 @@ class ChatPage extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.sm),
 
-                      // Avatar Doula yang dihubungi
-                      _buildAvatar(true, chatController),
+                      // Avatar: Doula jika dipandang user, atau User jika dipandang doula
+                      _buildAvatar(!isDoula, chatController),
                       const SizedBox(width: AppSpacing.sm),
 
-                      // Contact info: Selalu nama Doula yang dihubungi
+                      // Contact info: Selalu nama Doula yang dihubungi jika !isDoula
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Obx(
                               () {
-                                String displayName = chatController.namaDoula.value;
+                                if (isDoula) {
+                                  final name = chatController.namaUser.value.trim();
+                                  return Text(
+                                    name.isNotEmpty ? name : 'Bunda Pelanggan',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppSemanticColors.textDark,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                }
+
+                                String displayName = chatController.namaDoula.value.trim();
                                 if (displayName.isEmpty ||
                                     displayName.toLowerCase().contains('arvin') ||
                                     displayName.toLowerCase().contains('demas') ||
@@ -489,7 +535,7 @@ class ChatPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 1),
                             Text(
-                              'Mitra Doula & Bidan Bersertifikasi',
+                              isDoula ? 'Pasien / Pelanggan Konsultasi' : 'Mitra Doula & Bidan Bersertifikasi',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: AppSemanticColors.textMuted,

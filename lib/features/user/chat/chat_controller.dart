@@ -147,32 +147,54 @@ class ChatController extends GetxController {
   StreamSubscription? _chatSubscription;
 
   Future<void> getData() async {
-    try {
-      final value = await firestore.collection('mitra').doc(doula).get();
-      if (value.exists) {
-        final fetchedName = (value['name'] as String? ?? '').trim();
-        if (fetchedName.isNotEmpty &&
-            !fetchedName.toLowerCase().contains('arvin') &&
-            !fetchedName.toLowerCase().contains('demas') &&
-            !fetchedName.toLowerCase().contains('adnar')) {
-          namaDoula.value = fetchedName;
-          imageDoula.value = value['image'] ?? '';
+    final bool isTargetingDewi = doula == 'doula_dewi' ||
+        doula.toLowerCase().contains('dewi') ||
+        doula == 'doula_id_1' ||
+        doula == user ||
+        doula.toLowerCase().contains('arvin') ||
+        doula.toLowerCase().contains('adnar');
+
+    if (isTargetingDewi) {
+      namaDoula.value = 'Doula Dewi Sartika, S.Keb';
+      imageDoula.value = 'assets/images/dewi_riana.jpg';
+    } else {
+      try {
+        final value = await firestore.collection('mitra').doc(doula).get();
+        if (value.exists) {
+          final fetchedName = (value['name'] as String? ?? '').trim();
+          final fetchedImg = (value['image'] as String? ?? '').trim();
+          if (fetchedName.isNotEmpty &&
+              !fetchedName.toLowerCase().contains('arvin') &&
+              !fetchedName.toLowerCase().contains('demas') &&
+              !fetchedName.toLowerCase().contains('adnar') &&
+              fetchedName != 'Mitra Doula' &&
+              fetchedName != 'Bunda Pelanggan') {
+            namaDoula.value = fetchedName;
+            imageDoula.value = fetchedImg.isNotEmpty ? fetchedImg : 'assets/images/dewi_riana.jpg';
+          }
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     if (namaDoula.value.isEmpty ||
         namaDoula.value.toLowerCase().contains('arvin') ||
         namaDoula.value.toLowerCase().contains('demas') ||
         namaDoula.value.toLowerCase().contains('adnar') ||
-        namaDoula.value == 'Mitra Doula') {
+        namaDoula.value == 'Mitra Doula' ||
+        namaDoula.value == 'Bunda Pelanggan') {
       if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
         namaDoula.value = 'Anastasia Mawardi';
         imageDoula.value = 'assets/images/blank-profile.png';
       } else {
         namaDoula.value = 'Doula Dewi Sartika, S.Keb';
-        imageDoula.value = 'assets/images/doula_dewi.png';
+        imageDoula.value = 'assets/images/dewi_riana.jpg';
       }
+    }
+
+    if (imageDoula.value.isEmpty ||
+        imageDoula.value.contains('doula_dewi.png') ||
+        imageDoula.value.contains('blank-profile')) {
+      imageDoula.value = 'assets/images/dewi_riana.jpg';
     }
 
     try {
@@ -351,14 +373,15 @@ class ChatController extends GetxController {
                 user.toLowerCase().contains('arvin');
 
             if (event.docs.isNotEmpty) {
-              final loaded = event.docs
-                  .map((e) => ChatModel(
-                    sender: e['sender'],
-                    message: e['message'] as String? ?? '',
-                    replyQuote: e['replyQuote'] as String?,
-                    time: e['time'] as Timestamp?,
-                  ))
-                  .toList();
+              final loaded = event.docs.map((e) {
+                final data = e.data();
+                return ChatModel(
+                  sender: (data['sender'] as String?) ?? '',
+                  message: (data['message'] as String?) ?? '',
+                  replyQuote: data['replyQuote'] as String?,
+                  time: data['time'] as Timestamp?,
+                );
+              }).toList();
 
               final hasOldNames = loaded.any((m) {
                 final lower = m.message.toLowerCase();

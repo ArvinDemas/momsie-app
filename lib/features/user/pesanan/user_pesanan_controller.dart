@@ -80,17 +80,19 @@ class UserPesananController extends GetxController {
 
           final effectiveDoulaName = (b.doulaName.isEmpty ||
                   b.doulaName == 'Mitra Doula' ||
-                  b.doulaName.toLowerCase().contains('arvin'))
+                  b.doulaName.toLowerCase().contains('arvin') ||
+                  b.doulaName == userCtrl.username.value)
               ? 'Doula Dewi Sartika, S.Keb'
               : b.doulaName;
 
-          final effectiveDoulaUid = (b.doulaUid.isEmpty || b.doulaUid == 'doula_id_1')
+          final effectiveDoulaUid = (b.doulaUid.isEmpty ||
+                  b.doulaUid == 'doula_id_1' ||
+                  b.doulaUid == uid ||
+                  b.doulaUid.toLowerCase().contains('arvin'))
               ? 'doula_dewi'
               : b.doulaUid;
 
-          final effectiveDoulaPhoto = b.doulaPhoto.isNotEmpty
-              ? b.doulaPhoto
-              : 'assets/images/doula_dewi.png';
+          final effectiveDoulaPhoto = 'assets/images/dewi_riana.jpg';
 
           final effectiveDoulaJob = b.doulaJob.isNotEmpty
               ? b.doulaJob
@@ -100,7 +102,8 @@ class UserPesananController extends GetxController {
           if (b.id.isNotEmpty &&
               (b.layanan != effectiveLayanan ||
                   b.doulaName != effectiveDoulaName ||
-                  b.doulaUid != effectiveDoulaUid)) {
+                  b.doulaUid != effectiveDoulaUid ||
+                  b.doulaPhoto != effectiveDoulaPhoto)) {
             FirebaseFirestore.instance.collection('bookings').doc(b.id).update({
               'layanan': effectiveLayanan,
               'doulaName': effectiveDoulaName,
