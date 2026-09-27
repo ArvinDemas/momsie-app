@@ -36,18 +36,15 @@ class MitraPendapatanController extends GetxController {
   bool get isAnastasiaUser {
     if (!Get.isRegistered<UserController>()) return false;
     final userCtrl = Get.find<UserController>();
-    final email = userCtrl.email.value.toLowerCase();
-    final uid = userCtrl.uid.value.toLowerCase();
-    final username = userCtrl.username.value.toLowerCase();
-    final doulaUsername = userCtrl.doulaUsername.value.toLowerCase();
-    final isKnownDemo = email.contains('anastasia') ||
-        email.contains('dewi') ||
-        email.contains('laily') ||
-        email.contains('erny') ||
-        email.contains('agustin') ||
-        email.contains('karisma') ||
-        uid.startsWith('doula_');
-    return isKnownDemo || (userCtrl.isDoula.value && (email.isEmpty || email.contains('anastasia')));
+    final email = userCtrl.email.value.toLowerCase().trim();
+    final uid = userCtrl.uid.value.toLowerCase().trim();
+    final username = userCtrl.username.value.toLowerCase().trim();
+    final doulaUsername = userCtrl.doulaUsername.value.toLowerCase().trim();
+    return email == 'anastasia@momsie.id' ||
+        email.contains('anastasia') ||
+        doulaUsername.contains('anastasia') ||
+        username.contains('anastasia') ||
+        uid == 'doula_anastasia';
   }
 
   static List<WithdrawalModel> getAnastasiaDemoWithdrawals([String? dUid, String? dName]) {

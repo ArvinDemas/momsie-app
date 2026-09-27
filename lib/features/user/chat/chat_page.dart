@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:douce/features/user/chat/chat_controller.dart';
 import 'package:douce/features/user/chat/chat_model.dart';
+import 'package:douce/shared/data/dummy_data.dart';
 import 'package:douce/shared/theme/color.dart';
 import 'package:douce/shared/theme/design_system.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +146,8 @@ Widget _buildAvatar(bool isDoulaSender, ChatController controller) {
         (image.isEmpty ||
             image.contains('blank-profile') ||
             image.contains('doula_dewi.png'))) {
-      image = 'assets/images/dewi_riana.jpg';
+      final dummyMatch = DummyData.doulas.firstWhereOrNull((d) => d.uid == controller.doula);
+      image = dummyMatch?.image ?? 'assets/images/dewi_riana.jpg';
     }
 
     Widget imgWidget;
@@ -516,10 +518,10 @@ class ChatPage extends StatelessWidget {
                                 if (displayName.isEmpty ||
                                     displayName.toLowerCase().contains('arvin') ||
                                     displayName.toLowerCase().contains('demas') ||
-                                    displayName.toLowerCase().contains('adnar') ||
                                     displayName == 'Mitra Doula' ||
                                     displayName == 'Bunda Pelanggan') {
-                                  displayName = 'Doula Dewi Sartika, S.Keb';
+                                  final dummyMatch = DummyData.doulas.firstWhereOrNull((d) => d.uid == doula);
+                                  displayName = dummyMatch?.name ?? (doula == 'doula_dewi' ? 'Doula Dewi Sartika, S.Keb' : 'Mitra Doula');
                                 }
                                 return Text(
                                   displayName,
@@ -666,6 +668,51 @@ class ChatPage extends StatelessWidget {
                                 child: const Text('Kembali'),
                               ),
                             ],
+                          ),
+                        );
+                      }
+                      if (chatController.messages.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: ColorDouce.douceBase.withValues(alpha: 0.15),
+                                        blurRadius: 16,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(Icons.chat_bubble_outline_rounded, size: 38, color: ColorDouce.douceBase),
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                const Text(
+                                  'Mulai Sesi Konsultasi',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppSemanticColors.textDark,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  'Kirim pesan atau pertanyaan Anda di bawah untuk mulai berdiskusi.',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppSemanticColors.textSecondary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }

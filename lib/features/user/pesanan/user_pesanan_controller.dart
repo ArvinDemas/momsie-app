@@ -58,19 +58,28 @@ class UserPesananController extends GetxController {
       // Sort by createdAt descending
       all.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      final myUserBookings = all.where((b) =>
-        b.userId == uid ||
-        userCtrl.email.value == 'adnaryama1@gmail.com' ||
-        b.namaUser.toLowerCase().contains('arvin')
-      ).toList();
+      final email = userCtrl.email.value.toLowerCase().trim();
+      final isAdnarUser = email == 'adnaryama1@gmail.com' ||
+          email.contains('adnaryama') ||
+          email.contains('arvindemas');
 
-      final rawTargetList = myUserBookings.isNotEmpty ? myUserBookings : all;
+      final List<BookingModel> myUserBookings;
+      if (isAdnarUser) {
+        myUserBookings = all.where((b) =>
+          b.userId == uid ||
+          email == 'adnaryama1@gmail.com' ||
+          b.namaUser.toLowerCase().contains('arvin')
+        ).toList();
+      } else {
+        // Real user on Play Store: STRICTLY their own bookings by uid!
+        myUserBookings = all.where((b) => b.userId == uid).toList();
+      }
+
+      final rawTargetList = isAdnarUser
+          ? (myUserBookings.isNotEmpty ? myUserBookings : all)
+          : myUserBookings;
 
       final targetList = rawTargetList.map((b) {
-        final isAdnarUser = b.userId == uid ||
-            userCtrl.email.value == 'adnaryama1@gmail.com' ||
-            b.namaUser.toLowerCase().contains('arvin');
-
         if (isAdnarUser) {
           final effectiveLayanan = (b.layanan.isEmpty ||
                   b.layanan.toLowerCase().contains('arvin') ||
@@ -97,21 +106,6 @@ class UserPesananController extends GetxController {
           final effectiveDoulaJob = b.doulaJob.isNotEmpty
               ? b.doulaJob
               : 'Doula & Bidan Bersertifikasi';
-
-          // Proactively fix Firestore record if needed
-          if (b.id.isNotEmpty &&
-              (b.layanan != effectiveLayanan ||
-                  b.doulaName != effectiveDoulaName ||
-                  b.doulaUid != effectiveDoulaUid ||
-                  b.doulaPhoto != effectiveDoulaPhoto)) {
-            FirebaseFirestore.instance.collection('bookings').doc(b.id).update({
-              'layanan': effectiveLayanan,
-              'doulaName': effectiveDoulaName,
-              'doulaUid': effectiveDoulaUid,
-              'doulaPhoto': effectiveDoulaPhoto,
-              'doulaJob': effectiveDoulaJob,
-            }).catchError((_) {});
-          }
 
           return BookingModel(
             id: b.id,

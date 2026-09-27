@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:douce/features/user/chat/chat_model.dart';
+import 'package:douce/shared/data/dummy_data.dart';
+import 'package:douce/shared/util/user_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -70,9 +72,16 @@ class ChatController extends GetxController {
       }
 
       // Validasi 2: untuk scheduled services, cek waktu slot (dikecualikan untuk ongoing, layanan chat/konsultasi, atau akun demo)
-      final isDemoUser = user.toLowerCase().contains('adnar') ||
+      final email = Get.isRegistered<UserController>()
+          ? Get.find<UserController>().email.value.toLowerCase().trim()
+          : '';
+      final isDemoUser = email == 'adnaryama1@gmail.com' ||
+          email.contains('adnaryama') ||
+          user.toLowerCase().contains('adnar') ||
           user.toLowerCase().contains('arvin') ||
-          doula.toLowerCase().contains('dewi');
+          user == 'user_arvin' ||
+          email.contains('anastasia') ||
+          doula.toLowerCase().contains('anastasia');
       final isChatConsultation = layanan.toLowerCase().contains('chat') ||
           layanan.toLowerCase().contains('konsultasi');
 
@@ -147,26 +156,26 @@ class ChatController extends GetxController {
   StreamSubscription? _chatSubscription;
 
   Future<void> getData() async {
-    final bool isTargetingDewi = doula == 'doula_dewi' ||
-        doula.toLowerCase().contains('dewi') ||
-        doula == 'doula_id_1' ||
-        doula == user ||
-        doula.toLowerCase().contains('arvin') ||
-        doula.toLowerCase().contains('adnar');
+    final email = Get.isRegistered<UserController>()
+        ? Get.find<UserController>().email.value.toLowerCase().trim()
+        : '';
+    final isAdnarDemo = email == 'adnaryama1@gmail.com' ||
+        email.contains('adnaryama') ||
+        user.toLowerCase().contains('adnar') ||
+        user.toLowerCase().contains('arvin') ||
+        user == 'user_arvin';
 
-    if (isTargetingDewi) {
+    if (isAdnarDemo && (doula == 'doula_dewi' || doula == 'doula_id_1' || doula == user)) {
       namaDoula.value = 'Doula Dewi Sartika, S.Keb';
       imageDoula.value = 'assets/images/dewi_riana.jpg';
     } else {
+      // 1. Try Firestore mitra collection
       try {
         final value = await firestore.collection('mitra').doc(doula).get();
         if (value.exists) {
           final fetchedName = (value['name'] as String? ?? '').trim();
           final fetchedImg = (value['image'] as String? ?? '').trim();
           if (fetchedName.isNotEmpty &&
-              !fetchedName.toLowerCase().contains('arvin') &&
-              !fetchedName.toLowerCase().contains('demas') &&
-              !fetchedName.toLowerCase().contains('adnar') &&
               fetchedName != 'Mitra Doula' &&
               fetchedName != 'Bunda Pelanggan') {
             namaDoula.value = fetchedName;
@@ -174,26 +183,27 @@ class ChatController extends GetxController {
           }
         }
       } catch (_) {}
-    }
 
-    if (namaDoula.value.isEmpty ||
-        namaDoula.value.toLowerCase().contains('arvin') ||
-        namaDoula.value.toLowerCase().contains('demas') ||
-        namaDoula.value.toLowerCase().contains('adnar') ||
-        namaDoula.value == 'Mitra Doula' ||
-        namaDoula.value == 'Bunda Pelanggan') {
-      if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
-        namaDoula.value = 'Anastasia Mawardi';
-        imageDoula.value = 'assets/images/blank-profile.png';
-      } else {
-        namaDoula.value = 'Doula Dewi Sartika, S.Keb';
-        imageDoula.value = 'assets/images/dewi_riana.jpg';
+      // 2. If still empty, check DummyData.doulas
+      if (namaDoula.value.isEmpty || namaDoula.value == 'Mitra Doula') {
+        final dummyMatch = DummyData.doulas.firstWhereOrNull((d) => d.uid == doula);
+        if (dummyMatch != null) {
+          namaDoula.value = dummyMatch.name;
+          imageDoula.value = dummyMatch.image;
+        } else if (doula == 'doula_dewi' || doula.toLowerCase().contains('dewi')) {
+          namaDoula.value = 'Doula Dewi Sartika, S.Keb';
+          imageDoula.value = 'assets/images/dewi_riana.jpg';
+        } else if (doula.toLowerCase().contains('anastasia') || doula == 'doula_anastasia') {
+          namaDoula.value = 'Anastasia Mawardi';
+          imageDoula.value = 'assets/images/blank-profile.png';
+        } else {
+          namaDoula.value = 'Mitra Doula';
+          imageDoula.value = 'assets/images/dewi_riana.jpg';
+        }
       }
     }
 
-    if (imageDoula.value.isEmpty ||
-        imageDoula.value.contains('doula_dewi.png') ||
-        imageDoula.value.contains('blank-profile')) {
+    if (imageDoula.value.isEmpty || imageDoula.value.contains('doula_dewi.png')) {
       imageDoula.value = 'assets/images/dewi_riana.jpg';
     }
 
@@ -206,25 +216,23 @@ class ChatController extends GetxController {
     } catch (_) {}
 
     if (namaUser.value.isEmpty) {
-      if (user.toLowerCase().contains('arvin') || user.toLowerCase().contains('adnar')) {
+      if (isAdnarDemo) {
         namaUser.value = 'Arvin Demas Naryama';
-        imageUser.value = 'assets/images/blank-profile.png';
       } else if (user == 'user_nadia') {
         namaUser.value = 'Bunda Nadia Salsabila';
-        imageUser.value = 'assets/images/blank-profile.png';
       } else if (user == 'user_clarissa') {
         namaUser.value = 'Bunda Clarissa Putri';
-        imageUser.value = 'assets/images/blank-profile.png';
       } else if (user == 'user_sarah') {
         namaUser.value = 'Bunda Sarah Larasati';
-        imageUser.value = 'assets/images/blank-profile.png';
       } else if (user == 'user_rina') {
         namaUser.value = 'Bunda Rina Anggraini';
-        imageUser.value = 'assets/images/blank-profile.png';
+      } else if (Get.isRegistered<UserController>()) {
+        final regName = Get.find<UserController>().username.value.trim();
+        namaUser.value = regName.isNotEmpty ? regName : 'Bunda Pelanggan';
       } else {
-        namaUser.value = 'Arvin Demas Naryama';
-        imageUser.value = 'assets/images/blank-profile.png';
+        namaUser.value = 'Bunda Pelanggan';
       }
+      imageUser.value = 'assets/images/blank-profile.png';
     }
   }
 
@@ -232,11 +240,17 @@ class ChatController extends GetxController {
     if (messages.isNotEmpty) return;
     final now = DateTime.now();
 
-    final isDewiDemo = doula.toLowerCase().contains('dewi') ||
-        user.toLowerCase().contains('adnar') ||
-        user.toLowerCase().contains('arvin');
+    final email = Get.isRegistered<UserController>()
+        ? Get.find<UserController>().email.value.toLowerCase().trim()
+        : '';
+    final isAdnarDemo = (email == 'adnaryama1@gmail.com' ||
+            email.contains('adnaryama') ||
+            user.toLowerCase().contains('adnar') ||
+            user.toLowerCase().contains('arvin') ||
+            user == 'user_arvin') &&
+        (doula == 'doula_dewi' || doula.toLowerCase().contains('dewi'));
 
-    if (isDewiDemo) {
+    if (isAdnarDemo) {
       messages.value = [
         ChatModel(
           sender: user,
@@ -368,9 +382,19 @@ class ChatController extends GetxController {
           .orderBy('time', descending: false)
           .snapshots()
           .listen((event) {
-            final isDewiDemo = doula.toLowerCase().contains('dewi') ||
-                user.toLowerCase().contains('adnar') ||
-                user.toLowerCase().contains('arvin');
+            final email = Get.isRegistered<UserController>()
+                ? Get.find<UserController>().email.value.toLowerCase().trim()
+                : '';
+            final isAdnarDemo = (email == 'adnaryama1@gmail.com' ||
+                    email.contains('adnaryama') ||
+                    user.toLowerCase().contains('adnar') ||
+                    user.toLowerCase().contains('arvin') ||
+                    user == 'user_arvin') &&
+                (doula == 'doula_dewi' || doula.toLowerCase().contains('dewi'));
+
+            final isAnastasiaDemo = (email.contains('anastasia') ||
+                    doula.toLowerCase().contains('anastasia')) &&
+                (user.toLowerCase().contains('nadia') || user == 'user_nadia');
 
             if (event.docs.isNotEmpty) {
               final loaded = event.docs.map((e) {
@@ -383,30 +407,37 @@ class ChatController extends GetxController {
                 );
               }).toList();
 
-              final hasOldNames = loaded.any((m) {
-                final lower = m.message.toLowerCase();
-                return lower.contains('arvin') ||
-                    lower.contains('nadia') ||
-                    lower.contains('clarissa') ||
-                    lower.contains('anastasia') ||
-                    lower.contains('dewi');
-              });
+              if (isAdnarDemo) {
+                final hasOldNames = loaded.any((m) {
+                  final lower = m.message.toLowerCase();
+                  return lower.contains('arvin') ||
+                      lower.contains('nadia') ||
+                      lower.contains('clarissa') ||
+                      lower.contains('anastasia') ||
+                      lower.contains('dewi');
+                });
 
-              if (isDewiDemo && (loaded.length < 5 || hasOldNames)) {
-                _loadDemoMessages();
-                _seedDemoMessagesToFirestore();
-              } else {
-                messages.value = loaded;
+                if (loaded.length < 5 || hasOldNames) {
+                  _loadDemoMessages();
+                  _seedDemoMessagesToFirestore();
+                  return;
+                }
               }
+
+              messages.value = loaded;
             } else {
-              _loadDemoMessages();
-              if (isDewiDemo) {
-                _seedDemoMessagesToFirestore();
+              if (isAdnarDemo || isAnastasiaDemo) {
+                _loadDemoMessages();
+                if (isAdnarDemo) {
+                  _seedDemoMessagesToFirestore();
+                }
+              } else {
+                // Real user: clean empty messages
+                messages.value = [];
               }
             }
       }, onError: (e) {
         debugPrint('Chat error: $e');
-        _loadDemoMessages();
       });
     } catch (e) {
       debugPrint('Chat error: $e');
