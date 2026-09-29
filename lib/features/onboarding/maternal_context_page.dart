@@ -16,7 +16,7 @@ class _MaternalContextPageState extends State<MaternalContextPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animCtrl;
   late final Animation<double> _fadeAnim;
-  late final Animation<double> _slideAnim;
+  late final Animation<Offset> _slideAnim;
   int _currentStep = 0;
   final List<String> _roles = [
     'Ibu Hamil / Bunda',
@@ -46,10 +46,11 @@ class _MaternalContextPageState extends State<MaternalContextPage>
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animCtrl, curve: Curves.easeInOut),
     );
-    _slideAnim = Tween<double>(begin: 30.0, end: 0.0).animate(
+    _slideAnim = Tween<Offset>(begin: const Offset(0.08, 0.0), end: Offset.zero).animate(
       CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
     );
     _animCtrl.forward();
+
   }
 
   @override
@@ -151,15 +152,12 @@ class _MaternalContextPageState extends State<MaternalContextPage>
                 child: FadeTransition(
                   opacity: _fadeAnim,
                   child: SlideTransition(
-                    textDirection: TextDirection.ltr,
-                    position: Tween<Offset>(
-                      begin: const Offset(0.15, 0.0),
-                      end: Offset.zero,
-                    ).animate(_slideAnim),
+                    position: _slideAnim,
                     child: _buildStepContent(),
                   ),
                 ),
               ),
+
 
               // Bottom action area
               Padding(
@@ -378,30 +376,37 @@ class _StepQuestion extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Title
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: AppSemanticColors.textDarkSecondary,
-            height: 1.25,
-            fontFamily: AppTypography.fontFamily,
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppSemanticColors.textDarkSecondary,
+              height: 1.25,
+              fontFamily: AppTypography.fontFamily,
+            ),
           ),
         ),
         const SizedBox(height: 8),
 
         // Subtitle
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppSemanticColors.textSecondary,
-            height: 1.5,
-            fontFamily: AppTypography.fontFamily,
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppSemanticColors.textSecondary,
+              height: 1.5,
+              fontFamily: AppTypography.fontFamily,
+            ),
           ),
         ),
+
         const SizedBox(height: 32),
 
         // Options
@@ -435,7 +440,9 @@ class _OptionCard extends StatelessWidget {
           borderRadius: AppRadius.roundedLg,
           child: AnimatedContainer(
             duration: AppAnimation.fast,
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
+
             decoration: BoxDecoration(
               color: isSelected
                   ? ColorDouce.douceBase.withValues(alpha: 0.1)
