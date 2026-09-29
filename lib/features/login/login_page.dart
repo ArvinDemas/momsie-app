@@ -312,7 +312,7 @@ class LoginPage extends StatelessWidget {
                             ),
                           );
                         } else {
-                          final isSelected = loginController.selectedDemoEmail.value == "test@momsie.id";
+                          final isSelected = loginController.selectedDemoEmail.value == "tester@momsie.com" || loginController.selectedDemoEmail.value == "test@momsie.id";
                           return Container(
                             margin: const EdgeInsets.only(top: 2, bottom: 8),
                             child: Row(
@@ -330,10 +330,11 @@ class LoginPage extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 InkWell(
                                   onTap: () {
-                                    loginController.selectedDemoEmail.value = "test@momsie.id";
-                                    loginController.emailController.text = "test@momsie.id";
+                                    loginController.selectedDemoEmail.value = "tester@momsie.com";
+                                    loginController.emailController.text = "tester@momsie.com";
                                     loginController.passwordController.text = "momsie123";
                                   },
+
                                   borderRadius: BorderRadius.circular(20),
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

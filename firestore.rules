@@ -141,5 +141,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuth();
     }
+
+    // ─── EXPO VISITORS (Buku Tamu Digital Ekspo P2MW 2026 - Publik Read & Write) ──
+    match /expo_visitors/{visitorId} {
+      allow read, write: if true;
+    }
   }
 }

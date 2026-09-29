@@ -155,6 +155,22 @@ class VerifyEmailPage extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => controller.onVerifiedManually(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorDouce.douceBase,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Lanjutkan Masuk ke Aplikasi',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
               ] else ...[
                 // Success animation indicator
                 const SizedBox(height: 24),

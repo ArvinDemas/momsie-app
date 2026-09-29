@@ -56,11 +56,19 @@ class SplashController extends GetxController {
         userDoc['isDoula'],
       );
 
-      // Cek email verified
-      if (!user.emailVerified) {
+      // Cek email verified (Bypass untuk akun tester / reviewer / demo)
+      final emailLow = (user.email ?? '').toLowerCase();
+      final bool bypassEmailVerification = emailLow.contains('test') ||
+          emailLow.contains('demo') ||
+          emailLow.contains('reviewer') ||
+          emailLow.endsWith('@momsie.com') ||
+          emailLow.endsWith('@momsie.id');
+
+      if (!user.emailVerified && !bypassEmailVerification) {
         Get.offNamed('/verify-email');
         return;
       }
+
 
       // Cek mode aktif terakhir yang disimpan di SharedPreferences
       final prefs = await SharedPreferences.getInstance();

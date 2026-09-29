@@ -31,23 +31,72 @@ class LoginController extends GetxController {
     }
 
     // Doula & User Demo Pre-configured Accounts (Instant Test Login)
-    if (trimmedEmail.toLowerCase() == 'test@momsie.id' || trimmedEmail.toLowerCase() == 'ibu.hamil@momsie.id') {
+    final String lowEmail = trimmedEmail.toLowerCase();
+    final bool isUserDemoEmail = lowEmail == 'tester@momsie.com' ||
+        lowEmail == 'test@momsie.com' ||
+        lowEmail == 'tester@momsie.id' ||
+        lowEmail == 'test@momsie.id' ||
+        lowEmail == 'ibu.hamil@momsie.id' ||
+        lowEmail == 'google.reviewer@momsie.com' ||
+        lowEmail == 'reviewer@momsie.com';
+
+    if (isUserDemoEmail) {
       final UserController userController = Get.isRegistered<UserController>()
           ? Get.find<UserController>()
           : Get.put(UserController(), permanent: true);
-      userController.setUser(
-        'Bunda Test',
-        trimmedEmail,
-        'test-uid-123',
-        'assets/images/blank-profile.png',
-        false, // isDoula
-      );
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('is_logged_in', true);
-      await prefs.setBool('is_doula', false);
-      Get.offAllNamed(AppRoutes.user);
-      return;
+
+      final bool asDoula = isDoulaLogin.value;
+      if (asDoula) {
+        final doulaObj = DummyData.doulas.first;
+        userController.setUser(
+          doulaObj.name,
+          trimmedEmail,
+          doulaObj.uid,
+          doulaObj.image,
+          true, // isDoula
+        );
+        userController.setDoula(
+          doulaObj.name,
+          doulaObj.alamat,
+          'Daerah Istimewa Yogyakarta',
+          doulaObj.biografi,
+          doulaObj.image,
+          doulaObj.jenisKelamin,
+          '3404123456780001',
+        );
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('is_logged_in', true);
+        await prefs.setBool('is_doula', true);
+        await prefs.setString('doula_email', trimmedEmail);
+        await prefs.setString('doula_name', doulaObj.name);
+        await prefs.setString('doula_uid', doulaObj.uid);
+        await prefs.setString('doula_image', doulaObj.image);
+
+        if (Get.isRegistered<MitraPekerjaanController>()) {
+          Get.find<MitraPekerjaanController>().applyAnastasiaDemo(doulaObj);
+        }
+        if (Get.isRegistered<MitraPendapatanController>()) {
+          Get.find<MitraPendapatanController>().applyAnastasiaDemo();
+        }
+        Get.offAllNamed(AppRoutes.mitra);
+        return;
+      } else {
+        userController.setUser(
+          'Bunda Test',
+          trimmedEmail,
+          'test-uid-123',
+          'assets/images/blank-profile.png',
+          false, // isDoula
+        );
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('is_logged_in', true);
+        await prefs.setBool('is_doula', false);
+        await prefs.setBool('has_completed_maternal_context', true);
+        Get.offAllNamed(AppRoutes.user);
+        return;
+      }
     }
+
 
     final List<String> testDoulaEmails = [
       'anastasia.doula@momsie.id',
@@ -127,11 +176,18 @@ class LoginController extends GetxController {
         userDoc['isDoula'],
       );
 
-      // Cek email verified sebelum masuk
-      if (!userCredential.user!.emailVerified) {
+      // Cek email verified sebelum masuk (Bypass untuk akun tester / reviewer / demo)
+      final bool bypassEmailVerification = lowEmail.contains('test') ||
+          lowEmail.contains('demo') ||
+          lowEmail.contains('reviewer') ||
+          lowEmail.endsWith('@momsie.com') ||
+          lowEmail.endsWith('@momsie.id');
+
+      if (!userCredential.user!.emailVerified && !bypassEmailVerification) {
         Get.offNamed(AppRoutes.verifyEmail);
         return;
       }
+
 
       final bool isDoulaRole = isDoulaLogin.value || (userDoc['isDoula'] == true);
       if (isDoulaRole) {
